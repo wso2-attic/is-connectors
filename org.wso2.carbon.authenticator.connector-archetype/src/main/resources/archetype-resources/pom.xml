@@ -6,19 +6,24 @@
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}.${connector_name}</artifactId>
     <version>${version}</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>WSO2 Carbon - Mediation Library Connector For ${connector_name}</name>
     <url>http://wso2.org</url>
 
     <properties>
-        <internal>${artifactId}.</internal>
+        <!--Carbon identity version-->
+        <carbon.identity.version>4.2.0</carbon.identity.version>
+        <!-- Carbon kernel version -->
+        <carbon.kernel.version>4.2.0</carbon.kernel.version>
+        <amber.version>0.22.1358727.wso2v4</amber.version>
+        <commons-logging.version>4.2.0</commons-logging.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
-            <version>4.2.0</version>
+            <version>${commons-logging.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -28,33 +33,22 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ui</artifactId>
-            <version>4.2.0</version>
+            <version>${carbon.kernel.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.amber.wso2</groupId>
             <artifactId>amber</artifactId>
-            <version>0.22.1358727.wso2v4</version>
+            <version>${amber.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.application.common</artifactId>
-            <version>4.2.0</version>
+            <version>${carbon.identity.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.application.authenticator.oidc</artifactId>
-            <version>4.2.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.oltu.oauth2</groupId>
-            <artifactId>org.apache.oltu.oauth2.client</artifactId>
-            <version>0.31</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.oltu.oauth2</groupId>
-            <artifactId>org.apache.oltu.oauth2.common</artifactId>
-            <version>0.31</version>
+            <version>${carbon.identity.version}</version>
         </dependency>
     </dependencies>
 
@@ -72,7 +66,6 @@
     </repositories>
 
     <build>
-
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -102,7 +95,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package>org.wso2.carbon.connector.internal</Private-Package>
+                        <Private-Package>${package}.internal</Private-Package>
                         <Import-Package>org.apache.axis2.*,
                             org.apache.axiom.*,
                             org.wso2.carbon.ui.*,
@@ -113,8 +106,8 @@
                             javax.servlet.http,
                             *;resolution:=optional</Import-Package>
                         <Export-Package>
-                            !org.wso2.carbon.connector.internal,
-                            org.wso2.carbon.connector.*
+                            !${package}.internal,
+                            ${package}.*
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

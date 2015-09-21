@@ -41,9 +41,6 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
     /**
      * Check whether the authentication or logout request can be handled by the
      * authenticator
-     *
-     * @param request
-     * @return boolean
      */
     @Override
     public boolean canHandle(HttpServletRequest request) {
@@ -60,49 +57,44 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
                                                  HttpServletResponse response, AuthenticationContext context)
             throws AuthenticationFailedException {
         //Add you code here
-
     }
 
-
+    /**
+     * Get the configuration properties of UI
+     */
     @Override
     public List<Property> getConfigurationProperties() {
 
         List<Property> configProperties = new ArrayList<Property>();
-        //Add the property field name,description, etc in the property data type to display in the UI
-
+        //Add your code here for UI fields
         return configProperties;
     }
 
     /**
      * this method are overridden for extra claim request to ${connector_name} end-point
-     *
-     * @param request
-     * @param response
-     * @param context
-     * @throws AuthenticationFailedException
      */
     @Override
-    protected void processAuthenticationResponse(HttpServletRequest request,
-                                                 HttpServletResponse response, AuthenticationContext context)
-            throws AuthenticationFailedException {
+    protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
+        AuthenticationContext context) throws AuthenticationFailedException {
         try {
-            Map<String, String> authenticatorProperties = context
-                    .getAuthenticatorProperties();
+            Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
             //Add you code here
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new AuthenticationFailedException(e.getMessage(), e);
         }
     }
-
+    /**
+     * Get the friendly name of the Authenticator
+     * @return name
+     */
     @Override
     public String getFriendlyName() {
-        return "${connector_name}";
+        return "${connector_name} ";
     }
 
     /**
      * Get the name of the Authenticator
-     * @return name
      */
     @Override
     public String getName() {
