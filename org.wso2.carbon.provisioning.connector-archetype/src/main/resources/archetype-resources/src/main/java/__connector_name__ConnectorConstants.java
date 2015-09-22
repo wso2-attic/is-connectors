@@ -16,7 +16,9 @@
  *  under the License.
  *
  */
+
 package ${package};
 
-public class ${connector_name}Constants {
+public class ${connector_name}ConnectorConstants {
+    //Add the constants variables here
 }

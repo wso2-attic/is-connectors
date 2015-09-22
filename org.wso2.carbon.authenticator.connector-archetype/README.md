@@ -1,5 +1,7 @@
-#Build the maven template
-mvn clean install
+Authenticator Template
+
+#Build the this project
+org.wso2.carbon.authenticator.connector-archetype $mvn clean install
 
 #Run the following command to create the IS authenticator
 mvn archetype:generate
