@@ -38,7 +38,6 @@ public class ${connector_name}AuthenticatorServiceComponent {
         try {
             ${connector_name}Authenticator authenticator = new ${connector_name}Authenticator();
             Hashtable<String, String> props = new Hashtable<String, String>();
-
             ctxt.getBundleContext().registerService(ApplicationAuthenticator.class.getName(),
                     authenticator, props);
             if (log.isDebugEnabled()) {

@@ -16,6 +16,7 @@
  *  under the License.
  *
  */
+
 package ${package};
 
 public class ${connector_name}Constants {

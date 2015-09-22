@@ -37,8 +37,7 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
     private static Log log = LogFactory.getLog(${connector_name}Authenticator.class);
 
     /**
-     * Check whether the authentication or logout request can be handled by the
-     * authenticator
+     * Check whether the authentication or logout request can be handled by the authenticator
      */
     @Override
     public boolean canHandle(HttpServletRequest request) {
@@ -49,12 +48,14 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
         return false;
 
     }
-
+    /**
+     * initiate the authentication request
+     */
     @Override
     protected void initiateAuthenticationRequest(HttpServletRequest request,
                                                  HttpServletResponse response, AuthenticationContext context)
             throws AuthenticationFailedException {
-        //Add you code here
+        //Add you code here to initiate the request
     }
 
     /**
@@ -84,7 +85,6 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
     }
     /**
      * Get the friendly name of the Authenticator
-     * @return name
      */
     @Override
     public String getFriendlyName() {

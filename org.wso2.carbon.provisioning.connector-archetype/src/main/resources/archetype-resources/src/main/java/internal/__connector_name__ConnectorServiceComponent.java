@@ -41,7 +41,6 @@ public class ${connector_name}ConnectorServiceComponent {
         }
         try {
             ${connector_name}ProvisioningConnectorFactory provisioningConnectorFactory = new ${connector_name}ProvisioningConnectorFactory();
-
             context.getBundleContext().registerService(
                     AbstractProvisioningConnectorFactory.class.getName(),
                         provisioningConnectorFactory, null);

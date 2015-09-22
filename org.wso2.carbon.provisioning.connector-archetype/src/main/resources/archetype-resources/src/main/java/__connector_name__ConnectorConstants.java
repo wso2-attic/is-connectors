@@ -20,5 +20,5 @@
 package ${package};
 
 public class ${connector_name}ConnectorConstants {
-    //Add the constants variables here
+    //Add the constant variables here
 }
