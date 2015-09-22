@@ -7,7 +7,7 @@
     <artifactId>${artifactId}.${connector_name}</artifactId>
     <version>${version}</version>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - Mediation Library Connector For ${connector_name}</name>
+    <name>WSO2 Carbon - Authenticator Library Connector For ${connector_name}</name>
     <url>http://wso2.org</url>
 
     <properties>
