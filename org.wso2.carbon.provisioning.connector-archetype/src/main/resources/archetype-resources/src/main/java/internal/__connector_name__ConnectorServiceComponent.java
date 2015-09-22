@@ -35,7 +35,6 @@ public class ${connector_name}ConnectorServiceComponent {
     private static Log log = LogFactory.getLog(${connector_name}ConnectorServiceComponent.class);
 
     protected void activate(ComponentContext context) {
-
         if (log.isDebugEnabled()) {
             log.debug("Activating ${connector_name}ConnectorServiceComponent");
         }

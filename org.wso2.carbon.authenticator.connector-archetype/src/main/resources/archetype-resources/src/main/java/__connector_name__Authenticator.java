@@ -46,7 +46,6 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
         }
         //Add you code here
         return false;
-
     }
     /**
      * initiate the authentication request
@@ -63,7 +62,6 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
      */
     @Override
     public List<Property> getConfigurationProperties() {
-
         List<Property> configProperties = new ArrayList<Property>();
         //Add your code here for UI fields
         return configProperties;
