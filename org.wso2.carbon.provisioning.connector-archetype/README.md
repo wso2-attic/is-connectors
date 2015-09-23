@@ -1,13 +1,15 @@
-Provisioning Connector Template
+Product: Template for WSO2 IS Provisioning Connector
 
-#Build the this project
-org.wso2.carbon.provisioning.connector-archetype $mvn clean install
+STEPS:
 
-#Run the following command to create the IS provisioning connector
-mvn archetype:generate
-    -DarchetypeGroupId=org.wso2.carbon
-    -DarchetypeArtifactId=org.wso2.carbon.provisioning.connector-archetype
-    -DarchetypeVersion=4.2.0
-    -DgroupId=org.wso2.carbon.identity
-    -DartifactId=org.wso2.carbon.identity.provisioning.connector
-    -Dversion=4.2.0
+ 1. Navigate to "<IS_CONNECTORS_HOME>/org.wso2.carbon.provisioning.connector-archetype" and run the following command
+         mvn clean install
+
+ 2. Run the following command to create the IS authenticator
+        mvn archetype:generate
+            -DarchetypeGroupId=org.wso2.carbon
+            -DarchetypeArtifactId=org.wso2.carbon.provisioning.connector-archetype
+            -DarchetypeVersion=4.2.0
+            -DgroupId=org.wso2.carbon.identity
+            -DartifactId=org.wso2.carbon.identity.provisioning.connector
+            -Dversion=4.2.0
