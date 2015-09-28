@@ -32,6 +32,9 @@ import org.wso2.carbon.identity.application.authentication.framework.context.Aut
 import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
 import org.wso2.carbon.identity.application.common.model.Property;
 
+/**
+ * Authenticator of ${connector_name}
+ */
 public class ${connector_name}Authenticator extends AbstractApplicationAuthenticator {
 
     private static Log log = LogFactory.getLog(${connector_name}Authenticator.class);
