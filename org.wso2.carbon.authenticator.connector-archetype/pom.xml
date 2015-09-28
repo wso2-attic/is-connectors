@@ -23,7 +23,7 @@
     <version>4.2.0</version>
     <packaging>maven-archetype</packaging>
 
-    <name>WSO2 Carbon - Connector Archetype for Template</name>
+    <name>WSO2 Carbon - Authenticator Archetype for Template</name>
     <description>Platform Parent pom hold the properties, plugins which are required to build carbon components, carbon features and products</description>
     <url>http://wso2.org</url>
 

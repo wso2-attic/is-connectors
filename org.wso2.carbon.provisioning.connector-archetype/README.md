@@ -13,3 +13,7 @@ STEPS:
             -DgroupId=org.wso2.carbon.identity
             -DartifactId=org.wso2.carbon.identity.provisioning.connector
             -Dversion=4.2.0
+
+
+ 3. Enter the provisioning connector name after executing steps 1 & 2.
+    eg:- connector_name : : Salesforce

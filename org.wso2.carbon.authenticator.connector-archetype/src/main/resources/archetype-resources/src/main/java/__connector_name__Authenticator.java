@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -44,9 +44,10 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
         if (log.isTraceEnabled()) {
             log.trace("Inside ${connector_name}Authenticator.canHandle()");
         }
-        //Add you code here
+        //Add your code here
         return false;
     }
+
     /**
      * initiate the authentication request
      */
@@ -54,7 +55,7 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
     protected void initiateAuthenticationRequest(HttpServletRequest request,
                                                  HttpServletResponse response, AuthenticationContext context)
             throws AuthenticationFailedException {
-        //Add you code here to initiate the request
+        //Add your code here to initiate the request
     }
 
     /**
@@ -75,18 +76,19 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
         AuthenticationContext context) throws AuthenticationFailedException {
         try {
             Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
-            //Add you code here
+            //Add your code here
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new AuthenticationFailedException(e.getMessage(), e);
         }
     }
+
     /**
      * Get the friendly name of the Authenticator
      */
     @Override
     public String getFriendlyName() {
-        return "${connector_name} ";
+        return "${connector_name}";
     }
 
     /**
@@ -97,7 +99,11 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
         return "${connector_name}";
     }
 
+    /**
+     * Get the Context identifier sent with the request.
+     */
     public String getContextIdentifier(HttpServletRequest httpServletRequest) {
+        //Add your code here
         return null;
     }
 }
