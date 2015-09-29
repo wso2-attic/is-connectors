@@ -10,11 +10,11 @@ STEPS:
         -DarchetypeGroupId=org.wso2.carbon
         -DarchetypeArtifactId=org.wso2.carbon.authenticator.connector-archetype
         -DarchetypeVersion=4.2.0
-        -DgroupId=org.wso2.carbon.identity
+        -DgroupId=org.wso2.carbon.identity.authenticator
         -DartifactId=org.wso2.carbon.identity.authenticator
         -Dversion=1.0.0
 
- 3. Enter the authenticator name after executing steps 1 & 2. Please enter the connector name in upper camel case
+ 3. Enter the authenticator name after executing steps 1 & 2. Please enter the authenticator name in upper camel case
     eg:- connector_name : : LinkedIn
 
  4. Confirm the connector name

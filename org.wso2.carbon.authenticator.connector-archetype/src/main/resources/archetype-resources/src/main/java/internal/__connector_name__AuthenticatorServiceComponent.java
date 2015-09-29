@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -44,7 +44,7 @@ public class ${connector_name}AuthenticatorServiceComponent {
                 log.debug("${connector_name} authenticator is activated");
             }
         } catch (Throwable e) {
-            log.fatal("${connector_name} authenticator authenticator ", e);
+            log.fatal("Error while activating the ${connector_name} authenticator ", e);
         }
     }
 

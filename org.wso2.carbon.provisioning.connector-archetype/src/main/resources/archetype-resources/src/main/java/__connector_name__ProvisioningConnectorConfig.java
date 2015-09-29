@@ -23,12 +23,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.provisioning.IdentityProvisioningException;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class ${connector_name}ProvisioningConnectorConfig implements Serializable {
+public class ${connector_name}ProvisioningConnectorConfig {
 
     private static final Log log = LogFactory.getLog(${connector_name}ProvisioningConnectorConfig.class);
     private Properties configs;

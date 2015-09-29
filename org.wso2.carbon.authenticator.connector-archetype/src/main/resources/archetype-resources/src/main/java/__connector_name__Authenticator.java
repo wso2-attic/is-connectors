@@ -21,7 +21,6 @@ package ${package};
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,8 +43,8 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
      */
     @Override
     public boolean canHandle(HttpServletRequest request) {
-        if (log.isTraceEnabled()) {
-            log.trace("Inside ${connector_name}Authenticator.canHandle()");
+        if (log.isDebugEnabled()) {
+            log.debug("Inside ${connector_name}Authenticator.canHandle()");
         }
         //Add your code here
         return false;
@@ -72,18 +71,12 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
     }
 
     /**
-     * this method are overridden for extra claim request to ${connector_name} end-point
+     * Process the response of the ${connector_name} end-point
      */
     @Override
     protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
         AuthenticationContext context) throws AuthenticationFailedException {
-        try {
-            Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
-            //Add your code here
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
-        }
+        //Add your code here
     }
 
     /**
@@ -91,7 +84,7 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
      */
     @Override
     public String getFriendlyName() {
-        return "${connector_name}";
+        return ${connector_name}Constants.AUTHENTICATOR_FRIENDLY_NAME;
     }
 
     /**
@@ -99,7 +92,7 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
      */
     @Override
     public String getName() {
-        return "${connector_name}";
+        return ${connector_name}Constants.AUTHENTICATOR_NAME;
     }
 
     /**

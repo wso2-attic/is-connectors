@@ -20,4 +20,7 @@
 package ${package};
 
 public class ${connector_name}Constants {
+    public static final String AUTHENTICATOR_NAME = "${connector_name}";
+    public static final String AUTHENTICATOR_FRIENDLY_NAME = "${connector_name}";
+    //Add your constants here
 }

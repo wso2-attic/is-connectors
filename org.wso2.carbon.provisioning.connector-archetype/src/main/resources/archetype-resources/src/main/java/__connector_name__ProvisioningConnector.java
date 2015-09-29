@@ -60,20 +60,7 @@ public class ${connector_name}ProvisioningConnector extends AbstractOutboundProv
                 log.debug("JIT provisioning disabled for ${connector_name} connector");
                 return null;
             }
-
-            if (provisioningEntity.getEntityType() == ProvisioningEntityType.USER) {
-                if (provisioningEntity.getOperation() == ProvisioningOperation.DELETE) {
-                    deleteUser(provisioningEntity);
-                } else if (provisioningEntity.getOperation() == ProvisioningOperation.POST) {
-                    provisionedId = createUser(provisioningEntity);
-                } else if (provisioningEntity.getOperation() == ProvisioningOperation.PUT) {
-                    update(provisioningEntity.getIdentifier().getIdentifier());
-                } else {
-                    log.warn("Unsupported provisioning operation.");
-                }
-            } else {
-                log.warn("Unsupported provisioning operation.");
-            }
+            //Add your code here
         }
 
         // creates a provisioned identifier for the provisioned user.
@@ -81,68 +68,4 @@ public class ${connector_name}ProvisioningConnector extends AbstractOutboundProv
         identifier.setIdentifier(provisionedId);
         return identifier;
     }
-
-    /**
-     * Create the user
-     * @param provisioningEntity
-     * @return
-     * @throws IdentityProvisioningException
-     */
-    private String createUser(ProvisioningEntity provisioningEntity)
-            throws IdentityProvisioningException {
-        try {
-            //Add your code here to create the user
-        } catch (Exception e) {
-            log.error("Error while creating the user");
-            throw new IdentityProvisioningException(e);
-        }
-        return null;
-    }
-
-    /**
-     * Delete the user
-     * @param provisioningEntity
-     * @throws IdentityProvisioningException
-     */
-    private void deleteUser(ProvisioningEntity provisioningEntity)
-            throws IdentityProvisioningException {
-       try {
-            //Add your code here to delete the user
-        } catch (Exception e) {
-            log.error("Error while deleting the user");
-            throw new IdentityProvisioningException(e);
-        }
-    }
-
-    /**
-     * Update the user
-     * @param provsionedId
-     * @return
-     * @throws IdentityProvisioningException
-     */
-    private void update(String provsionedId)
-            throws IdentityProvisioningException {
-        try {
-        //Add your code to update the user
-        } catch (Exception e) {
-            log.error("Error while updating the user");
-            throw new IdentityProvisioningException(e);
-        }
-    }
-
-    /**
-     * List the users
-     * @return
-     * @throws IdentityProvisioningException
-     */
-    public String listUsers(String query) throws IdentityProvisioningException {
-        try {
-        //Add your code to list the user
-        } catch (Exception e) {
-            log.error("Error while listing the user");
-            throw new IdentityProvisioningException(e);
-        }
-        return null;
-    }
-
 }

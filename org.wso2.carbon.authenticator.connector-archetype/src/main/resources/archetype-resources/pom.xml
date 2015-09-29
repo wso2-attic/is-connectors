@@ -15,7 +15,8 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -23,7 +24,7 @@
     <artifactId>${artifactId}.${connector_name}</artifactId>
     <version>${version}</version>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - Authenticator Library Connector For ${connector_name}</name>
+    <name>WSO2 Carbon - Authenticator Library For ${connector_name}</name>
     <url>http://wso2.org</url>
 
     <properties>
@@ -31,7 +32,6 @@
         <carbon.identity.version>4.2.0</carbon.identity.version>
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.2.0</carbon.kernel.version>
-        <amber.version>0.22.1358727.wso2v4</amber.version>
         <commons-logging.version>4.2.0</commons-logging.version>
     </properties>
 
@@ -48,22 +48,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.ui</artifactId>
-            <version>${carbon.kernel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.amber.wso2</groupId>
-            <artifactId>amber</artifactId>
-            <version>${amber.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.application.common</artifactId>
-            <version>${carbon.identity.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.identity.application.authenticator.oidc</artifactId>
             <version>${carbon.identity.version}</version>
         </dependency>
     </dependencies>
@@ -120,12 +105,12 @@
                             org.wso2.carbon.identity.application.authentication.framework.*,
                             javax.servlet,
                             javax.servlet.http,
-                            *;resolution:=optional</Import-Package>
+                            *;resolution:=optional
+                        </Import-Package>
                         <Export-Package>
                             !${package}.internal,
                             ${package}.*
                         </Export-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>

@@ -53,7 +53,7 @@ public class ${connector_name}ProvisioningConnectorFactory extends AbstractProvi
     @Override
     public List<Property> getConfigurationProperties() {
         List<Property> configProperties = new ArrayList<Property>();
-        //add your code for the UI
+        //Add your code for the UI
         return configProperties;
     }
 

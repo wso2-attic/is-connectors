@@ -10,7 +10,7 @@ STEPS:
             -DarchetypeGroupId=org.wso2.carbon
             -DarchetypeArtifactId=org.wso2.carbon.provisioning.connector-archetype
             -DarchetypeVersion=4.2.0
-            -DgroupId=org.wso2.carbon.identity
+            -DgroupId=org.wso2.carbon.identity.provisioning.connector
             -DartifactId=org.wso2.carbon.identity.provisioning.connector
             -Dversion=1.0.0
 
