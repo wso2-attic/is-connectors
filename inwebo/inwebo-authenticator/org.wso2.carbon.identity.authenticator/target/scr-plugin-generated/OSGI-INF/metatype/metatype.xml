@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/metatype">
+    <OCD id="identity.application.authenticator.Inwebo.component" name="%identity.application.authenticator.Inwebo.component.name" description="%identity.application.authenticator.Inwebo.component.description"/>
+    <Designate pid="identity.application.authenticator.Inwebo.component">
+        <Object ocdref="identity.application.authenticator.Inwebo.component"/>
+    </Designate>
+</metatype:MetaData>
