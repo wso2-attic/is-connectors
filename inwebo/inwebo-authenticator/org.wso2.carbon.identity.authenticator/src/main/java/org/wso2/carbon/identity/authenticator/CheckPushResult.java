@@ -38,8 +38,8 @@ import java.security.SecureRandom;
 
 
 public class CheckPushResult {
-
     private static final Log log = LogFactory.getLog(CheckPushResult.class);
+
     private static String urlString = "https://api.myinwebo.com/FS?";
     private String serviceId;
     private String p12file;
@@ -156,7 +156,6 @@ public class CheckPushResult {
         } catch (Exception e) {
             json.put("err", "NOK:connection");
         }
-
         return json;
     }
 

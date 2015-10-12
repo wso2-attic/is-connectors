@@ -24,4 +24,5 @@ public class InweboConstants {
     public static final String INWEBO_P12FILE = "p12file";
     public static final String INWEBO_P12PASSWORD = "p12password";
     public static final String USER_ID = "UserId";
-    public static final String SERVICE_ID = "ServiceId";}
+    public static final String SERVICE_ID = "ServiceId";
+}

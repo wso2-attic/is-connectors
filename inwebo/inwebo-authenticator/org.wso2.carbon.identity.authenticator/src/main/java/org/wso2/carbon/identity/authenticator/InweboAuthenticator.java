@@ -77,9 +77,8 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
                 if (userId != null && serviceId != null && p12file != null && p12password != null) {
                     try {
                         CheckPushResult.setHttpsClientCert(p12file, p12password);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         log.error("Error while adding the certificate" + e.getMessage(), e);
-
                     }
                     PushREST push;
                     push = new PushREST(serviceId, p12file, p12password, userId);
@@ -125,7 +124,8 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         p12password.setDisplayName("P12Password");
         p12password.setRequired(true);
         p12password.setDescription("Enter your p12_password");
-        configProperties.add(p12password);        return configProperties;
+        configProperties.add(p12password);
+        return configProperties;
     }
 
     /**
@@ -133,7 +133,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
      */
     @Override
     protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
-        AuthenticationContext context) throws AuthenticationFailedException {
+                                                 AuthenticationContext context) throws AuthenticationFailedException {
     }
 
     /**

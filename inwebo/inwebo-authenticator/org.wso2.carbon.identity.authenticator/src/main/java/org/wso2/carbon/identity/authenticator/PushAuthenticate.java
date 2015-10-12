@@ -38,21 +38,22 @@ public class PushAuthenticate {
     private static final Log log = LogFactory.getLog(PushAuthenticate.class);
 
     private static String urlString = "https://api.myinwebo.com/FS?";
-	private String serviceId;
-	private String p12file;
-	private String p12password;
-	SSLContext context = null;
-	
-	public PushAuthenticate(String id, String p12file, String p12password) {
-		this.serviceId = id;
-		this.p12file = p12file;
-		this.p12password = p12password;		
-	}
-	
-	/**
+    private String serviceId;
+    private String p12file;
+    private String p12password;
+    SSLContext context = null;
+
+    public PushAuthenticate(String id, String p12file, String p12password) {
+        this.serviceId = id;
+        this.p12file = p12file;
+        this.p12password = p12password;
+    }
+
+    /**
      * Set the client certificate to Default SSL Context
-     * @param certificateFile		File containing certificate (PKCS12 format)
-     * @param certPassword			Password of certificate
+     *
+     * @param certificateFile File containing certificate (PKCS12 format)
+     * @param certPassword    Password of certificate
      * @throws Exception
      */
     public static SSLContext setHttpsClientCert(String certificateFile, String certPassword)
@@ -74,43 +75,42 @@ public class PushAuthenticate {
         SSLContext.setDefault(context);
         return context;
     }
-    
-    /**
-	 * Prompt for a login and an OTP and check if they are OK. 
-	 */
-	public JSONObject pushAuthenticate(String login)
-	{		
-		String urlParameters = null;
-		JSONObject json = null;
-		try {
-            urlParameters = "action=pushAuthenticate"
-					+ "&serviceId=" + URLEncoder.encode("" + serviceId, "UTF-8")
-					+ "&userId=" + URLEncoder.encode(login, "UTF-8")
-					+ "&format=json";
-		} catch (UnsupportedEncodingException e1) {
-            log.error("Error while adding the url" + e1.getMessage(), e1);
-			json.put("err", "NOK:params");
-		}
-	    try {
-	    	if (this.context == null) {
-	    		this.context = setHttpsClientCert(this.p12file, this.p12password);
-	    	}
-	    	SSLSocketFactory sslsocketfactory = context.getSocketFactory();
-	    	URL url = new URL(urlString + urlParameters);
-	    	HttpsURLConnection conn = (HttpsURLConnection)url.openConnection();
-	    	conn.setSSLSocketFactory(sslsocketfactory);
-	       	        
-	        conn.setRequestMethod("GET");
-	        InputStream is = conn.getInputStream();
-	        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-	        JSONParser parser = new JSONParser();
-	        json = (JSONObject) parser.parse(br);
 
-	    } catch (Exception e) {
-	         log.error("Error while process request");
-				json.put("err", "NOK:connection");
-	    }
-	    return json;
-	}
-	
+    /**
+     * Prompt for a login and an OTP and check if they are OK.
+     */
+    public JSONObject pushAuthenticate(String login) {
+        String urlParameters = null;
+        JSONObject json = null;
+        try {
+            urlParameters = "action=pushAuthenticate"
+                    + "&serviceId=" + URLEncoder.encode("" + serviceId, "UTF-8")
+                    + "&userId=" + URLEncoder.encode(login, "UTF-8")
+                    + "&format=json";
+        } catch (UnsupportedEncodingException e1) {
+            log.error("Error while adding the url" + e1.getMessage(), e1);
+            json.put("err", "NOK:params");
+        }
+        try {
+            if (this.context == null) {
+                this.context = setHttpsClientCert(this.p12file, this.p12password);
+            }
+            SSLSocketFactory sslsocketfactory = context.getSocketFactory();
+            URL url = new URL(urlString + urlParameters);
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setSSLSocketFactory(sslsocketfactory);
+
+            conn.setRequestMethod("GET");
+            InputStream is = conn.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            JSONParser parser = new JSONParser();
+            json = (JSONObject) parser.parse(br);
+
+        } catch (Exception e) {
+            log.error("Error while process request");
+            json.put("err", "NOK:connection");
+        }
+        return json;
+    }
+
 }
