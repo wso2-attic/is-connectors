@@ -44,7 +44,7 @@ public class CheckPushResult {
     private String serviceId;
     private String p12file;
     private String p12password;
-    SSLContext context = null;
+    private SSLContext context = null;
 
     public CheckPushResult(String id, String p12file, String p12password) {
         this.serviceId = id;
@@ -92,7 +92,7 @@ public class CheckPushResult {
                     + "&sessionId=" + URLEncoder.encode(sessionId, "UTF-8")
                     + "&format=json";
         } catch (UnsupportedEncodingException e1) {
-            e1.printStackTrace();
+            log.info("Error while encoding the Url" + e1.getMessage(), e1);
             json.put("err", "NOK:urlParams");
         }
         try {
@@ -118,10 +118,7 @@ public class CheckPushResult {
             } catch (IOException e) {
                 log.error("Error while creating the connection" + e.getMessage(), e);
             }
-            if (conn != null) {
-                conn.setSSLSocketFactory(sslsocketfactory);
-            }
-
+            conn.setSSLSocketFactory(sslsocketfactory);
             try {
                 if (conn != null) {
                     conn.setRequestMethod("GET");
@@ -143,15 +140,15 @@ public class CheckPushResult {
                     br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
                 }
             } catch (UnsupportedEncodingException e) {
-                log.error("Error while encoding the input");
+                log.error("Error while encoding the input" + e.getMessage(), e);
             }
             JSONParser parser = new JSONParser();
             try {
                 json = (JSONObject) parser.parse(br);
             } catch (IOException e) {
-                log.error("Error while parsing the json object ");
+                log.error("Error while getting response " + e.getMessage(), e);
             } catch (ParseException e) {
-                e.printStackTrace();
+                log.error("Error while parsing the json object " + e.getMessage(), e);
             }
         } catch (Exception e) {
             json.put("err", "NOK:connection");
