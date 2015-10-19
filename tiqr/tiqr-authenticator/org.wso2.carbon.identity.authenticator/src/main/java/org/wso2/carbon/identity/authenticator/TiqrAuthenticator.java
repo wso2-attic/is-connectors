@@ -240,7 +240,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 .get(TiqrConstants.TIQR_WAIT_TIME);
         if (userId != null && diaplayName != null && waitTime != null) {
             String formParameters = "uid=" + userId + "&displayName=" + diaplayName;
-            formParameters = formParameters.replaceAll(" ", "");
             String result = sendRESTCall(urlToEntrol, "", formParameters, "POST");
             try {
                 if (result.startsWith("Failed:")) {
