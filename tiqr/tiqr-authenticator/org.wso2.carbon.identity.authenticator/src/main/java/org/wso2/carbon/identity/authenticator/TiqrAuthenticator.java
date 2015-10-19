@@ -212,7 +212,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 context.setSubject("Enrolment process is failed");
                 throw new AuthenticationFailedException("Enrolment process is Failed");
             }
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             throw new AuthenticationFailedException(e.getMessage(), e);
         } finally {
             isCompleted = true;
@@ -305,7 +305,17 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 br.close();
             }
             connection.disconnect();
-        } catch (Exception e) {
+        } catch (ProtocolException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed: " + e.getMessage());
+            }
+            return "Failed: " + e.getMessage();
+        } catch (MalformedURLException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed: " + e.getMessage());
+            }
+            return "Failed: " + e.getMessage();
+        } catch (IOException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Failed: " + e.getMessage());
             }
