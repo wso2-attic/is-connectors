@@ -1,0 +1,28 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.identity.authenticator;uses:="org.wso2
+ .carbon.identity.application.common.model,org.apache.commons.logging,
+ org.wso2.carbon.identity.application.authentication.framework.context
+ ,org.wso2.carbon.identity.application.authentication.framework,org.ws
+ o2.carbon.identity.application.authentication.framework.exception,jav
+ ax.servlet.http";version="1.0.0"
+Service-Component: OSGI-INF/serviceComponents.xml
+Built-By: Shaki
+Tool: Bnd-1.43.0
+Bundle-Name: org.wso2.carbon.identity.authenticator.Tiqr
+Created-By: Apache Maven Bundle Plugin
+Build-Jdk: 1.7.0_79
+Bundle-Version: 1.0.0
+Bnd-LastModified: 1445248635585
+Bundle-ManifestVersion: 2
+Import-Package: javax.servlet;version="[2.6,3)",javax.servlet.http;ver
+ sion="[2.6,3)",org.apache.commons.logging;version="1.0.4",org.osgi.fr
+ amework;version="[1.7,2)",org.osgi.service.component;resolution:=opti
+ onal;version="[1.2,2)",org.wso2.carbon.identity.application.authentic
+ ation.framework;version="[4.2,5)",org.wso2.carbon.identity.applicatio
+ n.authentication.framework.context;version="[4.2,5)",org.wso2.carbon.
+ identity.application.authentication.framework.exception;version="[4.2
+ ,5)",org.wso2.carbon.identity.application.common.model;resolution:=op
+ tional;version="[4.2,5)",org.wso2.carbon.identity.authenticator;resol
+ ution:=optional
+Bundle-SymbolicName: org.wso2.carbon.identity.authenticator.Tiqr
+
