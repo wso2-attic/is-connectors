@@ -1,7 +1,7 @@
 Do the following:
 
 Navigate to tiqr-client/ by issuing the command mentioned below.
-cd tiqrClient
+cd tiqr-client
 
 Install dependencies using Composer:
 curl -sS https://getcomposer.org/installer | php
