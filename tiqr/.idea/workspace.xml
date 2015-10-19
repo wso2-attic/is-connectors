@@ -24,8 +24,8 @@
       <file leaf-file-name="TiqrAuthenticator.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tiqr-authenticator/org.wso2.carbon.identity.authenticator/src/main/java/org/wso2/carbon/identity/authenticator/TiqrAuthenticator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.32941177">
-              <caret line="229" column="29" selection-start-line="229" selection-start-column="29" selection-end-line="229" selection-end-column="29" />
+            <state vertical-scroll-proportion="8.258823">
+              <caret line="234" column="47" selection-start-line="234" selection-start-column="47" selection-end-line="234" selection-end-column="47" />
               <folding>
                 <element signature="e#0#15760#0" expanded="true" />
                 <element signature="imports" expanded="true" />
@@ -445,8 +445,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/tiqr-authenticator/org.wso2.carbon.identity.authenticator/src/main/java/org/wso2/carbon/identity/authenticator/TiqrAuthenticator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.32941177">
-          <caret line="229" column="29" selection-start-line="229" selection-start-column="29" selection-end-line="229" selection-end-column="29" />
+        <state vertical-scroll-proportion="8.258823">
+          <caret line="234" column="47" selection-start-line="234" selection-start-column="47" selection-end-line="234" selection-end-column="47" />
           <folding>
             <element signature="e#0#15760#0" expanded="true" />
             <element signature="imports" expanded="true" />
