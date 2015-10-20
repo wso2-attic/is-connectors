@@ -110,7 +110,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
         } finally {
             isCompleted = false;
         }
-        return;
     }
 
     /**
@@ -284,12 +283,9 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
      */
     private String sendRESTCall(String url, String urlParameters, String formParameters, String httpMethod) {
         String line;
-        StringBuffer responseString = new StringBuffer();
+        StringBuilder responseString = new StringBuilder();
         try {
             URL tiqrEP = new URL(url + urlParameters);
-
-            String encodedData = formParameters;
-
             HttpURLConnection connection = (HttpURLConnection) tiqrEP.openConnection();
             connection.setDoInput(true);
             connection.setDoOutput(true);
@@ -297,7 +293,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             if (httpMethod.toUpperCase().equals("POST")) {
                 OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
-                writer.write(encodedData);
+                writer.write(formParameters);
                 writer.close();
             }
             if (connection.getResponseCode() == 200) {
@@ -324,8 +320,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             }
             return "Failed: " + e.getMessage();
         }
-        String rs = responseString.toString();
-        return rs;
+        return responseString.toString();
     }
 
     /**
@@ -334,7 +329,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
     private void postContent(HttpServletResponse response, String image)
             throws IOException {
         response.setContentType("text/html");
-        PrintWriter out = null;
+        PrintWriter out;
         try {
             out = response.getWriter();
             response.setIntHeader("Refresh", 1);
