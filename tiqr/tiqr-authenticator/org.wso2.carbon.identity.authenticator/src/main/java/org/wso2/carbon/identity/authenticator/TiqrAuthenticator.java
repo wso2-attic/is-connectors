@@ -28,9 +28,11 @@ import java.lang.Integer;
 import java.net.*;
 import java.util.*;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.application.authentication.framework.AbstractApplicationAuthenticator;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
 import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
 import org.wso2.carbon.identity.application.common.model.Property;
@@ -53,11 +55,12 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
     public AuthenticatorFlowStatus process(HttpServletRequest request, HttpServletResponse response,
                                            AuthenticationContext context)
             throws AuthenticationFailedException, LogoutFailedException {
-        if(context.isLogoutRequest()) {
+        if (context.isLogoutRequest()) {
             isCompleted = false;
         }
         return super.process(request, response, context);
     }
+
     /**
      * Check whether the authentication or logout request can be handled by the authenticator
      */
@@ -66,7 +69,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
         if (log.isDebugEnabled()) {
             log.debug("Inside TiqrAuthenticator.canHandle()");
         }
-        return (qrCode != null && qrCode.startsWith("<img alt=\"QR\""));
+        return (!StringUtils.isEmpty(qrCode) && qrCode.startsWith("<img alt=\"QR\""));
     }
 
     /**
@@ -77,12 +80,12 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                                                  HttpServletResponse response, AuthenticationContext context)
             throws AuthenticationFailedException {
         try {
-            if (!isCompleted && enrolUserBody == null) {
+            if (!isCompleted && StringUtils.isEmpty(enrolUserBody)) {
                 Map<String, String> authenticatorProperties = context
                         .getAuthenticatorProperties();
                 if (authenticatorProperties != null) {
                     enrolUserBody = enrolUser(authenticatorProperties);
-                    if (enrolUserBody == null) {
+                    if (StringUtils.isEmpty(enrolUserBody)) {
                         throw new AuthenticationFailedException("Error while getting the QR code");
                     } else {
                         postContent(response, enrolUserBody);
@@ -152,12 +155,12 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
      */
     @Override
     protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
-        AuthenticationContext context) throws AuthenticationFailedException {
+                                                 AuthenticationContext context) throws AuthenticationFailedException {
         try {
             Map<String, String> authenticatorProperties = context
                     .getAuthenticatorProperties();
             String tiqrEP = getTiqrEndpoint(authenticatorProperties);
-            if (tiqrEP == null) {
+            if (StringUtils.isEmpty(tiqrEP)) {
                 tiqrEP = "http://" + authenticatorProperties.get(TiqrConstants.TIQR_CLIENTIP)
                         + ":8080";
             }
@@ -225,9 +228,9 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
     /**
      * Connect with the tiqr client
      */
-    public String enrolUser(Map<String, String> authenticatorProperties) {
+    private String enrolUser(Map<String, String> authenticatorProperties) {
         String tiqrEP = getTiqrEndpoint(authenticatorProperties);
-        if (tiqrEP == null) {
+        if (StringUtils.isEmpty(tiqrEP)) {
             tiqrEP = "http://" + authenticatorProperties.get(TiqrConstants.TIQR_CLIENTIP)
                     + ":8080";
         }
@@ -238,7 +241,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 .get(TiqrConstants.ENROLL_DISPLAYNAME);
         String waitTime = authenticatorProperties
                 .get(TiqrConstants.TIQR_WAIT_TIME);
-        if (userId != null && diaplayName != null && waitTime != null) {
+        if (!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(diaplayName) && !StringUtils.isEmpty(waitTime)) {
             String formParameters = "uid=" + userId + "&displayName=" + diaplayName;
             String result = sendRESTCall(urlToEntrol, "", formParameters, "POST");
             try {
@@ -279,7 +282,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
     /**
      * Get the QR code
      */
-    public String sendRESTCall(String url, String urlParameters, String formParameters, String httpMethod) {
+    private String sendRESTCall(String url, String urlParameters, String formParameters, String httpMethod) {
         String line;
         StringBuffer responseString = new StringBuffer();
         try {
@@ -328,7 +331,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
     /**
      * Display the QR code
      */
-    public void postContent(HttpServletResponse response, String image)
+    private void postContent(HttpServletResponse response, String image)
             throws IOException {
         response.setContentType("text/html");
         PrintWriter out = null;
@@ -380,4 +383,3 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
         return null;
     }
 }
-
