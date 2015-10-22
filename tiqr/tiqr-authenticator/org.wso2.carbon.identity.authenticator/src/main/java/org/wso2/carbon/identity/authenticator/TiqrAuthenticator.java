@@ -159,10 +159,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             Map<String, String> authenticatorProperties = context
                     .getAuthenticatorProperties();
             String tiqrEP = getTiqrEndpoint(authenticatorProperties);
-            if (StringUtils.isEmpty(tiqrEP)) {
-                tiqrEP = "http://" + authenticatorProperties.get(TiqrConstants.TIQR_CLIENTIP)
-                        + ":8080";
-            }
             String urlToCheckEntrolment = tiqrEP + "/enrol.php";
             int status = 0;
             log.info("Waiting for getting enrolment status...");
@@ -171,11 +167,14 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             int retryCount = Integer.parseInt(authenticatorProperties.get(TiqrConstants.TIQR_WAIT_TIME));
             while (retry < retryCount) {
                 try {
-                    String res = sendRESTCall(urlToCheckEntrolment, "", "action=getStatus&sessId=" + sessionId, "POST");
+                    String res = sendRESTCall(urlToCheckEntrolment, "", "action=getStatus&sessId="
+                            + sessionId, TiqrConstants.HTTP_POST);
                     if (res.startsWith("Failed:")) {
-                        throw new AuthenticationFailedException("Unable to connect to the Tiqr: " + res.replace("Failed: ", ""));
+                        throw new AuthenticationFailedException("Unable to connect to the Tiqr: "
+                                + res.replace("Failed: ", ""));
                     }
-                    status = Integer.parseInt(res.substring(res.indexOf("Enrolment status: "), res.indexOf("<!DOCTYPE")).replace("Enrolment status: ", "").trim());
+                    status = Integer.parseInt(res.substring(res.indexOf("Enrolment status: "),
+                            res.indexOf("<!DOCTYPE")).replace("Enrolment status: ", "").trim());
                     if (log.isDebugEnabled()) {
                         log.debug("Enrolment status: " + status);
                     }
@@ -229,10 +228,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
      */
     private String enrolUser(Map<String, String> authenticatorProperties) {
         String tiqrEP = getTiqrEndpoint(authenticatorProperties);
-        if (StringUtils.isEmpty(tiqrEP)) {
-            tiqrEP = "http://" + authenticatorProperties.get(TiqrConstants.TIQR_CLIENTIP)
-                    + ":8080";
-        }
         String urlToEntrol = tiqrEP + "/enrol.php";
         String userId = authenticatorProperties
                 .get(TiqrConstants.ENROLL_USERID);
@@ -242,7 +237,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 .get(TiqrConstants.TIQR_WAIT_TIME);
         if (!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(diaplayName) && !StringUtils.isEmpty(waitTime)) {
             String formParameters = "uid=" + userId + "&displayName=" + diaplayName;
-            String result = sendRESTCall(urlToEntrol, "", formParameters, "POST");
+            String result = sendRESTCall(urlToEntrol, "", formParameters, TiqrConstants.HTTP_POST);
             try {
                 if (result.startsWith("Failed:")) {
                     if (log.isDebugEnabled()) {
@@ -250,7 +245,8 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                     }
                     return null;
                 }
-                sessionId = result.substring(result.indexOf("Session id: ["), result.indexOf("'/>")).replace("Session id: [", "").replace("]", "").trim();
+                sessionId = result.substring(result.indexOf("Session id: ["),
+                        result.indexOf("'/>")).replace("Session id: [", "").replace("]", "").trim();
                 if (!result.contains("Session id: [")) {
                     if (log.isDebugEnabled()) {
                         log.debug("Unable to find the Session ID");
@@ -290,9 +286,9 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             connection.setDoInput(true);
             connection.setDoOutput(true);
             connection.setRequestMethod(httpMethod);
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            if (httpMethod.toUpperCase().equals("POST")) {
-                OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
+            connection.setRequestProperty(TiqrConstants.HTTP_CONTENT_TYPE, TiqrConstants.HTTP_CONTENT_TYPE_XWFUE);
+            if (httpMethod.toUpperCase().equals(TiqrConstants.HTTP_POST)) {
+                OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream(), TiqrConstants.CHARSET);
                 writer.write(formParameters);
                 writer.close();
             }
@@ -352,7 +348,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
     protected String getTiqrEndpoint(
             Map<String, String> authenticatorProperties) {
         return "http://" + authenticatorProperties.get(TiqrConstants.TIQR_CLIENTIP)
-                + ":8080";
+                + ":" + TiqrConstants.TIQR_CLIENT_PORT;
     }
 
     /**

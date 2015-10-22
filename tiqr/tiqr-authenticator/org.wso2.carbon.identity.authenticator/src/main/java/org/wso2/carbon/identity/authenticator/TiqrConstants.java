@@ -26,4 +26,9 @@ public class TiqrConstants {
     public static final String ENROLL_USERID = "UserId";
     public static final String ENROLL_DISPLAYNAME = "DiaplayName";
     public static final String TIQR_WAIT_TIME = "waitTime";
+    public static final String HTTP_POST = "POST";
+    public static final String HTTP_CONTENT_TYPE = "Content-Type";
+    public static final String HTTP_CONTENT_TYPE_XWFUE = "application/x-www-form-urlencoded";
+    public static final String CHARSET = "UTF-8";
+    public static final String TIQR_CLIENT_PORT = "8080";
 }
