@@ -46,7 +46,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
 
     private static Log log = LogFactory.getLog(TiqrAuthenticator.class);
 
-    private String enrolUserBody = null;
     private String qrCode = null;
     private String sessionId = null;
     private boolean isCompleted = false;
@@ -80,15 +79,15 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                                                  HttpServletResponse response, AuthenticationContext context)
             throws AuthenticationFailedException {
         try {
-            if (!isCompleted && StringUtils.isEmpty(enrolUserBody)) {
+            if (!isCompleted && StringUtils.isEmpty(qrCode)) {
                 Map<String, String> authenticatorProperties = context
                         .getAuthenticatorProperties();
                 if (authenticatorProperties != null) {
-                    enrolUserBody = enrolUser(authenticatorProperties);
-                    if (StringUtils.isEmpty(enrolUserBody)) {
+                    qrCode = enrolUser(authenticatorProperties);
+                    if (StringUtils.isEmpty(qrCode)) {
                         throw new AuthenticationFailedException("Error while getting the QR code");
                     } else {
-                        postContent(response, enrolUserBody);
+                        postContent(response, qrCode);
                         if (log.isDebugEnabled()) {
                             log.debug("The QR code is successfully displayed.");
                         }
@@ -218,7 +217,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
         } finally {
             isCompleted = true;
             qrCode = null;
-            enrolUserBody = null;
             sessionId = null;
         }
     }
@@ -262,8 +260,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                     }
                     return null;
                 }
-                qrCode = result.substring(result.indexOf("<img"), result.indexOf("</body>"));
-                return qrCode;
+                return result.substring(result.indexOf("<img"), result.indexOf("</body>"));
             } catch (IndexOutOfBoundsException e) {
                 log.error("Error while getting the QR code" + e.getMessage());
                 return null;
@@ -280,9 +277,10 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
     private String sendRESTCall(String url, String urlParameters, String formParameters, String httpMethod) {
         String line;
         StringBuilder responseString = new StringBuilder();
+        HttpURLConnection connection = null;
         try {
             URL tiqrEP = new URL(url + urlParameters);
-            HttpURLConnection connection = (HttpURLConnection) tiqrEP.openConnection();
+            connection = (HttpURLConnection) tiqrEP.openConnection();
             connection.setDoInput(true);
             connection.setDoOutput(true);
             connection.setRequestMethod(httpMethod);
@@ -299,7 +297,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 }
                 br.close();
             }
-            connection.disconnect();
         } catch (ProtocolException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Failed: " + e.getMessage());
@@ -315,6 +312,8 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 log.debug("Failed: " + e.getMessage());
             }
             return "Failed: " + e.getMessage();
+        } finally {
+            connection.disconnect();
         }
         return responseString.toString();
     }
