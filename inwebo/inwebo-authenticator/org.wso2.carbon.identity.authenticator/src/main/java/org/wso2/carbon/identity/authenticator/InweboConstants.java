@@ -20,9 +20,19 @@
 package org.wso2.carbon.identity.authenticator;
 
 public class InweboConstants {
+    public static final String AUTHENTICATOR_NAME = "Inwebo";
     public static final String AUTHENTICATOR_FRIENDLY_NAME = "Inwebo";
     public static final String INWEBO_P12FILE = "p12file";
     public static final String INWEBO_P12PASSWORD = "p12password";
     public static final String USER_ID = "UserId";
     public static final String SERVICE_ID = "ServiceId";
+    public static final String ERROR = "err";
+    public static final String ENCODING = "UTF-8";
+    public static final String PUSHRESPONSE = "\"err\":\"OK\"";
+    public static final String RETRYCOUNT = "retrycount";
+    public static final String RETRINTERVAL = "retryinterval";
+    public static final String ERRORCODE = "NOK:urlParams";
+    public static final String ERRORCODEPARAM = "NOK:params";
+    public static final String CODEWAITTING = "NOK:WAITING";
+    public static final String INWEBOURL = "https://api.myinwebo.com/FS?";
 }

@@ -22,12 +22,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.KeyStore;
@@ -79,17 +81,17 @@ public class PushAuthenticate {
     /**
      * Prompt for a login and an OTP and check if they are OK.
      */
-    public JSONObject pushAuthenticate(String login) {
+    public JSONObject pushAuthenticate(String userId) {
         String urlParameters = null;
         JSONObject json = null;
         try {
             urlParameters = "action=pushAuthenticate"
-                    + "&serviceId=" + URLEncoder.encode("" + serviceId, "UTF-8")
-                    + "&userId=" + URLEncoder.encode(login, "UTF-8")
+                    + "&serviceId=" + URLEncoder.encode("" + serviceId, InweboConstants.ENCODING)
+                    + "&userId=" + URLEncoder.encode(userId, InweboConstants.ENCODING)
                     + "&format=json";
         } catch (UnsupportedEncodingException e1) {
             log.error("Error while adding the url" + e1.getMessage(), e1);
-            json.put("err", "NOK:params");
+            json.put(InweboConstants.ERROR,InweboConstants.ERRORCODEPARAM);
         }
         try {
             if (this.context == null) {
@@ -97,18 +99,31 @@ public class PushAuthenticate {
             }
             SSLSocketFactory sslsocketfactory = context.getSocketFactory();
             URL url = new URL(urlString + urlParameters);
-            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            HttpsURLConnection conn = null;
+            if (url != null) {
+                conn = (HttpsURLConnection) url.openConnection();
+            }
             conn.setSSLSocketFactory(sslsocketfactory);
-
-            conn.setRequestMethod("GET");
+            if (conn != null) {
+                conn.setRequestMethod("GET");
+            }
             InputStream is = conn.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            BufferedReader br = null;
+            if (is != null) {
+                br = new BufferedReader(new InputStreamReader(is, InweboConstants.ENCODING));
+            }
             JSONParser parser = new JSONParser();
             json = (JSONObject) parser.parse(br);
 
+        } catch (MalformedURLException e) {
+            log.error("Error while creating the URL" + e.getMessage(), e);
+        } catch (IOException e) {
+            log.error("Error while creating the connection" + e.getMessage(), e);
+        } catch (ParseException e) {
+            log.error("Error while parsing the json object " + e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Error while process request");
-            json.put("err", "NOK:connection");
+            log.error("Error while pushing authentication");
+            json.put(InweboConstants.ERROR, InweboConstants.ERRORCODE);
         }
         return json;
     }

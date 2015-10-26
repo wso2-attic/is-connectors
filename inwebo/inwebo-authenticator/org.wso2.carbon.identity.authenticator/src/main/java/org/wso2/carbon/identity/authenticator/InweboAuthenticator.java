@@ -19,7 +19,10 @@
 
 package org.wso2.carbon.identity.authenticator;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -29,9 +32,13 @@ import org.wso2.carbon.identity.application.authentication.framework.AbstractApp
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
+import org.wso2.carbon.identity.application.authentication.framework.config.ConfigurationFacade;
 import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
 import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
+import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.Property;
+import org.apache.amber.oauth2.common.utils.JSONUtils;
+
 
 /**
  * Authenticator of Inwebo
@@ -40,8 +47,8 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
 
     private static Log log = LogFactory.getLog(InweboAuthenticator.class);
     private static final long serialVersionUID = -4154255583070524018L;
-    private String p12file;
-    private String p12password;
+    private String pushResponse = null;
+
 
     /**
      * Check whether the authentication or logout request can be handled by the authenticator
@@ -51,12 +58,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         if (log.isDebugEnabled()) {
             log.debug("Inside InweboAuthenticator.canHandle()");
         }
-        String userId = request.getParameter(InweboConstants.USER_ID);
-        String serviceId = request.getParameter(InweboConstants.SERVICE_ID);
-        if (userId != null && serviceId != null) {
-            return true;
-        }
-        return false;
+        return (pushResponse != null && pushResponse.contains(InweboConstants.PUSHRESPONSE));
     }
 
     /**
@@ -67,27 +69,38 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
                                                  HttpServletResponse response, AuthenticationContext context)
             throws AuthenticationFailedException {
         try {
-            Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
-            if (authenticatorProperties != null) {
-                String userId = authenticatorProperties.get(InweboConstants.USER_ID);
-                String serviceId = authenticatorProperties.get(InweboConstants.SERVICE_ID);
-                p12file = authenticatorProperties.get(InweboConstants.INWEBO_P12FILE);
-                p12password = authenticatorProperties.get(InweboConstants.INWEBO_P12PASSWORD);
-
-                if (userId != null && serviceId != null && p12file != null && p12password != null) {
-                    try {
-                        CheckPushResult.setHttpsClientCert(p12file, p12password);
-                    } catch (Exception e) {
-                        log.error("Error while adding the certificate" + e.getMessage(), e);
+            if (pushResponse == null) {
+                Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
+                if (authenticatorProperties != null) {
+                    String relyingParty = request.getParameterValues("relyingParty")[0];
+                    String type = request.getParameterValues("type")[0];
+                    String referer = request.getHeader("referer").toString();
+                    String finalReferer = "";
+                    if ((referer.charAt(referer.lastIndexOf(":") + 5) + "").equals("/")) {
+                        finalReferer = referer.substring(0, referer.lastIndexOf(":") + 5);
+                    } else if ((referer.charAt(referer.lastIndexOf(":") + 3) + "").equals("/")) {
+                        finalReferer = referer.substring(0, referer.lastIndexOf(":") + 3);
                     }
-                    PushREST push;
-                    push = new PushREST(serviceId, p12file, p12password, userId);
-                    push.run();
+                    String userId = authenticatorProperties.get(InweboConstants.USER_ID);
+                    String serviceId = authenticatorProperties.get(InweboConstants.SERVICE_ID);
+                    String p12file = authenticatorProperties.get(InweboConstants.INWEBO_P12FILE);
+                    String p12password = authenticatorProperties.get(InweboConstants.INWEBO_P12PASSWORD);
+                    int retryCount = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRYCOUNT));
+                    int retryInterval = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRINTERVAL));
+
+                    if (userId != null && serviceId != null && p12file != null && p12password != null) {
+                        PushREST push;
+                        push = new PushREST(serviceId, p12file, p12password, userId, retryCount, retryInterval);
+                        pushResponse = push.run();
+                        PushREST.showServlet(response, relyingParty, type, finalReferer);
+                    }
                 }
             }
         } catch (Exception e) {
             throw new AuthenticationFailedException(e.getMessage(), e);
         }
+
+
         return;
     }
 
@@ -114,18 +127,34 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
 
         Property p12file = new Property();
         p12file.setName(InweboConstants.INWEBO_P12FILE);
-        p12file.setDisplayName("P12FILE");
+        p12file.setDisplayName("Certificate File");
         p12file.setRequired(true);
         p12file.setDescription("Enter your p12_file path");
         configProperties.add(p12file);
 
         Property p12password = new Property();
         p12password.setName(InweboConstants.INWEBO_P12PASSWORD);
-        p12password.setDisplayName("P12Password");
+        p12password.setDisplayName("Certificate Password");
         p12password.setRequired(true);
+        p12password.setConfidential(true);
         p12password.setDescription("Enter your p12_password");
         configProperties.add(p12password);
+
+        Property retryCount = new Property();
+        retryCount.setName(InweboConstants.RETRYCOUNT);
+        retryCount.setDisplayName("Retry Count");
+        retryCount.setRequired(true);
+        retryCount.setDescription("Number of attempts waiting for authentication(<10)");
+        configProperties.add(retryCount);
+
+        Property retryInterval = new Property();
+        retryInterval.setName(InweboConstants.RETRINTERVAL);
+        retryInterval.setDisplayName("Retry Interval");
+        retryInterval.setRequired(true);
+        retryInterval.setDescription("Period of time for waiting eg:1000");
+        configProperties.add(retryInterval);
         return configProperties;
+
     }
 
     /**
@@ -134,6 +163,55 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
     @Override
     protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
                                                  AuthenticationContext context) throws AuthenticationFailedException {
+        if (pushResponse.contains(InweboConstants.PUSHRESPONSE)) {
+            log.info("Authentication Successful");
+            context.setSubject("Success");
+            Map<String, Object> userClaims = getUserClaims();
+            if (userClaims != null && !userClaims.isEmpty()) {
+                context.setSubjectAttributes(getSubjectAttributes(userClaims));
+                context.setSubject("Authentication Success");
+            } else {
+                throw new AuthenticationFailedException("Selected user profile found");
+            }
+        } else
+            throw new AuthenticationFailedException("Authentication failed");
+        pushResponse = null;
+    }
+
+    protected Map<ClaimMapping, String> getSubjectAttributes(
+            Map<String, Object> claimMap) {
+
+        Map<ClaimMapping, String> claims = new HashMap<ClaimMapping, String>();
+
+        if (claimMap != null) {
+            for (Map.Entry<String, Object> entry : claimMap.entrySet()) {
+                claims.put(ClaimMapping.build(entry.getKey(),
+                        entry.getKey(), null, false), entry.getValue()
+                        .toString());
+                if (log.isDebugEnabled()) {
+                    log.debug("Adding claim from end-point data mapping : "
+                            + entry.getKey() + " <> " + " : "
+                            + entry.getValue());
+                }
+
+            }
+        }
+
+        return claims;
+    }
+
+    protected Map<String, Object> getUserClaims() {
+        try {
+            String json = pushResponse;
+
+            Map<String, Object> jsonObject = JSONUtils.parseJSON(json);
+
+            return jsonObject;
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return new HashMap<String, Object>();
+
     }
 
     /**
@@ -149,7 +227,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
      */
     @Override
     public String getName() {
-        return InweboConstants.AUTHENTICATOR_FRIENDLY_NAME;
+        return InweboConstants.AUTHENTICATOR_NAME;
     }
 
     /**

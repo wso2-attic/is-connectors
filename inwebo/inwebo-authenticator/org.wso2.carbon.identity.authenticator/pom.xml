@@ -61,6 +61,11 @@
             <artifactId>json</artifactId>
             <version>20090211</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.amber.wso2</groupId>
+            <artifactId>amber</artifactId>
+            <version>0.22.1358727.wso2v4</version>
+        </dependency>
     </dependencies>
 
     <repositories>

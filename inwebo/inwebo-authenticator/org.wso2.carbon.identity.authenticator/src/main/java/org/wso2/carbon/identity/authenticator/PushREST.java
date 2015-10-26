@@ -23,6 +23,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 public class PushREST {
 
     private static final Log log = LogFactory.getLog(PushREST.class);
@@ -30,51 +34,72 @@ public class PushREST {
     private String p12file;
     private String p12password;
     private String userId;
+    private int retryCount;
+    private int retryInterval;
 
-    public PushREST(String serviceId, String p12file, String p12password, String userId) {
+    public PushREST(String serviceId, String p12file, String p12password, String userId, int retryCount, int retryInterval) {
         this.serviceId = serviceId;
         this.p12file = p12file;
         this.p12password = p12password;
         this.userId = userId;
+        this.retryCount = retryCount;
+        this.retryInterval = retryInterval;
     }
 
-    /**
-     * @param args
-     */
-    public void pushRESTCall() {
-        String login;
+    public String pushRESTCall() {
         String SessionId;
         log.info("\nAsk Push notification ");
 
-        log.info("Login? ");
-        login = userId;
-
-        PushAuthenticate pa = new PushAuthenticate(serviceId, p12file, p12password);
-        JSONObject result = pa.pushAuthenticate(login);
-        log.info("result: " + result.toJSONString());
+        PushAuthenticate pushAuthenticate = new PushAuthenticate(serviceId, p12file, p12password);
+        JSONObject result = pushAuthenticate.pushAuthenticate(userId);
+        if (log.isDebugEnabled()) {
+            log.info("result: " + result.toJSONString());
+        }
         SessionId = (String) result.get("sessionId");
-        log.info("SessionId: " + SessionId);
+        if (log.isDebugEnabled()) {
+            log.info("SessionId: " + SessionId);
+        }
         CheckPushResult cr = new CheckPushResult(serviceId, p12file, p12password);
         if (SessionId == null) {
-            log.info("no session id: " + result.get("err"));
-            return;
+            if (log.isDebugEnabled()) {
+                log.info("no session id: " + result.get(InweboConstants.ERROR));
+            }
+            return result.toString();
         }
-        while (true) {
-            result = cr.checkPushResult(login, SessionId);
-            if (!result.get("err").equals("NOK:WAITING")) break;
+        int retry = 0;
+        while ((retry < retryCount)) {
+            retry++;
+            result = cr.checkPushResult(userId, SessionId);
+            if (!result.get(InweboConstants.ERROR).equals(InweboConstants.CODEWAITTING)) break;
             try {
                 log.info("request pending...  " + result);
-                Thread.sleep(1000);
+                Thread.sleep(retryInterval);
             } catch (InterruptedException e) {
                 log.error("Error while getting response" + e.getMessage(), e);
             }
         }
-        log.info("result:" + result.get("err"));
-        return;
+        log.info("result:" + result.get(InweboConstants.ERROR));
+        return result.toString();
     }
 
-    public void run() {
-        pushRESTCall();
+    public String run() {
+        return pushRESTCall();
+    }
+
+    public static void showServlet(HttpServletResponse response, String relyingParty, String type, String finalReferer) {
+        response.setContentType("text/html");
+        PrintWriter out = null;
+        try {
+            out = response.getWriter();
+            out.println("<title>Inwebo</title>" +
+                    "<body bgcolor=FFFFFF>");
+            out.println("<h2>Waiting for client authentication...</h2>");
+            out.print("<A HREF=" + finalReferer + "/" + relyingParty +"/"+ type + ">Click to view details</A>");
+            out.println("</body");
+            out.close();
+        } catch (IOException e) {
+            log.error("Failure");
+        }
     }
 }
 
