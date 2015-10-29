@@ -25,14 +25,18 @@ public class GetQRCode extends HttpServlet {
         String res = "";
         if (!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(displayName)) {
             String enrolUserResponse = enrolUser(request);
-            String qrCode = getQrCode(enrolUserResponse);
-            res = qrCode;
-            String sessionId = getSessionID(enrolUserResponse);
-            res = res + "<input type='hidden' name='sessionId' id='sessionId' value='" + sessionId + "'/>";
-            response.setContentType("text/plain");
+            if(StringUtils.isEmpty(enrolUserResponse)) {
+                res = TiqrConstants.UNABLE_TO_CONNECT;
+            } else {
+                String qrCode = getQrCode(enrolUserResponse);
+                res = qrCode;
+                String sessionId = getSessionID(enrolUserResponse);
+                res = res + "<input type='hidden' name='sessionId' id='sessionId' value='" + sessionId + "'/>";
+            }
         } else {
             res = TiqrConstants.INVALID_INPUT;
         }
+        response.setContentType("text/plain");
         response.getWriter().write(res);
     }
 

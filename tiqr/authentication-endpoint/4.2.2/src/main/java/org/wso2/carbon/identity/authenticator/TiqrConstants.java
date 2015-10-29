@@ -28,4 +28,5 @@ public class TiqrConstants {
     public static final String TIQR_CLIENT_IP = "clientIP";
     public static final String TIQR_CLIENT_PORT = "port";
     public static final String INVALID_INPUT = "Invalid Input";
+    public static final String UNABLE_TO_CONNECT = "Unable to connect the tiqr client";
 }

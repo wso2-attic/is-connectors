@@ -50,23 +50,23 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	$('#enroll').click(function() {
-		    $.ajax({
-			    url : 'GetQRCode',
-			    data : {
-				    userId : $('#userId').val(),
-                    displayName : $('#displayName').val(),
-                    clientIP : $('#clientIP').val(),
-                    port : $('#port').val()
-			    },
-			    success : function(responseText) {
+		$.ajax({
+		    url : 'GetQRCode',
+			data : {
+				userId : $('#userId').val(),
+                displayName : $('#displayName').val(),
+                clientIP : $('#clientIP').val(),
+                port : $('#port').val()
+			},
+			success : function(responseText) {
 			    if(responseText != "Invalid Input") {
 				    document.getElementById("qrCodeDiv").innerHTML = responseText;
 				}
                 if(responseText == "Invalid Input" || $('#sessionId').val() != "") {
                     $('#loginForm').submit();
                 }
-			    }
-		    });
+			}
+		});
 	});
 });
 </script>

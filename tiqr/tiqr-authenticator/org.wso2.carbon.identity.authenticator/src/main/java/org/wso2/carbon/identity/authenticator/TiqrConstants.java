@@ -27,6 +27,7 @@ public class TiqrConstants {
     public static final String ENROLL_DISPLAYNAME = "displayName";
     public static final String ENROLL_QRCODE = "qrCode";
     public static final String ENROLL_SESSIONID = "sessionId";
+    public static final String ENROLLMENT_SUCCESS_STATUS = "5";
     public static final String TIQR_WAIT_TIME = "waitTime";
     public static final String HTTP_POST = "POST";
     public static final String HTTP_CONTENT_TYPE = "Content-Type";

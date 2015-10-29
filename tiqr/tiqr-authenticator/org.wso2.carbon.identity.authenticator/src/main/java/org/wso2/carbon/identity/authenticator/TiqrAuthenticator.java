@@ -180,7 +180,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 if (log.isDebugEnabled()) {
                     log.debug("Enrolment status: " + status);
                 }
-                if (status == 5) {
+                if (status == Integer.parseInt(TiqrConstants.ENROLLMENT_SUCCESS_STATUS)) {
                     if (log.isDebugEnabled()) {
                         log.debug("Successfully enrolled the user with User ID:"
                                 + request.getParameter(TiqrConstants.ENROLL_USERID)
@@ -198,7 +198,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                     break;
                 }
             }
-            if (status == 5) {
+            if (status == Integer.parseInt(TiqrConstants.ENROLLMENT_SUCCESS_STATUS)) {
                 context.setSubject(request.getParameter(TiqrConstants.ENROLL_USERID));
                 log.info("Successfully enrolled the user");
             } else {
