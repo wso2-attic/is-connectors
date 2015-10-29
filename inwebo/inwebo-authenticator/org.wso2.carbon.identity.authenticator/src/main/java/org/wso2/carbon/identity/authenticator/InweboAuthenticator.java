@@ -61,15 +61,6 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
     }
 
     /**
-     * initiate the authentication request
-     */
-    @Override
-    protected void initiateAuthenticationRequest(HttpServletRequest request,
-                                                 HttpServletResponse response, AuthenticationContext context)
-            throws AuthenticationFailedException {
-    }
-
-    /**
      * Get the configuration properties of UI
      */
     @Override
@@ -78,9 +69,9 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         Property userId = new Property();
 
         userId.setName(InweboConstants.USER_ID);
-        userId.setDisplayName("User name");
+        userId.setDisplayName("Username");
         userId.setRequired(true);
-        userId.setDescription("Enter your inwebo user name");
+        userId.setDescription("Enter your Inwebo username");
         configProperties.add(userId);
 
         Property serviceId = new Property();
@@ -107,20 +98,12 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
 
         Property retryCount = new Property();
         retryCount.setName(InweboConstants.RETRYCOUNT);
-        retryCount.setDisplayName("Retry Count");
+        retryCount.setDisplayName("Waiting Time");
         retryCount.setRequired(true);
-        retryCount.setDescription("Number of attempts waiting for authentication(<10)");
+        retryCount.setDescription("Waiting time for authentication(<10)");
         configProperties.add(retryCount);
 
         return configProperties;
-    }
-
-    /**
-     * Process the response of the Inwebo end-point
-     */
-    @Override
-    protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
-                                                 AuthenticationContext context) throws AuthenticationFailedException {
     }
 
     @Override
@@ -140,7 +123,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
                 }
             } catch (UnsupportedOperationException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Ignoring UnsupportedOperationException.", e);
+                    log.debug("Ignoring unsupported operation exception.", e);
                 }
                 return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
             }
@@ -159,7 +142,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
                             push = new PushRestCall(serviceId, p12file, p12password, userId, retryCount);
                             pushResponse = push.run();
                             if (pushResponse.contains(InweboConstants.PUSHRESPONSE)) {
-                                log.info("Authentication Successful");
+                                log.info("Authentication successful");
                                 Map<String, Object> userClaims = getUserClaims();
                                 if (userClaims != null && !userClaims.isEmpty()) {
                                     context.setSubjectAttributes(getSubjectAttributes(userClaims));
@@ -203,9 +186,17 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
             Map<String, Object> jsonObject = JSONUtils.parseJSON(json);
             return jsonObject;
         } catch (Exception e) {
-            log.error("Error while getting User Claims",e);
+            log.error("Error while getting user claims", e);
             throw new AuthenticationFailedException(e.getMessage(),e);
         }
+    }
+
+    /**
+     * Process the response of the Inwebo end-point
+     */
+    @Override
+    protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
+                                                 AuthenticationContext context) throws AuthenticationFailedException {
     }
 
     /**

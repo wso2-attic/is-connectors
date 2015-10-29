@@ -43,38 +43,40 @@ public class PushRestCall {
 
     public String invokePush() throws AuthenticationFailedException {
         String sessionId;
-        log.info("\nAsk Push notification ");
+        log.info("\nAsk push notification ");
 
         PushAuthentication pushAuthentication = new PushAuthentication(serviceId, p12file, p12password);
         JSONObject result = pushAuthentication.pushAuthenticate(userId);
         if (log.isDebugEnabled()) {
-            log.info("result: " + result.toJSONString());
+            log.info("Result: " + result.toJSONString());
         }
         sessionId = (String) result.get("sessionId");
         if (log.isDebugEnabled()) {
-            log.info("SessionId: " + sessionId);
+            log.info("Session id: " + sessionId);
         }
         PushResult cr = new PushResult(serviceId, p12file, p12password);
         if (sessionId == null) {
             if (log.isDebugEnabled()) {
-                log.info("no session id: " + result.get(InweboConstants.ERROR));
+                log.info("No session id: " + result.get(InweboConstants.ERROR));
             }
             return result.toString();
         }
         int retry = 0;
-        while ((retry < retryCount)) {
+        int maxRetryCount = 10;
+        int waitTime = maxRetryCount > retryCount ? retryCount : maxRetryCount;
+        while ((retry < waitTime)) {
             retry++;
             result = cr.checkPushResult(userId, sessionId);
             if (!result.get(InweboConstants.ERROR).equals(InweboConstants.CODEWAITTING)) break;
             try {
-                log.info("request pending...  " + result);
+                log.info("Request pending...  " + result);
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                log.error("Error while getting response",e);
-                throw new AuthenticationFailedException(e.getMessage(),e);
+                log.error("Error while getting response", e);
+                throw new AuthenticationFailedException(e.getMessage(), e);
             }
         }
-        log.info("result:" + result.get(InweboConstants.ERROR));
+        log.info("Result:" + result.get(InweboConstants.ERROR));
         return result.toString();
     }
 

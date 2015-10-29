@@ -87,7 +87,7 @@ public class PushAuthentication {
     }
 
     /**
-     * Prompt for a login and an OTP and check if they are OK.
+     * Prompt for a login and an OTP.
      */
     public JSONObject pushAuthenticate(String userId) throws AuthenticationFailedException {
         String urlParameters = null;
@@ -118,7 +118,7 @@ public class PushAuthentication {
             JSONParser parser = new JSONParser();
             json = (JSONObject) parser.parse(br);
         } catch (UnsupportedEncodingException e) {
-            log.error("Error while encoding the url");
+            log.error("Error while encoding the URL", e);
             throw new AuthenticationFailedException(e.getMessage(), e);
         } catch (MalformedURLException e) {
             log.error("Error while creating the URL", e);
