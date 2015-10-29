@@ -59,10 +59,10 @@ $(document).ready(function() {
                 port : $('#port').val()
 			},
 			success : function(responseText) {
-			    if(responseText != "Invalid Input") {
+			    if(!responseText.startsWith("Failed:")) {
 				    document.getElementById("qrCodeDiv").innerHTML = responseText;
 				}
-                if(responseText == "Invalid Input"|| responseText == "Unable to connect the tiqr client" || $('#sessionId').val() != "") {
+                if(responseText.startsWith("Failed:") || $('#sessionId').val() != "") {
                     $('#loginForm').submit();
                 }
 			}

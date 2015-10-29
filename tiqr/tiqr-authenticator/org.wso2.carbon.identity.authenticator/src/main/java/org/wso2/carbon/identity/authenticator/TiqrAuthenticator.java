@@ -169,7 +169,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             String tiqrEP = getTiqrEndpoint(authenticatorProperties);
             String urlToCheckEntrolment = tiqrEP + "/enrol.php";
             int status = 0;
-            log.info("Waiting for getting enrolment status...");
+            log.info("Waiting for getting enrollment status...");
             int retry = 0;
             int retryInterval = 1000;
             int maxCount = 120;
@@ -178,9 +178,9 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             while (retry < retryCount) {
                 String checkStatusResponse = sendRESTCall(urlToCheckEntrolment, "", "action=getStatus&sessId="
                         + request.getParameter(TiqrConstants.ENROLL_SESSIONID), TiqrConstants.HTTP_POST);
-                if (checkStatusResponse.startsWith("Failed:")) {
+                if (checkStatusResponse.startsWith(TiqrConstants.FAILED)) {
                     throw new AuthenticationFailedException("Unable to connect to the Tiqr: "
-                            + checkStatusResponse.replace("Failed: ", ""));
+                            + checkStatusResponse.replace(TiqrConstants.FAILED, ""));
                 }
                 status = Integer.parseInt(checkStatusResponse.substring(checkStatusResponse.indexOf("Enrolment status: "),
                         checkStatusResponse.indexOf("<!DOCTYPE")).replace("Enrolment status: ", "").trim());
@@ -217,9 +217,9 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
         }
         catch (InterruptedException e) {
             throw new AuthenticationFailedException(
-                    "Interruption occured while getting the enrolment status" + e.getMessage(), e);
+                    "Interruption occured while getting the enrollment status" + e.getMessage(), e);
         } catch (IndexOutOfBoundsException e) {
-            throw new AuthenticationFailedException("Error while getting the enrolment status"
+            throw new AuthenticationFailedException("Error while getting the enrollment status"
                     + e.getMessage(), e);
         }
     }
@@ -250,23 +250,23 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 }
                 br.close();
             } else {
-                return "Failed: " + TiqrConstants.UNABLE_TO_CONNECT;
+                return TiqrConstants.FAILED + TiqrConstants.UNABLE_TO_CONNECT;
             }
         } catch (ProtocolException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed: " + e.getMessage());
+                log.debug(TiqrConstants.FAILED + e.getMessage());
             }
-            return "Failed: " + e.getMessage();
+            return TiqrConstants.FAILED + e.getMessage();
         } catch (MalformedURLException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed: " + e.getMessage());
+                log.debug(TiqrConstants.FAILED + e.getMessage());
             }
-            return "Failed: " + e.getMessage();
+            return TiqrConstants.FAILED + e.getMessage();
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed: " + e.getMessage());
+                log.debug(TiqrConstants.FAILED + e.getMessage());
             }
-            return "Failed: " + e.getMessage();
+            return TiqrConstants.FAILED + e.getMessage();
         } finally {
             connection.disconnect();
         }

@@ -26,13 +26,13 @@ public class GetQRCode extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String userId = request.getParameter("userId").trim();
-        String displayName = request.getParameter("displayName").trim();
+        String userId = request.getParameter(TiqrConstants.ENROLL_USERID).trim();
+        String displayName = request.getParameter(TiqrConstants.ENROLL_DISPLAYNAME).trim();
         String res = "";
         if (!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(displayName)) {
             String enrolUserResponse = enrolUser(request);
-            if(enrolUserResponse.startsWith("Failed:")) {
-                res = TiqrConstants.UNABLE_TO_CONNECT;
+            if(enrolUserResponse.startsWith(TiqrConstants.FAILED)) {
+                res = enrolUserResponse;
             } else {
                 String qrCode = getQrCode(enrolUserResponse);
                 res = qrCode;
@@ -40,7 +40,7 @@ public class GetQRCode extends HttpServlet {
                 res = res + "<input type='hidden' name='sessionId' id='sessionId' value='" + sessionId + "'/>";
             }
         } else {
-            res = TiqrConstants.INVALID_INPUT;
+            res = TiqrConstants.FAILED + TiqrConstants.INVALID_INPUT;
         }
         response.setContentType("text/plain");
         response.getWriter().write(res);
@@ -57,7 +57,7 @@ public class GetQRCode extends HttpServlet {
         if (!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(diaplayName)) {
             String formParameters = "uid=" + userId + "&displayName=" + diaplayName;
             String result = sendRESTCall(urlToEntrol, "", formParameters, TiqrConstants.HTTP_POST);
-            if (result.startsWith("Failed:")) {
+            if (result.startsWith(TiqrConstants.FAILED)) {
                 if (log.isDebugEnabled()) {
                     log.error(result);
                 }
@@ -97,23 +97,23 @@ public class GetQRCode extends HttpServlet {
                 }
                 br.close();
             } else {
-                return "Failed: " + TiqrConstants.UNABLE_TO_CONNECT;
+                return TiqrConstants.FAILED + TiqrConstants.UNABLE_TO_CONNECT;
             }
         } catch (ProtocolException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed: " + e.getMessage());
+                log.debug(TiqrConstants.FAILED + e.getMessage());
             }
-            return "Failed: " + e.getMessage();
+            return TiqrConstants.FAILED + e.getMessage();
         } catch (MalformedURLException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed: " + e.getMessage());
+                log.debug(TiqrConstants.FAILED + e.getMessage());
             }
-            return "Failed: " + e.getMessage();
+            return TiqrConstants.FAILED + e.getMessage();
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed: " + e.getMessage());
+                log.debug(TiqrConstants.FAILED + e.getMessage());
             }
-            return "Failed: " + e.getMessage();
+            return TiqrConstants.FAILED + e.getMessage();
         } finally {
             connection.disconnect();
         }

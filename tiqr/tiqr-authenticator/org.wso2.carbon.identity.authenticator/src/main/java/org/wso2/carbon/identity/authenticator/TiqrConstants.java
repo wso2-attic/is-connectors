@@ -41,4 +41,5 @@ public class TiqrConstants {
     public static final String FAILURE_REASON = "showAuthFailureReason";
 
     public static final String UNABLE_TO_CONNECT = "Unable to connect the tiqr client";
+    public static final String FAILED = "Failed: ";
 }
