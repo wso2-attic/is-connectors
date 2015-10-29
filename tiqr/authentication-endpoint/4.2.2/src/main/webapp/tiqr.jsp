@@ -62,7 +62,7 @@ $(document).ready(function() {
 			    if(responseText != "Invalid Input") {
 				    document.getElementById("qrCodeDiv").innerHTML = responseText;
 				}
-                if(responseText == "Invalid Input" || $('#sessionId').val() != "") {
+                if(responseText == "Invalid Input"|| responseText == "Unable to connect the tiqr client" || $('#sessionId').val() != "") {
                     $('#loginForm').submit();
                 }
 			}

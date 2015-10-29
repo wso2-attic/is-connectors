@@ -156,8 +156,11 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 if (log.isDebugEnabled()) {
                     log.debug("User ID and Full Name cannot not be null");
                 }
-                log.warn("User ID and Full Name cannot not be null");
+                log.error("User ID and Full Name cannot not be null");
                 throw new InvalidCredentialsException();
+            } else if(StringUtils.isEmpty(request.getParameter(TiqrConstants.ENROLL_SESSIONID))) {
+                log.error("Unable to connect with the tiqr client");
+                throw new AuthenticationFailedException("Unable to connect with the tiqr client");
             }
             Map<String, String> authenticatorProperties = context
                     .getAuthenticatorProperties();
