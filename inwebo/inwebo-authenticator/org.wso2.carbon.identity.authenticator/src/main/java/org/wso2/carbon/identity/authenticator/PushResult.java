@@ -23,18 +23,24 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.*;
+import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
 
-public class CheckPushResult {
-    private static final Log log = LogFactory.getLog(CheckPushResult.class);
+public class PushResult {
+    private static final Log log = LogFactory.getLog(PushResult.class);
 
     private static String urlString = InweboConstants.INWEBOURL;
     private String serviceId;
@@ -42,7 +48,7 @@ public class CheckPushResult {
     private String p12password;
     private SSLContext context = null;
 
-    public CheckPushResult(String id, String p12file, String p12password) {
+    public PushResult(String id, String p12file, String p12password) {
         this.serviceId = id;
         this.p12file = p12file;
         this.p12password = p12password;
@@ -51,7 +57,7 @@ public class CheckPushResult {
     /**
      * Prompt for a login and an OTP and check if they are OK.
      */
-    public JSONObject checkPushResult(String userId, String sessionId) {
+    public JSONObject checkPushResult(String userId, String sessionId) throws AuthenticationFailedException {
         String urlParameters = null;
         JSONObject json = null;
         try {
@@ -60,49 +66,42 @@ public class CheckPushResult {
                     + "&userId=" + URLEncoder.encode(userId, InweboConstants.ENCODING)
                     + "&sessionId=" + URLEncoder.encode(sessionId, InweboConstants.ENCODING)
                     + "&format=json";
-        } catch (UnsupportedEncodingException e1) {
-            log.error("Error while encoding the Url" + e1.getMessage(), e1);
-            json.put(InweboConstants.ERROR, InweboConstants.ERRORCODE);
-        }
-        try {
             if (this.context == null) {
-                try {
-                    this.context = PushAuthenticate.setHttpsClientCert(this.p12file, this.p12password);
-                } catch (Exception e) {
-                    log.error("Error while adding the certificate" + e.getMessage(), e);
-                }
+                this.context = PushAuthentication.setHttpsClientCert(this.p12file, this.p12password);
             }
             SSLSocketFactory sslsocketfactory = context.getSocketFactory();
             URL url = null;
-            try {
-                url = new URL(urlString + urlParameters);
-                HttpsURLConnection conn = null;
-                if (url != null) {
-                    conn = (HttpsURLConnection) url.openConnection();
-                }
-                conn.setSSLSocketFactory(sslsocketfactory);
-                if (conn != null) {
-                    conn.setRequestMethod("GET");
-                }
-                InputStream is = null;
-                is = conn.getInputStream();
-                BufferedReader br = null;
-                if (is != null) {
-                    br = new BufferedReader(new InputStreamReader(is, InweboConstants.ENCODING));
-                }
-                JSONParser parser = new JSONParser();
-                json = (JSONObject) parser.parse(br);
-
-            } catch (MalformedURLException e) {
-                log.error("Error while creating the URL" + e.getMessage(), e);
-            } catch (IOException e) {
-                log.error("Error while creating the connection" + e.getMessage(), e);
-            } catch (ParseException e) {
-                log.error("Error while parsing the json object " + e.getMessage(), e);
+            url = new URL(urlString + urlParameters);
+            HttpsURLConnection conn = null;
+            if (url != null) {
+                conn = (HttpsURLConnection) url.openConnection();
             }
+            conn.setSSLSocketFactory(sslsocketfactory);
+            if (conn != null) {
+                conn.setRequestMethod("GET");
+            }
+            InputStream is = null;
+            is = conn.getInputStream();
+            BufferedReader br = null;
+            if (is != null) {
+                br = new BufferedReader(new InputStreamReader(is, InweboConstants.ENCODING));
+            }
+            JSONParser parser = new JSONParser();
+            json = (JSONObject) parser.parse(br);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error while encoding the Url" + e.getMessage(), e);
+        } catch (MalformedURLException e) {
+            log.error("Error while creating the URL", e);
+            throw new AuthenticationFailedException(e.getMessage(), e);
+        } catch (IOException e) {
+            log.error("Error while creating the connection", e);
+            throw new AuthenticationFailedException(e.getMessage(), e);
+        } catch (ParseException e) {
+            log.error("Error while parsing the json object ", e);
+            throw new AuthenticationFailedException(e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Error while checking push result");
-            json.put(InweboConstants.ERROR, InweboConstants.ERRORCODE);
+            log.error("Error while pushing authentication", e);
+            throw new AuthenticationFailedException(e.getMessage(), e);
         }
         return json;
     }

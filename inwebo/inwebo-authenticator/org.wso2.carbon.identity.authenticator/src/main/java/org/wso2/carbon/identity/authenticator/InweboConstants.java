@@ -30,9 +30,9 @@ public class InweboConstants {
     public static final String ENCODING = "UTF-8";
     public static final String PUSHRESPONSE = "\"err\":\"OK\"";
     public static final String RETRYCOUNT = "retrycount";
-    public static final String RETRINTERVAL = "retryinterval";
-    public static final String ERRORCODE = "NOK:urlParams";
-    public static final String ERRORCODEPARAM = "NOK:params";
     public static final String CODEWAITTING = "NOK:WAITING";
     public static final String INWEBOURL = "https://api.myinwebo.com/FS?";
+    public static final String SUNFORMAT="SunX509";
+    public static final String PKCSFORMAT="PKCS12";
+    public static final String TLSFORMAT="TLS";
 }

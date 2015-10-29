@@ -99,8 +99,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.0</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -120,7 +120,7 @@
                             org.wso2.carbon.identity.application.authentication.framework.*,
                             javax.servlet,
                             javax.servlet.http,
-                            *;resolution:=optional
+                            *;
                         </Import-Package>
                         <Export-Package>
                             !org.wso2.carbon.identity.authenticator.internal,

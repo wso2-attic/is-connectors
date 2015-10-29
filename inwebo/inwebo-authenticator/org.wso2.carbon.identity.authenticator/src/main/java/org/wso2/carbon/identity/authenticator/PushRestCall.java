@@ -22,45 +22,40 @@ package org.wso2.carbon.identity.authenticator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
+import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+public class PushRestCall {
 
-public class PushREST {
-
-    private static final Log log = LogFactory.getLog(PushREST.class);
+    private static final Log log = LogFactory.getLog(PushRestCall.class);
     private String serviceId;
     private String p12file;
     private String p12password;
     private String userId;
     private int retryCount;
-    private int retryInterval;
 
-    public PushREST(String serviceId, String p12file, String p12password, String userId, int retryCount, int retryInterval) {
+    public PushRestCall(String serviceId, String p12file, String p12password, String userId, int retryCount) {
         this.serviceId = serviceId;
         this.p12file = p12file;
         this.p12password = p12password;
         this.userId = userId;
         this.retryCount = retryCount;
-        this.retryInterval = retryInterval;
     }
 
-    public String pushRESTCall() {
-        String SessionId;
+    public String invokePush() throws AuthenticationFailedException {
+        String sessionId;
         log.info("\nAsk Push notification ");
 
-        PushAuthenticate pushAuthenticate = new PushAuthenticate(serviceId, p12file, p12password);
-        JSONObject result = pushAuthenticate.pushAuthenticate(userId);
+        PushAuthentication pushAuthentication = new PushAuthentication(serviceId, p12file, p12password);
+        JSONObject result = pushAuthentication.pushAuthenticate(userId);
         if (log.isDebugEnabled()) {
             log.info("result: " + result.toJSONString());
         }
-        SessionId = (String) result.get("sessionId");
+        sessionId = (String) result.get("sessionId");
         if (log.isDebugEnabled()) {
-            log.info("SessionId: " + SessionId);
+            log.info("SessionId: " + sessionId);
         }
-        CheckPushResult cr = new CheckPushResult(serviceId, p12file, p12password);
-        if (SessionId == null) {
+        PushResult cr = new PushResult(serviceId, p12file, p12password);
+        if (sessionId == null) {
             if (log.isDebugEnabled()) {
                 log.info("no session id: " + result.get(InweboConstants.ERROR));
             }
@@ -69,37 +64,22 @@ public class PushREST {
         int retry = 0;
         while ((retry < retryCount)) {
             retry++;
-            result = cr.checkPushResult(userId, SessionId);
+            result = cr.checkPushResult(userId, sessionId);
             if (!result.get(InweboConstants.ERROR).equals(InweboConstants.CODEWAITTING)) break;
             try {
                 log.info("request pending...  " + result);
-                Thread.sleep(retryInterval);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
-                log.error("Error while getting response" + e.getMessage(), e);
+                log.error("Error while getting response",e);
+                throw new AuthenticationFailedException(e.getMessage(),e);
             }
         }
         log.info("result:" + result.get(InweboConstants.ERROR));
         return result.toString();
     }
 
-    public String run() {
-        return pushRESTCall();
-    }
-
-    public static void showServlet(HttpServletResponse response, String relyingParty, String type, String finalReferer) {
-        response.setContentType("text/html");
-        PrintWriter out = null;
-        try {
-            out = response.getWriter();
-            out.println("<title>Inwebo</title>" +
-                    "<body bgcolor=FFFFFF>");
-            out.println("<h2>Waiting for client authentication...</h2>");
-            out.print("<A HREF=" + finalReferer + "/" + relyingParty +"/"+ type + ">Click to view details</A>");
-            out.println("</body");
-            out.close();
-        } catch (IOException e) {
-            log.error("Failure");
-        }
+    public String run() throws AuthenticationFailedException {
+        return invokePush();
     }
 }
 
