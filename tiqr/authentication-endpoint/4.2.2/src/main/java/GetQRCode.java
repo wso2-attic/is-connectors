@@ -1,12 +1,18 @@
 
-import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.OutputStreamWriter;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -25,7 +31,7 @@ public class GetQRCode extends HttpServlet {
         String res = "";
         if (!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(displayName)) {
             String enrolUserResponse = enrolUser(request);
-            if(StringUtils.isEmpty(enrolUserResponse)) {
+            if(enrolUserResponse.startsWith("Failed:")) {
                 res = TiqrConstants.UNABLE_TO_CONNECT;
             } else {
                 String qrCode = getQrCode(enrolUserResponse);
@@ -53,9 +59,8 @@ public class GetQRCode extends HttpServlet {
             String result = sendRESTCall(urlToEntrol, "", formParameters, TiqrConstants.HTTP_POST);
             if (result.startsWith("Failed:")) {
                 if (log.isDebugEnabled()) {
-                    log.error("Unable to find QR code");
+                    log.error(result);
                 }
-                return null;
             }
             return result;
         } else {
@@ -91,6 +96,8 @@ public class GetQRCode extends HttpServlet {
                     responseString.append(line);
                 }
                 br.close();
+            } else {
+                return "Failed: " + TiqrConstants.UNABLE_TO_CONNECT;
             }
         } catch (ProtocolException e) {
             if (log.isDebugEnabled()) {
@@ -161,7 +168,7 @@ public class GetQRCode extends HttpServlet {
      * Get the tiqr end-point
      */
     protected String getTiqrEndpoint(HttpServletRequest request) {
-        return "http://" + request.getParameter(TiqrConstants.TIQR_CLIENT_IP).trim()
+        return TiqrConstants.PROTOCOL + request.getParameter(TiqrConstants.TIQR_CLIENT_IP).trim()
                 + ":" + request.getParameter(TiqrConstants.TIQR_CLIENT_PORT).trim();
     }
 }

@@ -19,14 +19,20 @@
 
 package org.wso2.carbon.identity.authenticator;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.OutputStreamWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.HttpURLConnection;
 import java.lang.Integer;
-import java.net.*;
-import java.util.*;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.application.authentication.framework.AbstractApplicationAuthenticator;
@@ -106,11 +112,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                         "Error while retrieving properties. Authenticator Properties cannot be null");
             }
         } catch (IOException e) {
-            throw new AuthenticationFailedException("Exception while showing the QR code: " + e.getMessage(), e);
-        } catch (NumberFormatException e) {
-            throw new AuthenticationFailedException("Exception while showing the QR code: " + e.getMessage(), e);
-        } catch (IndexOutOfBoundsException e) {
-            throw new AuthenticationFailedException("Unable to get QR code: " + e.getMessage(), e);
+            throw new AuthenticationFailedException("Exception while redirecting the page: " + e.getMessage(), e);
         }
     }
 
@@ -170,7 +172,9 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             log.info("Waiting for getting enrolment status...");
             int retry = 0;
             int retryInterval = 1000;
-            int retryCount = Integer.parseInt(authenticatorProperties.get(TiqrConstants.TIQR_WAIT_TIME));
+            int maxCount = 120;
+            int waitTime = Integer.parseInt(authenticatorProperties.get(TiqrConstants.TIQR_WAIT_TIME));
+            int retryCount = maxCount > waitTime ? waitTime : maxCount;
             while (retry < retryCount) {
                 String checkStatusResponse = sendRESTCall(urlToCheckEntrolment, "", "action=getStatus&sessId="
                         + request.getParameter(TiqrConstants.ENROLL_SESSIONID), TiqrConstants.HTTP_POST);
@@ -245,6 +249,8 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                     responseString.append(line);
                 }
                 br.close();
+            } else {
+                return "Failed: " + TiqrConstants.UNABLE_TO_CONNECT;
             }
         } catch (ProtocolException e) {
             if (log.isDebugEnabled()) {
@@ -272,7 +278,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
      */
     protected String getTiqrEndpoint(
             Map<String, String> authenticatorProperties) {
-        return "http://" + authenticatorProperties.get(TiqrConstants.TIQR_CLIENT_IP)
+        return TiqrConstants.PROTOCOL + authenticatorProperties.get(TiqrConstants.TIQR_CLIENT_IP)
                 + ":" + authenticatorProperties.get(TiqrConstants.TIQR_CLIENT_PORT);
     }
 
@@ -300,7 +306,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
     /**
      * Get the Context identifier sent with the request.
      */
-    public String getContextIdentifier(HttpServletRequest httpServletRequest) {
-        return httpServletRequest.getParameter("sessionDataKey");
+    public String getContextIdentifier(HttpServletRequest request) {
+        return request.getParameter("sessionDataKey");
     }
 }

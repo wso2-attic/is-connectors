@@ -14,19 +14,15 @@
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.wso2.carbon.identity.authenticator</groupId>
     <artifactId>org.wso2.carbon.identity.authenticator.Tiqr</artifactId>
     <version>1.0.0</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Authenticator Library For Tiqr</name>
     <url>http://wso2.org</url>
-
     <properties>
         <!--Carbon identity version-->
         <carbon.identity.version>4.2.0</carbon.identity.version>
@@ -34,7 +30,6 @@
         <carbon.kernel.version>4.2.0</carbon.kernel.version>
         <commons-logging.version>4.2.0</commons-logging.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -57,7 +52,6 @@
             <version>4.2.0</version>
         </dependency>
     </dependencies>
-
     <repositories>
         <repository>
             <id>wso2-nexus</id>
@@ -70,7 +64,6 @@
             </releases>
         </repository>
     </repositories>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -82,7 +75,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -134,7 +126,6 @@
             </plugin>
         </plugins>
     </build>
-
     <distributionManagement>
         <repository>
             <id>wso2-maven2-repository</id>
@@ -142,5 +133,4 @@
             <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/maven2/</url>
         </repository>
     </distributionManagement>
-
 </project>

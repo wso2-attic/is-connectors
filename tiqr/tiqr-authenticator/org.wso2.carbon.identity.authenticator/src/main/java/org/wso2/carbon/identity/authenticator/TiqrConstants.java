@@ -32,10 +32,13 @@ public class TiqrConstants {
     public static final String HTTP_POST = "POST";
     public static final String HTTP_CONTENT_TYPE = "Content-Type";
     public static final String HTTP_CONTENT_TYPE_XWFUE = "application/x-www-form-urlencoded";
+    public static final String PROTOCOL = "http://";
     public static final String CHARSET = "UTF-8";
     public static final String TIQR_CLIENT_PORT = "port";
 
     public static final String AUTHENTICATORS = "&authenticators=";
     public static final String LOCAL = "LOCAL";
     public static final String FAILURE_REASON = "showAuthFailureReason";
+
+    public static final String UNABLE_TO_CONNECT = "Unable to connect the tiqr client";
 }
