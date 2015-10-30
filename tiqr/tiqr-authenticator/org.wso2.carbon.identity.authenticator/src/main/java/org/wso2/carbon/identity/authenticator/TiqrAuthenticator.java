@@ -94,7 +94,8 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 if (context.isRetrying()) {
                     retryParam = "&authFailure=true&authFailureMsg=enrollment.fail.message";
                 }
-                String enrollmentPage = ConfigurationFacade.getInstance().getAuthenticationEndpointURL();
+                String enrollmentPage = ConfigurationFacade.getInstance().getAuthenticationEndpointURL()
+                        .replace("login.do", "tiqr.jsp");
                 String queryParams = FrameworkUtils
                         .getQueryStringWithFrameworkContextId(context.getQueryParams(),
                                 context.getCallerSessionKey(),

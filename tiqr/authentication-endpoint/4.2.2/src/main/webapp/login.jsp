@@ -106,8 +106,6 @@
                 
                 if (errorMessage.equalsIgnoreCase("login.fail.message")) {
                     errorMessage = "Authentication Failed! Please Retry";
-                } else if (errorMessage.equalsIgnoreCase("enrollment.fail.message")) {
-                    errorMessage = "Authentication Failed! Please Retry";
                 }
             }
         }
@@ -135,7 +133,7 @@ if (idpAuthenticatorMapping.get(IdentityApplicationConstants.RESIDENT_IDP_RESERV
 
 %>
 
-<%if(localAuthenticatorNames.contains("BasicAuthenticator") || localAuthenticatorNames.contains("Tiqr")){ %>
+<%if(localAuthenticatorNames.contains("BasicAuthenticator")){ %>
     <div id="local_auth_div" class="container main-login-container" style="margin-top:10px;">
 <%} %>
 
@@ -161,15 +159,6 @@ if (idpAuthenticatorMapping.get(IdentityApplicationConstants.RESIDENT_IDP_RESERV
                 </div>
             </div>
 
-            <%
-            } else if(localAuthenticatorNames.size()>0 && localAuthenticatorNames.contains("Tiqr")){
-                hasLocalLoginOptions = true;
-            %>
-                <div class="row">
-                    <div class="span6">
-                        <%@ include file="tiqr.jsp" %>
-                    </div>
-                </div>
             <%
             } else if(localAuthenticatorNames.size()>0 && localAuthenticatorNames.contains("BasicAuthenticator")) {
             	hasLocalLoginOptions = true;
@@ -290,4 +279,3 @@ if (idpAuthenticatorMapping.get(IdentityApplicationConstants.RESIDENT_IDP_RESERV
     </html>
 
 </fmt:bundle>
-
