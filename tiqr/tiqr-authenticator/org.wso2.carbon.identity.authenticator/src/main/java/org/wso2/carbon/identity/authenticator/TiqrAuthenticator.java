@@ -133,7 +133,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
 
         Property clientPort = new Property();
         clientPort.setName(TiqrConstants.TIQR_CLIENT_PORT);
-        clientPort.setDisplayName("Client IP");
+        clientPort.setDisplayName("Client Port");
         clientPort.setRequired(true);
         clientPort.setDescription("Enter the port of the tiqr client");
         configProperties.add(clientPort);
@@ -141,7 +141,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
         Property waitTime = new Property();
         waitTime.setName(TiqrConstants.TIQR_WAIT_TIME);
         waitTime.setDisplayName("Wait Time");
-        waitTime.setRequired(true);
         waitTime.setDescription("Period of waiting to terminate the authentication (in seconds)");
         configProperties.add(waitTime);
         return configProperties;
@@ -174,7 +173,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             int retry = 0;
             int retryInterval = 1000;
             int maxCount = 120;
-            int waitTime = Integer.parseInt(authenticatorProperties.get(TiqrConstants.TIQR_WAIT_TIME));
+            int waitTime =  StringUtils.isEmpty(authenticatorProperties.get(TiqrConstants.TIQR_WAIT_TIME)) ? maxCount : Integer.parseInt(authenticatorProperties.get(TiqrConstants.TIQR_WAIT_TIME));
             int retryCount = maxCount > waitTime ? waitTime : maxCount;
             while (retry < retryCount) {
                 String checkStatusResponse = sendRESTCall(urlToCheckEntrolment, "", "action=getStatus&sessId="
