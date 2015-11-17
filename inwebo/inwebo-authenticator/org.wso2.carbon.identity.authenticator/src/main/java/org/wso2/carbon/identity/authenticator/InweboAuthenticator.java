@@ -26,17 +26,24 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.application.authentication.framework.AbstractApplicationAuthenticator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.application.authentication.framework.AuthenticatorFlowStatus;
 import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
+import org.wso2.carbon.identity.application.authentication.framework.LocalApplicationAuthenticator;
+import org.wso2.carbon.identity.application.authentication.framework.config.ConfigurationFacade;
 import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
 import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
 import org.wso2.carbon.identity.application.authentication.framework.exception.LogoutFailedException;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.apache.amber.oauth2.common.utils.JSONUtils;
+import org.apache.commons.lang.StringUtils;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 
 /**
@@ -47,6 +54,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
     private static Log log = LogFactory.getLog(InweboAuthenticator.class);
     private static final long serialVersionUID = -4154255583070524018L;
     private String pushResponse = null;
+    private String serviceId = null;
 
 
     /**
@@ -97,11 +105,16 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         configProperties.add(p12password);
 
         Property retryCount = new Property();
-        retryCount.setName(InweboConstants.RETRYCOUNT);
+        retryCount.setName(InweboConstants.RETRY_COUNT);
         retryCount.setDisplayName("Waiting Time");
-        retryCount.setRequired(true);
         retryCount.setDescription("Waiting time for authentication(<10)");
         configProperties.add(retryCount);
+
+        Property retryInterval = new Property();
+        retryInterval.setName(InweboConstants.RETRY_INTERVAL);
+        retryInterval.setDisplayName("Retry Interval");
+        retryInterval.setDescription("Retrying time interval(eg 1000)");
+        configProperties.add(retryInterval);
 
         return configProperties;
     }
@@ -110,54 +123,82 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
     public AuthenticatorFlowStatus process(HttpServletRequest request, HttpServletResponse response,
                                            AuthenticationContext context) throws AuthenticationFailedException,
             LogoutFailedException {
+        int waitTime;
+        int retryInterval;
+        String username = null;
+        for (int i = context.getSequenceConfig().getStepMap().size() - 1; i > 0; i--) {
+            //Getting the last authenticated local user
+            if (context.getSequenceConfig().getStepMap().get(i).getAuthenticatedUser() != null &&
+                    context.getSequenceConfig().getStepMap().get(i).getAuthenticatedAutenticator()
+                            .getApplicationAuthenticator() instanceof LocalApplicationAuthenticator) {
+
+                username = context.getSequenceConfig().getStepMap().get(i).getAuthenticatedUser();
+                if (log.isDebugEnabled()) {
+                    log.debug("username :" + username);
+                }
+                break;
+            }
+        }
+        if (username != null) {
+            try {
+                UserRealm userRealm = getUserRealm();
+                username = MultitenantUtils.getTenantAwareUsername(username);
+                if (userRealm != null) {
+                    serviceId = userRealm.getUserStoreManager().getUserClaimValue(username, InweboConstants.INWEBO_SERVICEID, null).toString();
+                } else {
+                    throw new AuthenticationFailedException(
+                            "Cannot find the user claim for the given serviceId: " + serviceId);
+                }
+            } catch (UserStoreException e) {
+                throw new AuthenticationFailedException("Error while getting the user store"+ e.getMessage(),e);
+            }
+        }
 
         if (context.isLogoutRequest()) {
-            try {
-                if (!canHandle(request)) {
-                    context.setCurrentAuthenticator(getName());
-                    initiateLogoutRequest(request, response, context);
-                    return AuthenticatorFlowStatus.INCOMPLETE;
-                } else {
-                    processLogoutResponse(request, response, context);
-                    return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
-                }
-            } catch (UnsupportedOperationException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Ignoring unsupported operation exception.", e);
-                }
-                return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
-            }
+            return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
         } else {
-                if (pushResponse == null) {
-                    Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
-                    if (authenticatorProperties != null) {
-                        String userId = authenticatorProperties.get(InweboConstants.USER_ID);
-                        String serviceId = authenticatorProperties.get(InweboConstants.SERVICE_ID);
-                        String p12file = authenticatorProperties.get(InweboConstants.INWEBO_P12FILE);
-                        String p12password = authenticatorProperties.get(InweboConstants.INWEBO_P12PASSWORD);
-                        int retryCount = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRYCOUNT));
-
-                        if (userId != null && serviceId != null && p12file != null && p12password != null) {
-                            PushRestCall push;
-                            push = new PushRestCall(serviceId, p12file, p12password, userId, retryCount);
-                            pushResponse = push.run();
-                            if (pushResponse.contains(InweboConstants.PUSHRESPONSE)) {
-                                log.info("Authentication successful");
-                                Map<String, Object> userClaims = getUserClaims();
-                                if (userClaims != null && !userClaims.isEmpty()) {
-                                    context.setSubjectAttributes(getSubjectAttributes(userClaims));
-                                    context.setSubject(userId);
-                                } else {
-                                    throw new AuthenticationFailedException("Selected user profile not found");
-                                }
-                            } else
-                                throw new AuthenticationFailedException("Authentication failed");
-                            pushResponse = null;
-                        }
+            if (pushResponse == null) {
+                Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
+                if (authenticatorProperties != null) {
+                    String userId = authenticatorProperties.get(InweboConstants.USER_ID);
+                    String p12file = authenticatorProperties.get(InweboConstants.INWEBO_P12FILE);
+                    String p12password = authenticatorProperties.get(InweboConstants.INWEBO_P12PASSWORD);
+                    if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_COUNT))) {
+                        waitTime = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_COUNT));
+                    } else {
+                        waitTime = Integer.parseInt(InweboConstants.WAITTIME_DEFAULT);
                     }
-                }
+                    if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL))) {
+                        retryInterval = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL
+                        ));
+                    } else {
+                        retryInterval = Integer.parseInt(InweboConstants.RETRYINTERVAL_DEFAULT);
+                    }
+                    PushRestCall push = new PushRestCall(serviceId, p12file, p12password, userId, waitTime, retryInterval);
+                    pushResponse = push.run();
+                    if (pushResponse.contains(InweboConstants.PUSHRESPONSE)) {
+                        log.info("Authentication successful");
+                        Map<String, Object> userClaims = getUserClaims();
+                        if (userClaims != null && !userClaims.isEmpty()) {
+                            context.setSubjectAttributes(getSubjectAttributes(userClaims));
+                            context.setSubject(userId);
+                        } else {
+                            throw new AuthenticationFailedException("Selected user profile not found");
+                        }
+                    } else
+                        throw new AuthenticationFailedException("Authentication failed");
+                    pushResponse = null;
+                    serviceId = null;
+                } else
+                    throw new AuthenticationFailedException("Required parameters are empty");
+            }
             return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
         }
+    }
+
+
+    public static UserRealm getUserRealm() {
+        return (UserRealm) CarbonContext.getThreadLocalCarbonContext().getUserRealm();
     }
 
     protected Map<ClaimMapping, String> getSubjectAttributes(
@@ -187,7 +228,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
             return jsonObject;
         } catch (Exception e) {
             log.error("Error while getting user claims", e);
-            throw new AuthenticationFailedException(e.getMessage(),e);
+            throw new AuthenticationFailedException(e.getMessage(), e);
         }
     }
 

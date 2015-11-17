@@ -26,13 +26,17 @@ public class InweboConstants {
     public static final String INWEBO_P12PASSWORD = "p12password";
     public static final String USER_ID = "UserId";
     public static final String SERVICE_ID = "ServiceId";
-    public static final String ERROR = "err";
+    public static final String RESULT = "err";
     public static final String ENCODING = "UTF-8";
     public static final String PUSHRESPONSE = "\"err\":\"OK\"";
-    public static final String RETRYCOUNT = "retrycount";
+    public static final String RETRY_COUNT = "retrycount";
     public static final String CODEWAITTING = "NOK:WAITING";
     public static final String INWEBOURL = "https://api.myinwebo.com/FS?";
     public static final String SUNFORMAT="SunX509";
     public static final String PKCSFORMAT="PKCS12";
     public static final String TLSFORMAT="TLS";
+    public static final String RETRY_INTERVAL="RetryInterval";
+    public static final String RETRYINTERVAL_DEFAULT="1000";
+    public static final String WAITTIME_DEFAULT="10";
+    public static final String INWEBO_SERVICEID = "http://wso2.org/claims/serviceId";
 }

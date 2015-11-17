@@ -55,11 +55,13 @@ public class PushResult {
     }
 
     /**
-     * validate the push result
+     * validate push result
      */
     public JSONObject checkPushResult(String userId, String sessionId) throws AuthenticationFailedException {
         String urlParameters = null;
         JSONObject json = null;
+        HttpsURLConnection conn = null;
+        InputStream is = null;
         try {
             urlParameters = "action=checkPushResult"
                     + "&serviceId=" + URLEncoder.encode("" + serviceId, InweboConstants.ENCODING)
@@ -70,38 +72,35 @@ public class PushResult {
                 this.context = PushAuthentication.setHttpsClientCert(this.p12file, this.p12password);
             }
             SSLSocketFactory sslsocketfactory = context.getSocketFactory();
-            URL url = null;
-            url = new URL(urlString + urlParameters);
-            HttpsURLConnection conn = null;
-            if (url != null) {
-                conn = (HttpsURLConnection) url.openConnection();
-            }
+            URL url = new URL(urlString + urlParameters);
+            conn = (HttpsURLConnection) url.openConnection();
             conn.setSSLSocketFactory(sslsocketfactory);
-            if (conn != null) {
-                conn.setRequestMethod("GET");
-            }
-            InputStream is = null;
+            conn.setRequestMethod("GET");
             is = conn.getInputStream();
-            BufferedReader br = null;
-            if (is != null) {
-                br = new BufferedReader(new InputStreamReader(is, InweboConstants.ENCODING));
-            }
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, InweboConstants.ENCODING));
             JSONParser parser = new JSONParser();
             json = (JSONObject) parser.parse(br);
         } catch (UnsupportedEncodingException e) {
-            log.error("Error while encoding the URL" + e.getMessage(), e);
+            throw new AuthenticationFailedException("Error while encoding the URL" + e.getMessage(), e);
         } catch (MalformedURLException e) {
-            log.error("Error while creating the URL", e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
+            throw new AuthenticationFailedException("Error while creating the URL" + e.getMessage(), e);
         } catch (IOException e) {
-            log.error("Error while creating the connection", e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
+            throw new AuthenticationFailedException("Error while creating the connection" + e.getMessage(), e);
         } catch (ParseException e) {
-            log.error("Error while parsing the json object ", e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
+            throw new AuthenticationFailedException("Error while parsing the json object" + e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Error while pushing authentication", e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
+            throw new AuthenticationFailedException("Error while pushing authentication" + e.getMessage(), e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException e) {
+                throw new AuthenticationFailedException("Error while closing stream" + e.getMessage(), e);
+            }
         }
         return json;
     }

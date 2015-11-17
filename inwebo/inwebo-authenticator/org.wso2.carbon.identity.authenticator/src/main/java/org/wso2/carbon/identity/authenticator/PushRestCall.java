@@ -31,14 +31,16 @@ public class PushRestCall {
     private String p12file;
     private String p12password;
     private String userId;
-    private int retryCount;
+    private int waitTime;
+    private int retryInterval;
 
-    public PushRestCall(String serviceId, String p12file, String p12password, String userId, int retryCount) {
+    public PushRestCall(String serviceId, String p12file, String p12password, String userId, Integer waitTime, Integer retryInterval) {
         this.serviceId = serviceId;
         this.p12file = p12file;
         this.p12password = p12password;
         this.userId = userId;
-        this.retryCount = retryCount;
+        this.waitTime = waitTime;
+        this.retryInterval = retryInterval;
     }
 
     public String invokePush() throws AuthenticationFailedException {
@@ -48,35 +50,34 @@ public class PushRestCall {
         PushAuthentication pushAuthentication = new PushAuthentication(serviceId, p12file, p12password);
         JSONObject result = pushAuthentication.pushAuthenticate(userId);
         if (log.isDebugEnabled()) {
-            log.info("Result: " + result.toJSONString());
+            log.debug("Result: " + result.toJSONString());
         }
         sessionId = (String) result.get("sessionId");
         if (log.isDebugEnabled()) {
-            log.info("Session id: " + sessionId);
+            log.debug("Session id: " + sessionId);
         }
         PushResult cr = new PushResult(serviceId, p12file, p12password);
         if (sessionId == null) {
             if (log.isDebugEnabled()) {
-                log.info("No session id: " + result.get(InweboConstants.ERROR));
+                log.debug("No session id: " + result.get(InweboConstants.RESULT));
             }
             return result.toString();
         }
         int retry = 0;
-        int maxRetryCount = 10;
-        int waitTime = maxRetryCount > retryCount ? retryCount : maxRetryCount;
         while ((retry < waitTime)) {
             retry++;
             result = cr.checkPushResult(userId, sessionId);
-            if (!result.get(InweboConstants.ERROR).equals(InweboConstants.CODEWAITTING)) break;
+            if (!result.get(InweboConstants.RESULT).equals(InweboConstants.CODEWAITTING)) break;
             try {
-                log.info("Request pending...  " + result);
-                Thread.sleep(1000);
+                if (log.isDebugEnabled()) {
+                    log.debug("Request pending...  " + result);
+                }
+                Thread.sleep(retryInterval);
             } catch (InterruptedException e) {
-                log.error("Error while getting response", e);
-                throw new AuthenticationFailedException(e.getMessage(), e);
+                throw new AuthenticationFailedException("Error while getting response" + e.getMessage(), e);
             }
         }
-        log.info("Result:" + result.get(InweboConstants.ERROR));
+        log.info("Result:" + result.get(InweboConstants.RESULT));
         return result.toString();
     }
 
