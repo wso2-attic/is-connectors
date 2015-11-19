@@ -48,7 +48,6 @@ public class PushAuthentication {
     private static final Log log = LogFactory.getLog(PushAuthentication.class);
 
     private static String urlString = InweboConstants.INWEBOURL;
-    ;
     private String serviceId;
     private String p12file;
     private String p12password;

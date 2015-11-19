@@ -54,7 +54,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
     private static Log log = LogFactory.getLog(InweboAuthenticator.class);
     private static final long serialVersionUID = -4154255583070524018L;
     private String pushResponse = null;
-    private String serviceId = null;
+    private String userId = null;
 
 
     /**
@@ -65,7 +65,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         if (log.isDebugEnabled()) {
             log.debug("Inside InweboAuthenticator.canHandle()");
         }
-        return (pushResponse != null && pushResponse.contains(InweboConstants.PUSHRESPONSE));
+        return (true);
     }
 
     /**
@@ -74,14 +74,6 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
     @Override
     public List<Property> getConfigurationProperties() {
         List<Property> configProperties = new ArrayList<Property>();
-        Property userId = new Property();
-
-        userId.setName(InweboConstants.USER_ID);
-        userId.setDisplayName("Username");
-        userId.setRequired(true);
-        userId.setDescription("Enter your Inwebo username");
-        configProperties.add(userId);
-
         Property serviceId = new Property();
         serviceId.setName(InweboConstants.SERVICE_ID);
         serviceId.setDisplayName("Service Id");
@@ -107,13 +99,13 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         Property retryCount = new Property();
         retryCount.setName(InweboConstants.RETRY_COUNT);
         retryCount.setDisplayName("Waiting Time");
-        retryCount.setDescription("Waiting time for authentication(<10)");
+        retryCount.setDescription("Waiting time for authentication in seconds(<10)");
         configProperties.add(retryCount);
 
         Property retryInterval = new Property();
         retryInterval.setName(InweboConstants.RETRY_INTERVAL);
         retryInterval.setDisplayName("Retry Interval");
-        retryInterval.setDescription("Retrying time interval(eg 1000)");
+        retryInterval.setDescription("Retrying time interval in ms(eg 1000)");
         configProperties.add(retryInterval);
 
         return configProperties;
@@ -144,10 +136,10 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
                 UserRealm userRealm = getUserRealm();
                 username = MultitenantUtils.getTenantAwareUsername(username);
                 if (userRealm != null) {
-                    serviceId = userRealm.getUserStoreManager().getUserClaimValue(username, InweboConstants.INWEBO_SERVICEID, null).toString();
+                    userId = userRealm.getUserStoreManager().getUserClaimValue(username, InweboConstants.INWEBO_SERVICEID, null).toString();
                 } else {
                     throw new AuthenticationFailedException(
-                            "Cannot find the user claim for the given serviceId: " + serviceId);
+                            "Cannot find the user claim for the given serviceId: " + userId);
                 }
             } catch (UserStoreException e) {
                 throw new AuthenticationFailedException("Error while getting the user store"+ e.getMessage(),e);
@@ -157,10 +149,9 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         if (context.isLogoutRequest()) {
             return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
         } else {
-            if (pushResponse == null) {
                 Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
                 if (authenticatorProperties != null) {
-                    String userId = authenticatorProperties.get(InweboConstants.USER_ID);
+                    String serviceId=authenticatorProperties.get(InweboConstants.SERVICE_ID);
                     String p12file = authenticatorProperties.get(InweboConstants.INWEBO_P12FILE);
                     String p12password = authenticatorProperties.get(InweboConstants.INWEBO_P12PASSWORD);
                     if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_COUNT))) {
@@ -185,13 +176,14 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
                         } else {
                             throw new AuthenticationFailedException("Selected user profile not found");
                         }
-                    } else
+                    } else{
                         throw new AuthenticationFailedException("Authentication failed");
+                    }
                     pushResponse = null;
-                    serviceId = null;
-                } else
+                    userId = null;
+                } else{
                     throw new AuthenticationFailedException("Required parameters are empty");
-            }
+                }
             return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
         }
     }
