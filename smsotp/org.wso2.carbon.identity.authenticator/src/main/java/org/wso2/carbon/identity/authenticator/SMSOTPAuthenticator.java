@@ -135,15 +135,15 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
             String urlParameters = "api_key=" + clientId + "&api_secret=" + clientSecret + "&from=NEXMO&to=" + mobile
                     + "&text=" + otpToken;
 
-//            try {
-//                if(!sendRESTCall(SMSOTPConstants.NEXMO_SMS_URL, urlParameters)) {
-//                    throw new AuthenticationFailedException("Unable to send the code");
-//               }
-//            } catch (IOException e) {
-//                if (log.isDebugEnabled()) {
-//                    log.debug("Error while sending the HTTP request", e);
-//                }
-//            }
+            try {
+                if(!sendRESTCall(SMSOTPConstants.NEXMO_SMS_URL, urlParameters)) {
+                    throw new AuthenticationFailedException("Unable to send the code");
+               }
+            } catch (IOException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Error while sending the HTTP request", e);
+                }
+            }
         }
     }
 
