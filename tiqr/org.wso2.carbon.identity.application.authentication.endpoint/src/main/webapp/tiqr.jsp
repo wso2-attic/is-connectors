@@ -166,7 +166,7 @@
 $(document).ready(function() {
 	$('#enroll').click(function() {
 		$.ajax({
-		    url : 'GetQRCode',
+		    url : 'QRCode',
 		    data : {
 		        username : $('#username').val(),
 		        password : $('#password').val(),
@@ -194,7 +194,7 @@ $(document).ready(function() {
 function showAuthenticationQR() {
 if($('#tiqrAction').val() == "authentication" && $('#error').val() != "enrollment.fail.message") {
     $.ajax({
-        url : 'GetQRCode',
+        url : 'QRCode',
         data : {
             username : "",
             password : "",
