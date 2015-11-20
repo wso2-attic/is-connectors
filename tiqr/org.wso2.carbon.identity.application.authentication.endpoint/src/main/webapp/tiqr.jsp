@@ -137,7 +137,7 @@
         <%
         } else {
         %>
-            <div id="enrollmentTable" class="identity-box"">
+            <div id="enrollmentTable" class="identity-box">
         <%
         }
         %>

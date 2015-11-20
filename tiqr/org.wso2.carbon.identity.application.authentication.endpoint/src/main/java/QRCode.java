@@ -35,9 +35,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.application.authentication.endpoint.util.TiqrConstants;
 
-@WebServlet("/GetQRCode")
-public class GetQRCode extends HttpServlet {
-    private static Log log = LogFactory.getLog(GetQRCode.class);
+@WebServlet("/QRCode")
+public class QRCode extends HttpServlet {
+    private static Log log = LogFactory.getLog(QRCode.class);
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
