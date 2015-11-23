@@ -81,7 +81,6 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         Object myToken = otpToken;
         authContext.setProperty(otpToken, myToken);
 
-        System.out.println("hh " + myToken);
         Map<String, String> authenticatorProperties = context
                 .getAuthenticatorProperties();
         String clientId = authenticatorProperties
