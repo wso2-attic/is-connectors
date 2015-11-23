@@ -64,7 +64,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         if (log.isDebugEnabled()) {
             log.debug("Inside SMSOTPAuthenticator canHandle method");
         }
-        return !StringUtils.isEmpty(request.getParameter(SMSOTPConstants.CODE));
+        return StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.CODE));
     }
 
     /**
