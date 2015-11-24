@@ -90,7 +90,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
         if (log.isDebugEnabled()) {
             log.debug("Inside TiqrAuthenticator.canHandle()");
         }
-        return ((!StringUtils.isEmpty(request.getParameter(TiqrConstants.TIQR_ACTION))
+        return ((StringUtils.isNotEmpty(request.getParameter(TiqrConstants.TIQR_ACTION))
                 && request.getParameter(TiqrConstants.TIQR_ACTION).equals(TiqrConstants.TIQR_ACTION_AUTHENTICATION))
                 || (request.getParameter(TiqrConstants.ENROLL_USERID) != null
                 && request.getParameter(TiqrConstants.ENROLL_DISPLAYNAME) != null
