@@ -59,7 +59,6 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
     /**
      * Check whether the authentication or logout request can be handled by the authenticator
      */
-//    @Override
     public boolean canHandle(HttpServletRequest request) {
         if (log.isDebugEnabled()) {
             log.debug("Inside SMSOTPAuthenticator canHandle method");
@@ -165,7 +164,6 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
     /**
      * Get the friendly name of the Authenticator
      */
-//    @Override
     public String getFriendlyName() {
         return SMSOTPConstants.AUTHENTICATOR_FRIENDLY_NAME;
     }
@@ -173,7 +171,6 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
     /**
      * Get the name of the Authenticator
      */
-//    @Override
     public String getName() {
         return SMSOTPConstants.AUTHENTICATOR_NAME;
     }
