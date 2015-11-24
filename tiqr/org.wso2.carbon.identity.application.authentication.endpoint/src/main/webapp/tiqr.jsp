@@ -105,7 +105,7 @@
                     <div class="boarder-all ">
                         <div class="clearfix"></div>
                         <div class="padding-double login-form">
-                            <div id="alertDiv"></div>
+                        <div id="alertDiv"></div>
         <%
         if ("true".equals(enrollmentFailed)) {
         %>
@@ -206,10 +206,11 @@ if($('#tiqrAction').val() == "authentication" && $('#error').val() != "enrollmen
         },
         success : function(responseText) {
             if(!responseText.startsWith("Failed:")) {
+	            clearAlert();
                 document.getElementById("qrCodeDiv").innerHTML = responseText;
 			    $('#enrollmentForm').submit();
             } else {
-            	document.getElementById('alertDiv').innerHTML = '<div id="alertDiv" class="alert alert-danger">'
+            	document.getElementById('alertDiv').innerHTML = '<div id="error-msg" class="alert alert-danger">'
             	+ responseText + '</div>';
             }
         }

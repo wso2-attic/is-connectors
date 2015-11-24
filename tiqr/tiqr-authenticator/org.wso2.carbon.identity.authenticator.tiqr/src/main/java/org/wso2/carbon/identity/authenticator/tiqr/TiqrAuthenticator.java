@@ -17,7 +17,7 @@
  *
  */
 
-package org.wso2.carbon.identity.authenticator;
+package org.wso2.carbon.identity.authenticator.tiqr;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,7 +55,7 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.authentication.framework.AuthenticatorFlowStatus;
 import org.wso2.carbon.identity.application.authentication.framework.config.model.SequenceConfig;
-import org.wso2.carbon.identity.authenticator.internal.TiqrAuthenticatorServiceComponent;
+import org.wso2.carbon.identity.authenticator.tiqr.internal.TiqrAuthenticatorServiceComponent;
 import org.wso2.carbon.identity.core.util.IdentityDatabaseUtil;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.user.profile.mgt.UserProfileAdmin;

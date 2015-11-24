@@ -17,7 +17,7 @@
  *
  */
 
-package org.wso2.carbon.identity.authenticator.internal;
+package org.wso2.carbon.identity.authenticator.tiqr.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,7 +25,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.authentication.framework.ApplicationAuthenticator;
-import org.wso2.carbon.identity.authenticator.TiqrAuthenticator;
+import org.wso2.carbon.identity.authenticator.tiqr.TiqrAuthenticator;
 import org.wso2.carbon.user.core.service.RealmService;
 
 import java.util.Hashtable;
