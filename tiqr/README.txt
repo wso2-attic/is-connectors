@@ -14,7 +14,7 @@ Do the following:
 
 Build org.wso2.carbon.identity.application.authentication.endpoint and place the jar into <IS_HOME>/repository/deployment/server/webapps
 Build org.wso2.carbon.identity.application.authentication.endpoint.util and patch the jar into <IS_HOME>/repository/components/patches
-Put the jars given in https://github.com/Shakila/Tiqr-IS-5.1.0/tree/master/tiqr-authenticator/org.wso2.carbon.identity.authenticator/src/main/resources into TIQR_AUTHENTICATOR_HOME>/org.wso2.carbon.identity.authenticator/src/main/resources
+Put the jars given in https://github.com/Shakila/Tiqr-IS-5.1.0/tree/master/tiqr-authenticator/org.wso2.carbon.identity.authenticator.tiqr/src/main/resources into TIQR_AUTHENTICATOR_HOME>/org.wso2.carbon.identity.authenticator/src/main/resources
 Patch the jars given in TIQR_AUTHENTICATOR_HOME>/org.wso2.carbon.identity.authenticator/src/main/resources into <IS_HOME>/repository/components/patches
 
 Start the IS server and create Identity provider and service provider in IS via the IS dashboard.
