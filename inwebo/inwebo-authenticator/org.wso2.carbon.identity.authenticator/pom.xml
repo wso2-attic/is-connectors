@@ -14,28 +14,29 @@
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.wso2.carbon.identity.authenticator</groupId>
     <artifactId>org.wso2.carbon.identity.authenticator.Inwebo</artifactId>
     <version>1.0.0</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Authenticator Library For Inwebo</name>
     <url>http://wso2.org</url>
-
     <properties>
         <!--Carbon identity version-->
-        <carbon.identity.version>4.2.0</carbon.identity.version>
+        <carbon.identity.version>5.0.2-beta</carbon.identity.version>
+        <!--<carbon.identity.version>5.0.3-SNAPSHOT</carbon.identity.version>-->
         <!-- Carbon kernel version -->
-        <carbon.kernel.version>4.2.0</carbon.kernel.version>
+        <carbon.kernel.version>4.4.2</carbon.kernel.version>
         <commons-logging.version>4.2.0</commons-logging.version>
     </properties>
-
     <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.idp.mgt</artifactId>
+            <version>5.0.2-beta</version>
+        </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
@@ -44,12 +45,46 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.application.authentication.framework</artifactId>
-            <version>4.2.2</version>
+            <version>${carbon.identity.version}</version>
+            <scope>system</scope>
+            <systemPath>
+                ${basedir}/src/main/resources/org.wso2.carbon.identity.application.authentication.framework-${carbon.identity.version}.jar
+            </systemPath>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.application.common</artifactId>
             <version>${carbon.identity.version}</version>
+            <scope>system</scope>
+            <systemPath>
+                ${basedir}/src/main/resources/org.wso2.carbon.identity.application.common-${carbon.identity.version}.jar
+            </systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.identity.user.profile</artifactId>
+            <version>${carbon.identity.version}</version>
+            <scope>system</scope>
+            <systemPath>
+                ${basedir}/src/main/resources/org.wso2.carbon.identity.user.profile-${carbon.identity.version}.jar
+            </systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.identity.user.account.association</artifactId>
+            <version>${carbon.identity.version}</version>
+            <scope>system</scope>
+            <systemPath>
+                ${basedir}/src/main/resources/org.wso2.carbon.identity.user.account.association-${carbon.identity.version}.jar
+            </systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.identity.core</artifactId>
+            <version>${carbon.identity.version}</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/org.wso2.carbon.identity.core-${carbon.identity.version}.jar
+            </systemPath>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
@@ -67,7 +102,6 @@
             <version>0.22.1358727.wso2v4</version>
         </dependency>
     </dependencies>
-
     <repositories>
         <repository>
             <id>wso2-nexus</id>
@@ -80,7 +114,6 @@
             </releases>
         </repository>
     </repositories>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -92,7 +125,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -120,7 +152,7 @@
                             org.wso2.carbon.identity.application.authentication.framework.*,
                             javax.servlet,
                             javax.servlet.http,
-                            *;
+                            *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
                             !org.wso2.carbon.identity.authenticator.internal,
@@ -144,7 +176,6 @@
             </plugin>
         </plugins>
     </build>
-
     <distributionManagement>
         <repository>
             <id>wso2-maven2-repository</id>
@@ -152,5 +183,4 @@
             <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/maven2/</url>
         </repository>
     </distributionManagement>
-
 </project>

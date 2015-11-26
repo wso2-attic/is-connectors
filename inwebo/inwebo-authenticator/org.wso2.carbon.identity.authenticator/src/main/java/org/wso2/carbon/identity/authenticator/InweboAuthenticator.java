@@ -19,31 +19,29 @@
 
 package org.wso2.carbon.identity.authenticator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.identity.application.authentication.framework.AbstractApplicationAuthenticator;
+import org.apache.amber.oauth2.common.utils.JSONUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.application.authentication.framework.AbstractApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.AuthenticatorFlowStatus;
 import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.LocalApplicationAuthenticator;
-import org.wso2.carbon.identity.application.authentication.framework.config.ConfigurationFacade;
 import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
 import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
 import org.wso2.carbon.identity.application.authentication.framework.exception.LogoutFailedException;
-import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.application.common.model.Property;
-import org.apache.amber.oauth2.common.utils.JSONUtils;
-import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -118,19 +116,15 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         int waitTime;
         int retryInterval;
         String username = null;
-        for (int i = context.getSequenceConfig().getStepMap().size() - 1; i > 0; i--) {
-            //Getting the last authenticated local user
-            if (context.getSequenceConfig().getStepMap().get(i).getAuthenticatedUser() != null &&
-                    context.getSequenceConfig().getStepMap().get(i).getAuthenticatedAutenticator()
+        //Getting the last authenticated local user
+        for (Integer stepMap : context.getSequenceConfig().getStepMap().keySet())
+            if (context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser() != null &&
+                    context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedAutenticator()
                             .getApplicationAuthenticator() instanceof LocalApplicationAuthenticator) {
 
-                username = context.getSequenceConfig().getStepMap().get(i).getAuthenticatedUser();
-                if (log.isDebugEnabled()) {
-                    log.debug("username :" + username);
-                }
+                username = String.valueOf(context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser());
                 break;
             }
-        }
         if (username != null) {
             try {
                 UserRealm userRealm = getUserRealm();
@@ -142,86 +136,48 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
                             "Cannot find the user claim for the given serviceId: " + userId);
                 }
             } catch (UserStoreException e) {
-                throw new AuthenticationFailedException("Error while getting the user store"+ e.getMessage(),e);
+                throw new AuthenticationFailedException("Error while getting the user store" + e.getMessage(), e);
             }
         }
 
         if (context.isLogoutRequest()) {
             return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
         } else {
-                Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
-                if (authenticatorProperties != null) {
-                    String serviceId=authenticatorProperties.get(InweboConstants.SERVICE_ID);
-                    String p12file = authenticatorProperties.get(InweboConstants.INWEBO_P12FILE);
-                    String p12password = authenticatorProperties.get(InweboConstants.INWEBO_P12PASSWORD);
-                    if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_COUNT))) {
-                        waitTime = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_COUNT));
-                    } else {
-                        waitTime = Integer.parseInt(InweboConstants.WAITTIME_DEFAULT);
-                    }
-                    if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL))) {
-                        retryInterval = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL
-                        ));
-                    } else {
-                        retryInterval = Integer.parseInt(InweboConstants.RETRYINTERVAL_DEFAULT);
-                    }
-                    PushRestCall push = new PushRestCall(serviceId, p12file, p12password, userId, waitTime, retryInterval);
-                    pushResponse = push.run();
-                    if (pushResponse.contains(InweboConstants.PUSHRESPONSE)) {
-                        log.info("Authentication successful");
-                        Map<String, Object> userClaims = getUserClaims();
-                        if (userClaims != null && !userClaims.isEmpty()) {
-                            context.setSubjectAttributes(getSubjectAttributes(userClaims));
-                            context.setSubject(userId);
-                        } else {
-                            throw new AuthenticationFailedException("Selected user profile not found");
-                        }
-                    } else{
-                        throw new AuthenticationFailedException("Authentication failed");
-                    }
-                    pushResponse = null;
-                    userId = null;
-                } else{
-                    throw new AuthenticationFailedException("Required parameters are empty");
+            Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
+            if (authenticatorProperties != null) {
+                String serviceId = authenticatorProperties.get(InweboConstants.SERVICE_ID);
+                String p12file = authenticatorProperties.get(InweboConstants.INWEBO_P12FILE);
+                String p12password = authenticatorProperties.get(InweboConstants.INWEBO_P12PASSWORD);
+                if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_COUNT))) {
+                    waitTime = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_COUNT));
+                } else {
+                    waitTime = Integer.parseInt(InweboConstants.WAITTIME_DEFAULT);
                 }
+                if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL))) {
+                    retryInterval = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL
+                    ));
+                } else {
+                    retryInterval = Integer.parseInt(InweboConstants.RETRYINTERVAL_DEFAULT);
+                }
+                PushRestCall push = new PushRestCall(serviceId, p12file, p12password, userId, waitTime, retryInterval);
+                pushResponse = push.run();
+                if (pushResponse.contains(InweboConstants.PUSHRESPONSE)) {
+                    log.info("Authentication successful");
+                    context.setSubject(AuthenticatedUser.createLocalAuthenticatedUserFromSubjectIdentifier(userId));
+                } else {
+                    throw new AuthenticationFailedException("Authentication failed");
+                }
+                pushResponse = null;
+                userId = null;
+            } else {
+                throw new AuthenticationFailedException("Required parameters are empty");
+            }
             return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
         }
     }
 
-
     public static UserRealm getUserRealm() {
         return (UserRealm) CarbonContext.getThreadLocalCarbonContext().getUserRealm();
-    }
-
-    protected Map<ClaimMapping, String> getSubjectAttributes(
-            Map<String, Object> claimMap) {
-
-        Map<ClaimMapping, String> claims = new HashMap<>();
-
-        if (claimMap != null) {
-            for (Map.Entry<String, Object> entry : claimMap.entrySet()) {
-                claims.put(ClaimMapping.build(entry.getKey(),
-                        entry.getKey(), null, false), entry.getValue()
-                        .toString());
-                if (log.isDebugEnabled()) {
-                    log.debug("Adding claim from end-point data mapping : "
-                            + entry.getKey() + " <> " + " : "
-                            + entry.getValue());
-                }
-            }
-        }
-        return claims;
-    }
-
-    protected Map<String, Object> getUserClaims() throws AuthenticationFailedException {
-        try {
-            String json = pushResponse;
-            Map<String, Object> jsonObject = JSONUtils.parseJSON(json);
-            return jsonObject;
-        } catch (Exception e) {
-            log.error("Error while getting user claims", e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
-        }
     }
 
     /**
