@@ -204,7 +204,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                     ? maxCount : Integer.parseInt(authenticatorProperties.get(TiqrConstants.TIQR_WAIT_TIME));
             int retryCount = maxCount > waitTime ? waitTime : maxCount;
             if (request.getParameter(TiqrConstants.TIQR_ACTION).equals(TiqrConstants.TIQR_ACTION_AUTHENTICATION)) {
-                log.info("Waiting for getting authentication status...");
                 String urlToCheckAuthentication = tiqrEP;
                 while (retry < retryCount) {
                     String checkStatusResponse = sendRESTCall(urlToCheckAuthentication, "",
@@ -227,9 +226,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                             break;
                         }
                     }
-                    if (log.isDebugEnabled()) {
-                        log.debug("Authentication pending...");
-                    }
                     Thread.sleep(retryInterval);
                     retry++;
                     if (retry == retryCount) {
@@ -240,7 +236,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 if (status == Integer.parseInt(TiqrConstants.ENROLLMENT_SUCCESS_STATUS)) {
                     String userName = getAssociatedUsername(context, userId);
                     if (StringUtils.isEmpty(userName)) {
-                        log.error("This tiqr user is not associated with any authenticated IS user");
                         throw new AuthenticationFailedException("This tiqr user is not associated with " +
                                 "any authenticated IS user");
                     } else {
@@ -260,7 +255,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 if (!isAuthenticated) {
                     throw new AuthenticationFailedException("Authentication Failed: Invalid username or password");
                 }
-                log.info("Waiting for getting enrollment status...");
                 userId = request.getParameter(TiqrConstants.ENROLL_USERID);
                 String urlToCheckEntrolment = tiqrEP + "/enrol.php";
                 while (retry < retryCount) {
@@ -284,9 +278,6 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                         }
                         break;
                     }
-                    if (log.isDebugEnabled()) {
-                        log.debug("Enrolment pending...");
-                    }
                     Thread.sleep(retryInterval);
                     retry++;
                     if (retry == retryCount) {
@@ -308,7 +299,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             }
         } catch (NumberFormatException e) {
             log.error(request.getParameter(TiqrConstants.TIQR_ACTION) + " failed: " + e.getMessage(), e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
+            throw new AuthenticationFailedException(request.getParameter(TiqrConstants.TIQR_ACTION) + " failed: " + e.getMessage(), e);
         } catch (InterruptedException e) {
             log.error("Interruption occured while getting the"
                     + request.getParameter(TiqrConstants.TIQR_ACTION) + " status" + e.getMessage(), e);

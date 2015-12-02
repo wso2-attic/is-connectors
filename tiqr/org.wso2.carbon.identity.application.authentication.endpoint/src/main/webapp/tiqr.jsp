@@ -100,7 +100,7 @@
                 <div class="container col-xs-10 col-sm-6 col-md-6 col-lg-4 col-centered wr-content wr-login col-centered">
                     <div>
                         <h2 class="wr-title blue-bg padding-double white boarder-bottom-blue margin-none">
-                            Authenticating user with Tiqr</h2>
+                            Authenticating with Tiqr <a href="https://tiqr.org/" target="blank"><img src="images/tiqr-icon.jpg" style="float:right;" width="50" height="50"/></a></h2>
                     </div>
                     <div class="boarder-all ">
                         <div class="clearfix"></div>
@@ -144,23 +144,28 @@
             <input type="hidden" name="sessionDataKey" value='<%=request.getParameter("sessionDataKey")%>' />
             <!--Username-->
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                <input id="username" name="username" type="text" class="form-control" tabindex="0" placeholder="Username">
+                <input id="username" name="username" type="text" class="form-control" tabindex="0" placeholder="Username" data-toggle="tooltip" title="The Username of the WSO2 Identity server user!">
             </div>
             <!--Password-->
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                <input id="password" name="password" type="password" class="form-control" tabindex="0" placeholder="password">
+                <input id="password" name="password" type="password" class="form-control" tabindex="0" placeholder="password" data-toggle="tooltip" title="The password of the WSO2 Identity server user!">
             </div>
             <!-- userId -->
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                <input id="userId" name="userId" type="text" class="form-control" tabindex="0" placeholder="User Id">
+                <input id="userId" name="userId" type="text" class="form-control" tabindex="0" placeholder="User Id" data-toggle="tooltip" title="User Identifier of the tiqr user!">
             </div>
             <!--DisplayName-->
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                <input id="displayName" name="displayName" type="text" class="form-control" tabindex="0" placeholder="Full Name">
+                <input id="displayName" name="displayName" type="text" class="form-control" tabindex="0" placeholder="Full Name" data-toggle="tooltip" title="Full name of the tiqr user!">
             </div>
         <div class="form-actions">
             <input type="button" value="<fmt:message key='go'/>" class="wr-btn grey-bg col-xs-12 col-md-12 col-lg-12 uppercase font-extra-large" id="enroll">
         </div>
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
 <script src="http://code.jquery.com/jquery-1.10.2.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function() {
