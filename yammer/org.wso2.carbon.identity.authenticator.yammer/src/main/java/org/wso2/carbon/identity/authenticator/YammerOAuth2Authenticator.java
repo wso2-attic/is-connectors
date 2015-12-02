@@ -105,7 +105,6 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
             throws AuthenticationFailedException {
 
         try {
-
             Map< String, String > authenticatorProperties = context.getAuthenticatorProperties();
 
             String clientId = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_ID);
@@ -196,7 +195,6 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
     @Override
     protected Map< ClaimMapping, String > getSubjectAttributes(OAuthClientResponse token,
                                                                Map< String, String > authenticatorProperties) {
-
         Map< ClaimMapping, String > claims = new HashMap<>();
 
         try {
