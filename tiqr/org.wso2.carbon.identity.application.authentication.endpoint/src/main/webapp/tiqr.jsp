@@ -142,21 +142,21 @@
         }
         %>
             <input type="hidden" name="sessionDataKey" value='<%=request.getParameter("sessionDataKey")%>' />
-            <!--Username-->
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                <input id="username" name="username" type="text" class="form-control" tabindex="0" placeholder="Username" data-toggle="tooltip" title="The Username of the WSO2 Identity server user!">
-            </div>
-            <!--Password-->
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                <input id="password" name="password" type="password" class="form-control" tabindex="0" placeholder="password" data-toggle="tooltip" title="The password of the WSO2 Identity server user!">
-            </div>
             <!-- userId -->
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                <input id="userId" name="userId" type="text" class="form-control" tabindex="0" placeholder="User Id" data-toggle="tooltip" title="User Identifier of the tiqr user!">
+                <input id="userId" name="userId" type="text" class="form-control" tabindex="0" placeholder="User Id" data-toggle="tooltip" title="User Identifier of the tiqr user">
             </div>
             <!--DisplayName-->
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
-                <input id="displayName" name="displayName" type="text" class="form-control" tabindex="0" placeholder="Full Name" data-toggle="tooltip" title="Full name of the tiqr user!">
+                <input id="displayName" name="displayName" type="text" class="form-control" tabindex="0" placeholder="Full Name" data-toggle="tooltip" title="Full name of the tiqr user">
+            </div>
+            <!--Username-->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
+                <input id="username" name="username" type="text" class="form-control" tabindex="0" placeholder="Username" data-toggle="tooltip" title="The Username">
+            </div>
+            <!--Password-->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 form-group">
+                <input id="password" name="password" type="password" class="form-control" tabindex="0" placeholder="password" data-toggle="tooltip" title="The password">
             </div>
         <div class="form-actions">
             <input type="button" value="<fmt:message key='go'/>" class="wr-btn grey-bg col-xs-12 col-md-12 col-lg-12 uppercase font-extra-large" id="enroll">
@@ -268,9 +268,9 @@ function clearAlert() {
         <% } else { %>
             <div id="enrollmentLinkDiv" style="display:none; float:left">
         <% } %>
-                <a id="showEnrollmentDiv">Enroll a user</a>
+                <a id="showEnrollmentDiv">Enroll</a>
             </div><div id="authenticationLinkDiv" style="display:inline-block; float:right">
-                <a id="showAuthenticationDiv">Authenticate a user</a>
+                <a id="showAuthenticationDiv">Authenticate</a>
             </div>
     </div>
     </form>
