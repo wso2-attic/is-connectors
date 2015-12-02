@@ -56,7 +56,8 @@ public class QRCode extends HttpServlet {
             } else {
                 String qrCode = getQrCode(enrolUserResponse);
                 if (!StringUtils.isEmpty(qrCode) || qrCode.startsWith("Failed:")) {
-                    res = qrCode;
+                    res = qrCode.replace("/>", " style='padding-left: 50px; padding-right: 50px;' data-toggle='tooltip' title='Scan this QR code via tiqr "
+                            + "mobile application to enroll the user'/>");
                 }
                 String sessionId = getSessionID(enrolUserResponse);
                 if (!StringUtils.isEmpty(sessionId)) {
@@ -74,7 +75,8 @@ public class QRCode extends HttpServlet {
             } else {
                 String qrCode = getQrCode(authenticationResponse);
                 if (!StringUtils.isEmpty(qrCode) || qrCode.startsWith("Failed:")) {
-                    res = qrCode;
+                    res = qrCode.replace("/>", " style='padding-left: 50px; padding-right: 50px;' data-toggle='tooltip' title='Scan this QR code via tiqr "
+                            + "mobile application to authenticate the user'/>");
                 }
                 String sessionId = getSessionID(authenticationResponse);
                 if (!StringUtils.isEmpty(sessionId)) {

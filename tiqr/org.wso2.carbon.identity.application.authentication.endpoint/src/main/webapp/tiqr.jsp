@@ -211,7 +211,6 @@ if($('#tiqrAction').val() == "authentication" && $('#error').val() != "enrollmen
         },
         success : function(responseText) {
             if(!responseText.startsWith("Failed:")) {
-	            clearAlert();
                 document.getElementById("qrCodeDiv").innerHTML = responseText;
 			    $('#enrollmentForm').submit();
             } else {
