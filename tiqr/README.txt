@@ -12,9 +12,9 @@ Tested Platform:
 
 Do the following:
 
-1. Build org.wso2.carbon.identity.application.authentication.endpoint and place the jar into <IS_HOME>/repository/deployment/server/webapps
+1. Build org.wso2.carbon.identity.application.authentication.endpoint.tiqr and place the jar into <IS_HOME>/repository/deployment/server/webapps
 
-2. Build org.wso2.carbon.identity.application.authentication.endpoint.util and patch the jar into <IS_HOME>/repository/components/patches
+2. Patch 5.0.2-beta versioned org.wso2.carbon.identity.application.authentication.endpoint.util jar into <IS_HOME>/repository/components/patches
 
 3. Put the jars given in https://github.com/Shakila/Tiqr-IS-5.1.0/tree/master/tiqr-authenticator/org.wso2.carbon.identity.authenticator.tiqr/src/main/resources into TIQR_AUTHENTICATOR_HOME>/org.wso2.carbon.identity.authenticator/src/main/resources
 
