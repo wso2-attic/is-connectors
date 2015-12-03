@@ -119,7 +119,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                     }
                 }
                 String enrollmentPage = ConfigurationFacade.getInstance().getAuthenticationEndpointURL()
-                        .replace("login.do", "tiqr.jsp");
+                        .replace("authenticationendpoint/login.do", "tiqrauthenticationendpoint/tiqr.jsp");
                 String tiqrAction = StringUtils.isEmpty(request.getParameter(TiqrConstants.TIQR_ACTION))
                         ? TiqrConstants.TIQR_ACTION_AUTHENTICATION : request.getParameter(TiqrConstants.TIQR_ACTION);
                 String queryParams = FrameworkUtils
