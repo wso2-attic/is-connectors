@@ -164,5 +164,4 @@ public class OneTimePassword {
         }
         return result;
     }
-
 }
