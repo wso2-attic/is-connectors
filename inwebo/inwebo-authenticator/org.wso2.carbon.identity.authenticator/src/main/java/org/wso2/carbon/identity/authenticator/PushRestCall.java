@@ -45,8 +45,9 @@ public class PushRestCall {
 
     public String invokePush() throws AuthenticationFailedException {
         String sessionId;
-        log.info("\nAsk push notification ");
-
+        if (log.isDebugEnabled()) {
+            log.info("\nAsk push notification ");
+        }
         PushAuthentication pushAuthentication = new PushAuthentication(serviceId, p12file, p12password);
         JSONObject result = pushAuthentication.pushAuthenticate(userId);
         if (log.isDebugEnabled()) {
@@ -77,7 +78,9 @@ public class PushRestCall {
                 throw new AuthenticationFailedException("Error while getting response" + e.getMessage(), e);
             }
         }
-        log.info("Result:" + result.get(InweboConstants.RESULT));
+        if (log.isDebugEnabled()) {
+            log.info("Result:" + result.get(InweboConstants.RESULT));
+        }
         return result.toString();
     }
 

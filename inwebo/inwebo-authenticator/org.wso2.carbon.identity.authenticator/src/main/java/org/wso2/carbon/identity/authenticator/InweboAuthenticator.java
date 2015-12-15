@@ -16,29 +16,31 @@
  *  under the License.
  *
  */
-
 package org.wso2.carbon.identity.authenticator;
 
-import org.apache.amber.oauth2.common.utils.JSONUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.CarbonContext;
+
 import org.wso2.carbon.identity.application.authentication.framework.AbstractApplicationAuthenticator;
-import org.wso2.carbon.identity.application.authentication.framework.AuthenticatorFlowStatus;
 import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.LocalApplicationAuthenticator;
+import org.wso2.carbon.identity.application.authentication.framework.config.ConfigurationFacade;
 import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
 import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
-import org.wso2.carbon.identity.application.authentication.framework.exception.LogoutFailedException;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
+import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.model.Property;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+
 import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,6 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
     private String pushResponse = null;
     private String userId = null;
 
-
     /**
      * Check whether the authentication or logout request can be handled by the authenticator
      */
@@ -63,7 +64,25 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         if (log.isDebugEnabled()) {
             log.debug("Inside InweboAuthenticator.canHandle()");
         }
-        return (true);
+        return (!StringUtils.isEmpty(request.getParameter("inwebo")));
+    }
+
+    /**
+     * initiate the authentication request
+     */
+    @Override
+    protected void initiateAuthenticationRequest(HttpServletRequest request,
+                                                 HttpServletResponse response, AuthenticationContext context)
+            throws AuthenticationFailedException {
+        String loginPage = ConfigurationFacade.getInstance().getAuthenticationEndpointURL();
+        loginPage = loginPage.replace("login.do", "inwebo.jsp");
+        try {
+            response.sendRedirect(response.encodeRedirectURL(loginPage + "?" + FrameworkConstants.SESSION_DATA_KEY + "="
+                            + context.getContextIdentifier()
+            ));
+        } catch (IOException e) {
+            throw new AuthenticationFailedException("Error while redirecting", e);
+        }
     }
 
     /**
@@ -109,83 +128,75 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         return configProperties;
     }
 
-    @Override
-    public AuthenticatorFlowStatus process(HttpServletRequest request, HttpServletResponse response,
-                                           AuthenticationContext context) throws AuthenticationFailedException,
-            LogoutFailedException {
-        int waitTime;
-        int retryInterval;
-        String username = null;
-        //Getting the last authenticated local user
-        for (Integer stepMap : context.getSequenceConfig().getStepMap().keySet())
-            if (context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser() != null &&
-                    context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedAutenticator()
-                            .getApplicationAuthenticator() instanceof LocalApplicationAuthenticator) {
-
-                username = String.valueOf(context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser());
-                break;
-            }
-        if (username != null) {
-            try {
-                UserRealm userRealm = getUserRealm();
-                username = MultitenantUtils.getTenantAwareUsername(username);
-                if (userRealm != null) {
-                    userId = userRealm.getUserStoreManager().getUserClaimValue(username, InweboConstants.INWEBO_SERVICEID, null).toString();
-                } else {
-                    throw new AuthenticationFailedException(
-                            "Cannot find the user claim for the given serviceId: " + userId);
-                }
-            } catch (UserStoreException e) {
-                throw new AuthenticationFailedException("Error while getting the user store" + e.getMessage(), e);
-            }
-        }
-
-        if (context.isLogoutRequest()) {
-            return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
-        } else {
-            Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
-            if (authenticatorProperties != null) {
-                String serviceId = authenticatorProperties.get(InweboConstants.SERVICE_ID);
-                String p12file = authenticatorProperties.get(InweboConstants.INWEBO_P12FILE);
-                String p12password = authenticatorProperties.get(InweboConstants.INWEBO_P12PASSWORD);
-                if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_COUNT))) {
-                    waitTime = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_COUNT));
-                } else {
-                    waitTime = Integer.parseInt(InweboConstants.WAITTIME_DEFAULT);
-                }
-                if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL))) {
-                    retryInterval = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL
-                    ));
-                } else {
-                    retryInterval = Integer.parseInt(InweboConstants.RETRYINTERVAL_DEFAULT);
-                }
-                PushRestCall push = new PushRestCall(serviceId, p12file, p12password, userId, waitTime, retryInterval);
-                pushResponse = push.run();
-                if (pushResponse.contains(InweboConstants.PUSHRESPONSE)) {
-                    log.info("Authentication successful");
-                    context.setSubject(AuthenticatedUser.createLocalAuthenticatedUserFromSubjectIdentifier(userId));
-                } else {
-                    throw new AuthenticationFailedException("Authentication failed");
-                }
-                pushResponse = null;
-                userId = null;
-            } else {
-                throw new AuthenticationFailedException("Required parameters are empty");
-            }
-            return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
-        }
-    }
-
-    public static UserRealm getUserRealm() {
-        return (UserRealm) CarbonContext.getThreadLocalCarbonContext().getUserRealm();
-    }
-
     /**
      * Process the response of the Inwebo end-point
      */
     @Override
     protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
                                                  AuthenticationContext context) throws AuthenticationFailedException {
+        int waitTime;
+        int retryInterval;
+        String username = null;
+
+        //Getting the last authenticated local user
+        for (Integer stepMap : context.getSequenceConfig().getStepMap().keySet())
+            if (context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser() != null &&
+                    context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedAutenticator()
+                            .getApplicationAuthenticator() instanceof LocalApplicationAuthenticator) {
+                username = String.valueOf(context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser());
+                break;
+            }
+        if (username != null) {
+            UserRealm userRealm = null;
+            try {
+                String tenantDomain = MultitenantUtils.getTenantDomain(username);
+                int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
+                RealmService realmService = IdentityTenantUtil.getRealmService();
+                userRealm = (UserRealm) realmService.getTenantUserRealm(tenantId);
+                username = MultitenantUtils.getTenantAwareUsername(username);
+                if (userRealm != null) {
+                    userId = userRealm.getUserStoreManager().getUserClaimValue(username, InweboConstants.INWEBO_USERID,
+                            null).toString();
+                } else {
+                    throw new AuthenticationFailedException(
+                            "Cannot find the user claim for the given userId: " + userId);
+                }
+            } catch (UserStoreException e) {
+                throw new AuthenticationFailedException("Error while getting the user realm" + e.getMessage(), e);
+            }
+        }
+        Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
+        if (authenticatorProperties != null) {
+            String serviceId = authenticatorProperties.get(InweboConstants.SERVICE_ID);
+            String p12file = authenticatorProperties.get(InweboConstants.INWEBO_P12FILE);
+            String p12password = authenticatorProperties.get(InweboConstants.INWEBO_P12PASSWORD);
+            if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_COUNT))) {
+                waitTime = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_COUNT));
+            } else {
+                waitTime = Integer.parseInt(InweboConstants.WAITTIME_DEFAULT);
+            }
+            if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL))) {
+                retryInterval = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL
+                ));
+            } else {
+                retryInterval = Integer.parseInt(InweboConstants.RETRYINTERVAL_DEFAULT);
+            }
+            PushRestCall push = new PushRestCall(serviceId, p12file, p12password, userId, waitTime, retryInterval);
+            pushResponse = push.run();
+
+            if (pushResponse.contains(InweboConstants.PUSHRESPONSE)) {
+                if (log.isDebugEnabled()) {
+                    log.info("Authentication successful");
+                }
+                context.setSubject(AuthenticatedUser.createLocalAuthenticatedUserFromSubjectIdentifier(userId));
+            } else {
+                throw new AuthenticationFailedException("Authentication failed");
+            }
+            pushResponse = null;
+            userId = null;
+        } else {
+            throw new AuthenticationFailedException("Required parameters are empty");
+        }
     }
 
     /**

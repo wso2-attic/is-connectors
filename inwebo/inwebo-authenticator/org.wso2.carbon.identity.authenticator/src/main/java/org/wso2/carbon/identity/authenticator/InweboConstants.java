@@ -37,5 +37,5 @@ public class InweboConstants {
     public static final String RETRY_INTERVAL = "RetryInterval";
     public static final String RETRYINTERVAL_DEFAULT = "1000";
     public static final String WAITTIME_DEFAULT = "10";
-    public static final String INWEBO_SERVICEID = "http://wso2.org/claims/userId";
+    public static final String INWEBO_USERID = "http://wso2.org/claims/authentication/inwebo/userId";
 }
