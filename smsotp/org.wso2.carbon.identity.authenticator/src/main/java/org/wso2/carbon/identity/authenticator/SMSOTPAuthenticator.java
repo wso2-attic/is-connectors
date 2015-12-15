@@ -22,7 +22,6 @@ package org.wso2.carbon.identity.authenticator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.application.authentication.framework.AbstractApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.LocalApplicationAuthenticator;
@@ -31,20 +30,24 @@ import org.wso2.carbon.identity.application.authentication.framework.exception.A
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
 import org.wso2.carbon.identity.application.common.model.Property;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Authenticator of SMSOTP
@@ -53,8 +56,13 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
 
     private static Log log = LogFactory.getLog(SMSOTPAuthenticator.class);
     AuthenticationContext authContext = new AuthenticationContext();
+    Map<String, String> newAuthenticatorProperties;
     private String otpToken;
     private String mobile;
+    private String smsUrl = "";
+    private String clientId = "";
+    private String clientSecret = "";
+    private String fullUrl = "";
 
     /**
      * Check whether the authentication or logout request can be handled by the authenticator
@@ -63,7 +71,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         if (log.isDebugEnabled()) {
             log.debug("Inside SMSOTPAuthenticator canHandle method");
         }
-        return StringUtils.isNotEmpty(request.getParameter(SMSOTPConstants.CODE));
+        return !StringUtils.isEmpty(request.getParameter(SMSOTPConstants.CODE));
     }
 
     /**
@@ -73,7 +81,26 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
     protected void initiateAuthenticationRequest(HttpServletRequest request,
                                                  HttpServletResponse response, AuthenticationContext context)
             throws AuthenticationFailedException {
-        
+
+        String resourceName = SMSOTPConstants.PROPERTIES_FILE;
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        Properties prop = new Properties();
+
+        InputStream resourceStream = loader.getResourceAsStream(resourceName);
+        try {
+            prop.load(resourceStream);
+        } catch (IOException e) {
+            throw new AuthenticationFailedException("Can not find the file", e);
+        }
+
+        newAuthenticatorProperties = context
+                .getAuthenticatorProperties();
+        newAuthenticatorProperties.put("username", prop.getProperty("username"));
+        newAuthenticatorProperties.put("password", prop.getProperty("password"));
+        newAuthenticatorProperties.put("from", prop.getProperty("from"));
+        newAuthenticatorProperties.put("text", prop.getProperty("text"));
+        context.setAuthenticatorProperties(newAuthenticatorProperties);
+
         OneTimePassword token = new OneTimePassword();
         String secret = OneTimePassword.getRandomNumber(SMSOTPConstants.SECRET_KEY_LENGTH);
         otpToken = token.generateToken(secret, "" + SMSOTPConstants.NUMBER_BASE, SMSOTPConstants.NUMBER_DIGIT);
@@ -82,19 +109,20 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
 
         Map<String, String> authenticatorProperties = context
                 .getAuthenticatorProperties();
-        String clientId = authenticatorProperties
+        clientId = authenticatorProperties
                 .get(SMSOTPConstants.API_KEY);
-        String clientSecret = authenticatorProperties
+        clientSecret = authenticatorProperties
                 .get(SMSOTPConstants.API_SECRET);
+        smsUrl = authenticatorProperties.get(SMSOTPConstants.SMS_URL);
 
-        String loginPage = "/authenticationendpoint/smsotp.jsp";
+        String loginPage = SMSOTPConstants.LOGIN_PAGE;
         String queryParams = FrameworkUtils.getQueryStringWithFrameworkContextId(
                 context.getQueryParams(), context.getCallerSessionKey(),
                 context.getContextIdentifier());
         String retryParam = "";
 
         if (context.isRetrying()) {
-            retryParam = "&authFailure=true&authFailureMsg=login.fail.message";
+            retryParam = SMSOTPConstants.RETRY_PARAMS;
         }
 
         try {
@@ -106,8 +134,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         }
 
         String username = null;
-        //Getting the last authenticated local user
-        for (Integer stepMap: context.getSequenceConfig().getStepMap().keySet())
+        for (Integer stepMap : context.getSequenceConfig().getStepMap().keySet())
             if (context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser() != null &&
                     context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedAutenticator()
                             .getApplicationAuthenticator() instanceof LocalApplicationAuthenticator) {
@@ -115,28 +142,35 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
                 username = String.valueOf(context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser());
                 break;
             }
-
         if (username != null) {
+            UserRealm userRealm = null;
+            try {
+                String tenantDomain = MultitenantUtils.getTenantDomain(username);
+                int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
 
-            UserRealm userRealm = getUserRealm();
+                RealmService realmService = IdentityTenantUtil.getRealmService();
+                userRealm = (UserRealm) realmService.getTenantUserRealm(tenantId);
+            } catch (Exception e) {
+                throw new AuthenticationFailedException("Cannot find the user realm", e);
+            }
             username = MultitenantUtils.getTenantAwareUsername(String.valueOf(username));
             if (userRealm != null) {
                 try {
                     mobile = userRealm.getUserStoreManager().getUserClaimValue(username, SMSOTPConstants.MOBILE_CLAIM, null).toString();
                 } catch (UserStoreException e) {
-                    throw new AuthenticationFailedException("Cannot find the user claim for mobile "+ e.getMessage(),e);
+                    log.error("Cannot find the user claim for mobile", e);
+                    throw new AuthenticationFailedException("Cannot find the user claim for mobile " + e.getMessage(), e);
                 }
             }
         }
 
         if (!StringUtils.isEmpty(clientId) && !StringUtils.isEmpty(clientSecret) && !StringUtils.isEmpty(mobile)) {
-            String urlParameters = "api_key=" + clientId + "&api_secret=" + clientSecret + "&from=NEXMO&to=" + mobile
-                    + "&text=" + otpToken;
-
+            fullUrl = setUrl();
             try {
-                if(!sendRESTCall(SMSOTPConstants.NEXMO_SMS_URL, urlParameters)) {
+                if (!sendRESTCall(smsUrl, fullUrl)) {
+                    log.error("Unable to send the code");
                     throw new AuthenticationFailedException("Unable to send the code");
-               }
+                }
             } catch (IOException e) {
                 if (log.isDebugEnabled()) {
                     log.debug("Error while sending the HTTP request", e);
@@ -157,6 +191,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         if (userToken.equals(contextToken)) {
             context.setSubject(AuthenticatedUser.createLocalAuthenticatedUserFromSubjectIdentifier("an authorised user"));
         } else {
+            log.error("Code Mismatch");
             throw new AuthenticationFailedException("Code mismatch");
         }
     }
@@ -196,6 +231,13 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         clientId.setRequired(true);
         clientId.setDescription("Enter client identifier value");
         configProperties.add(clientId);
+
+        Property smsUrl = new Property();
+        smsUrl.setName(SMSOTPConstants.SMS_URL);
+        smsUrl.setDisplayName("SMS URL");
+        smsUrl.setRequired(true);
+        smsUrl.setDescription("Enter client sms url value");
+        configProperties.add(smsUrl);
 
         Property clientSecret = new Property();
         clientSecret.setName(SMSOTPConstants.API_SECRET);
@@ -238,16 +280,17 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
                 log.debug("Error while getting the HTTP response", e);
             }
             throw new IOException();
-        }
-        finally {
+        } finally {
             connection.disconnect();
         }
         return false;
     }
 
-    public static UserRealm getUserRealm() {
-        return (UserRealm) CarbonContext.getThreadLocalCarbonContext().getUserRealm();
+    public String setUrl() {
+        fullUrl = newAuthenticatorProperties.get("username") + clientId + newAuthenticatorProperties.get("password") + clientSecret +
+                newAuthenticatorProperties.get("from") + mobile + newAuthenticatorProperties.get("text") + otpToken;
+        System.out.println("full " + fullUrl);
+        return fullUrl;
     }
-
 }
 
