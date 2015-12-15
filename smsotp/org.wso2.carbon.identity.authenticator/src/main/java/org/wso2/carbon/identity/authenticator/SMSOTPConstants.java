@@ -19,25 +19,27 @@
 
 package org.wso2.carbon.identity.authenticator;
 
+import java.lang.String;
+
 public class SMSOTPConstants {
     public static final String AUTHENTICATOR_NAME = "SMSOTP";
     public static final String AUTHENTICATOR_FRIENDLY_NAME = "SMSOTP";
-    public static final String ALGORITHM_NAME ="SHA1PRNG";
-    public static final String ALGORITHM_HMAC ="HmacSHA1";
-    public static final String ALGORITHM_HMAC_SHA ="HMAC-SHA-1";
+    public static final String ALGORITHM_NAME = "SHA1PRNG";
+    public static final String ALGORITHM_HMAC = "HmacSHA1";
+    public static final String ALGORITHM_HMAC_SHA = "HMAC-SHA-1";
 
-    public static final int SECRET_KEY_LENGTH=5;
-    public static final int NUMBER_BASE=2;
-    public static final int NUMBER_DIGIT=6;
-    public static final String HTTP_METHOD="GET";
-    public static final String CODE="code";
+    public static final int SECRET_KEY_LENGTH = 5;
+    public static final int NUMBER_BASE = 2;
+    public static final int NUMBER_DIGIT = 6;
+    public static final String HTTP_METHOD = "GET";
+    public static final String CODE = "code";
     public static final String MOBILE_CLAIM = "http://wso2.org/claims/mobile";
 
-    public static final String NEXMO_SMS_URL = "https://rest.nexmo.com/sms/json?";
     public static final String API_KEY = "api_key";
     public static final String API_SECRET = "api_secret";
-    public static final String MOBILE_NO = "mobile_no";
+    public static final String SMS_URL = "sms_url";
 
-    public static final String AUTHENTICATORS = "&authenticators=";
-    public static final String LOCAL = "LOCAL";
+    public static final String PROPERTIES_FILE = "smsprovider.properties";
+    public static final String LOGIN_PAGE = "/authenticationendpoint/smsotp.jsp";
+    public static final String RETRY_PARAMS = "&authFailure=true&authFailureMsg=login.fail.message";
 }
