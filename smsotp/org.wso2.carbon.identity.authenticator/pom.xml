@@ -90,6 +90,11 @@
             <systemPath>${basedir}/src/main/resources/org.wso2.carbon.identity.core-${carbon.identity.version}.jar
             </systemPath>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.core.services</artifactId>
+            <version>4.4.2</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -103,6 +108,7 @@
             </releases>
         </repository>
     </repositories>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -164,6 +170,14 @@
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
     <distributionManagement>
         <repository>
