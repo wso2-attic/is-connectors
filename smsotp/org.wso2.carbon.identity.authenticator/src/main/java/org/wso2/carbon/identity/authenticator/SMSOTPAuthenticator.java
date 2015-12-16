@@ -289,7 +289,6 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
     public String setUrl() {
         fullUrl = newAuthenticatorProperties.get("username") + clientId + newAuthenticatorProperties.get("password") + clientSecret +
                 newAuthenticatorProperties.get("from") + mobile + newAuthenticatorProperties.get("text") + otpToken;
-        System.out.println("full " + fullUrl);
         return fullUrl;
     }
 }
