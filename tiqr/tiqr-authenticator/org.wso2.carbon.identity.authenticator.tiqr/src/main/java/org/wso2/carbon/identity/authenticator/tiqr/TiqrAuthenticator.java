@@ -189,8 +189,8 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 throw new InvalidCredentialsException();
             } else if (request.getParameter(TiqrConstants.TIQR_ACTION).equals(TiqrConstants.TIQR_ACTION_ENROLLMENT)
                     && StringUtils.isEmpty(request.getParameter(TiqrConstants.ENROLL_SESSIONID))) {
-                log.error("Unable to connect with the tiqr client");
-                throw new AuthenticationFailedException("Unable to connect with the tiqr client");
+                log.error(TiqrConstants.UNABLE_TO_CONNECT + ":" + TiqrConstants.SESSIONID_NULL);
+                throw new AuthenticationFailedException(TiqrConstants.UNABLE_TO_CONNECT + ":" + TiqrConstants.SESSIONID_NULL);
             }
             Map<String, String> authenticatorProperties = context
                     .getAuthenticatorProperties();
@@ -256,7 +256,8 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 boolean isAuthenticated = userStoreManager.authenticate(
                         MultitenantUtils.getTenantAwareUsername(username), password);
                 if (!isAuthenticated) {
-                    throw new AuthenticationFailedException("Authentication Failed: Invalid username or password");
+                    log.error(TiqrConstants.INVALID_USERNAME_PASSWORD_ERROR);
+                    throw new AuthenticationFailedException(TiqrConstants.INVALID_USERNAME_PASSWORD_ERROR);
                 }
                 userId = request.getParameter(TiqrConstants.ENROLL_USERID);
                 String urlToCheckEntrolment = tiqrEP + TiqrConstants.TIQR_CLIENT_NEW_USER_URL
@@ -354,7 +355,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                 }
                 br.close();
             } else {
-                return TiqrConstants.FAILED + TiqrConstants.UNABLE_TO_CONNECT;
+                return TiqrConstants.FAILED + TiqrConstants.REQUEST_FAILED;
             }
         } catch (ProtocolException e) {
             if (log.isDebugEnabled()) {
