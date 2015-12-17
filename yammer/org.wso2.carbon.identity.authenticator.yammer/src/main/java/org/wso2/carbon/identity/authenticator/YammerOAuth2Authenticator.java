@@ -105,7 +105,7 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
             throws AuthenticationFailedException {
 
         try {
-            Map< String, String > authenticatorProperties = context.getAuthenticatorProperties();
+            Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
 
             String clientId = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_ID);
             String clientSecret = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_SECRET);
@@ -120,25 +120,19 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
 
             OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
             OAuthClientResponse oAuthResponse = getOauthResponse(oAuthClient, accessRequest);
-
             String token = oAuthResponse.getParam("access_token");
             String accessToken = JSONUtils.parseJSON(token).get(YammerOAuth2AuthenticatorConstants.ACCESS_TOKEN).toString();
-
             if (StringUtils.isBlank(accessToken)) {
                 throw new AuthenticationFailedException("Access token is empty or null");
             }
 
             AuthenticatedUser authenticatedUserObj;
             Map< ClaimMapping, String > claims;
-
             authenticatedUserObj = AuthenticatedUser
                     .createFederateAuthenticatedUserFromSubjectIdentifier(JSONUtils.parseJSON(token).get("user_id").toString());
             authenticatedUserObj.setAuthenticatedSubjectIdentifier(JSONUtils.parseJSON(token).get("user_id").toString());
-
             claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
-
             authenticatedUserObj.setUserAttributes(claims);
-
             context.setSubject(authenticatedUserObj);
 
         } catch (OAuthProblemException e) {
@@ -156,11 +150,7 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
                     .setGrantType(GrantType.AUTHORIZATION_CODE).setClientId(clientId)
                     .setClientSecret(clientSecret).setRedirectURI(callbackurl).setCode(code)
                     .buildBodyMessage();
-
         } catch (OAuthSystemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Exception while building request for request access token", e);
-            }
             throw new AuthenticationFailedException(e.getMessage(), e);
         }
         return accessRequest;
@@ -173,14 +163,9 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
         try {
             oAuthResponse = oAuthClient.accessToken(accessRequest);
         } catch (OAuthSystemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Exception while requesting access token", e);
-            }
             throw new AuthenticationFailedException(e.getMessage(), e);
         } catch (OAuthProblemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Exception while requesting access token", e);
-            }
+            throw new AuthenticationFailedException(e.getMessage(), e)
         }
         return oAuthResponse;
     }
@@ -204,7 +189,6 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
             String url = getUserInfoEndpoint(token, authenticatorProperties);
 
             String json = sendRequest(url, accessToken);
-
             if (StringUtils.isBlank(json)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Unable to fetch user claims. Proceeding without user claims");
@@ -212,20 +196,16 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
                 return claims;
             }
 
-            Map< String, Object > jsonObject = JSONUtils.parseJSON(json);
+            Map<String, Object> jsonObject = JSONUtils.parseJSON(json);
 
-            for (Map.Entry< String, Object > data : jsonObject.entrySet()) {
-
+            for (Map.Entry<String, Object> data : jsonObject.entrySet()) {
                 String key = data.getKey();
-
                 claims.put(ClaimMapping.build(key, key, null, false), jsonObject.get(key).toString());
-
                 if (log.isDebugEnabled()) {
                     log.debug("Adding claims from end-point data mapping : " + key + " - " +
                             jsonObject.get(key).toString());
                 }
             }
-
         } catch (Exception e) {
             log.error("Error occurred while accessing user info endpoint", e);
         }
