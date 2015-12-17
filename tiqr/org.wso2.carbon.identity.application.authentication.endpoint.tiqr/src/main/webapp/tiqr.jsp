@@ -184,6 +184,7 @@ $(document).ready(function() {
 			success : function(responseText) {
                 document.getElementById("qrCodeDiv").innerHTML = "";
 			    if(!responseText.startsWith("Failed:")) {
+			        document.getElementById("errorDiv").innerHTML = "";
 			        document.getElementById("qrCodeDiv").innerHTML = responseText;
     	            document.getElementById('linksDiv').style.display = 'none';
 			    }
@@ -219,7 +220,8 @@ function showAuthenticationQR() {
                 document.getElementById("qrCodeDiv").innerHTML = responseText;
 			    $('#enrollmentForm').submit();
             } else {
-                if(responseText.startsWith("Failed: Unable to connect the tiqr client")) {
+                if (responseText.startsWith("Failed: Unable to connect the tiqr client")
+                || responseText.startsWith("Failed: Unable to get authentication state")) {
                     document.getElementById('linksDiv').style.display = 'inline';
                 }
             	document.getElementById('alertDiv').innerHTML = '<div id="error-msg" class="alert alert-danger">'

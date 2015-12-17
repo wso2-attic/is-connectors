@@ -55,6 +55,8 @@ public class QRCode extends HttpServlet {
                 && !StringUtils.isEmpty(displayName)) {
             String enrolUserResponse = enrolUser(request);
             if (enrolUserResponse.startsWith(TiqrConstants.FAILED)) {
+                log.error("Unable to show the QR code for enrollment: "
+                        + enrolUserResponse.replace("Failed:", "").trim());
                 res = enrolUserResponse;
             } else {
                 String authState = getAuthState(request, enrolUserResponse);
@@ -63,7 +65,7 @@ public class QRCode extends HttpServlet {
                     res = "<input type='hidden' name='authState' id='authState' value='" + authState + "'/>";
                 }
                 String qrCode = getQrCode(enrolUserResponse);
-                if (!StringUtils.isEmpty(qrCode) || qrCode.startsWith("Failed:")) {
+                if (!StringUtils.isEmpty(qrCode)) {
                     res = res + qrCode.replace("/>", " style=\"padding-left: 50px; padding-right: 50px;\" " +
                             "data-toggle=\"tooltip\" title=\"Scan this QR code via tiqr mobile application to " +
                             "enroll the user\"/>");
@@ -89,7 +91,7 @@ public class QRCode extends HttpServlet {
                         res = "<input type='hidden' name='authState' id='authState' value='" + authState + "'/>";
                     }
                     String qrCode = getQrCode(authenticationResponse);
-                    if (!StringUtils.isEmpty(qrCode) || qrCode.startsWith("Failed:")) {
+                    if (!StringUtils.isEmpty(qrCode)) {
                         res = res + qrCode.replace("/>", " style=\"padding-left: 50px; padding-right: 50px;\" " +
                                 "data-toggle=\"tooltip\" title=\"Scan this QR code via tiqr mobile application to " +
                                 "authenticate the user\"/>");
@@ -143,20 +145,17 @@ public class QRCode extends HttpServlet {
             if (!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(diaplayName)) {
                 String formParameters = "userId=" + userId + "&displayName=" + diaplayName + "&create=1";
                 String result = sendRESTCall(urlToEntrol, "", formParameters, TiqrConstants.HTTP_POST);
-                if (result.startsWith(TiqrConstants.FAILED)) {
-                    log.error(result);
-                } else if (result.contains("Invalid user ID")) {
+                if (result.contains("Invalid user ID")) {
                     return TiqrConstants.FAILED + TiqrConstants.INVALID_INPUT;
+                } else if (result.contains("Account already exists")) {
+                    return TiqrConstants.FAILED + TiqrConstants.USERID_EXISTS;
                 }
                 return result;
             } else {
-                if (log.isDebugEnabled()) {
-                    log.error("Required parameters should be given");
-                }
-                return TiqrConstants.FAILED + TiqrConstants.UNABLE_TO_CONNECT;
+                return TiqrConstants.FAILED + TiqrConstants.REQUIRED_PARAMS_NULL;
             }
         } else {
-            return TiqrConstants.FAILED + TiqrConstants.UNABLE_TO_CONNECT;
+            return TiqrConstants.FAILED + TiqrConstants.NULL_AUTHSTATE;
         }
     }
 
@@ -214,13 +213,13 @@ public class QRCode extends HttpServlet {
      */
     protected String getQrCode(String result) {
         try {
-            if (!result.contains("<img")) {
+            if (!result.contains("<img alt=\"QR\"")) {
                 if (log.isDebugEnabled()) {
                     log.debug("Unable to find QR code");
                 }
                 return null;
             }
-            return result.substring(result.indexOf("<img"), result.indexOf(" <br/>"));
+            return result.substring(result.indexOf("<img"), result.indexOf("id=\"QR\"/>")) + "id=\"QR\"/>";
         } catch (IndexOutOfBoundsException e) {
             if (log.isDebugEnabled()) {
                 log.error("Error while getting the QR code" + e.getMessage());
