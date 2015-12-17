@@ -48,5 +48,8 @@ public class TiqrConstants {
     public static final String LOCAL = "LOCAL";
 
     public static final String UNABLE_TO_CONNECT = "Unable to connect the tiqr client";
+    public static final String REQUEST_FAILED = "Request to tiqr client is failed";
+    public static final String SESSIONID_NULL = "Session ID is null";
+    public static final String INVALID_USERNAME_PASSWORD_ERROR = "Authentication Failed: Invalid username or password";
     public static final String FAILED = "Failed: ";
 }

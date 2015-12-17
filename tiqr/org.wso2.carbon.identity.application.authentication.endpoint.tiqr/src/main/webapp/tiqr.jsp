@@ -184,7 +184,6 @@ $(document).ready(function() {
 			success : function(responseText) {
                 document.getElementById("qrCodeDiv").innerHTML = "";
 			    if(!responseText.startsWith("Failed:")) {
-			        document.getElementById("errorDiv").innerHTML = "";
 			        document.getElementById("qrCodeDiv").innerHTML = responseText;
     	            document.getElementById('linksDiv').style.display = 'none';
 			    }
