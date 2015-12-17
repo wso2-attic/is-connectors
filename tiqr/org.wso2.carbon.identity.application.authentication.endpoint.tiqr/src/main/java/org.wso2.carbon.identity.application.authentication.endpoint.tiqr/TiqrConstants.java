@@ -35,6 +35,9 @@ public class TiqrConstants {
     public static final String TIQR_CLIENT_PORT = "port";
     public static final String INVALID_INPUT = "Invalid Input";
     public static final String UNABLE_TO_CONNECT = "Unable to connect the tiqr client";
+    public static final String REQUIRED_PARAMS_NULL = "Required parameters are null";
+    public static final String NULL_AUTHSTATE = "Unable to get authentication state";
+    public static final String USERID_EXISTS = "Account already exists";
     public static final String FAILED = "Failed: ";
     public static final String PROTOCOL = "http://";
     public static final String AUTH_FAILURE_MSG = "authFailureMsg";
