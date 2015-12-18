@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><!--
-  ~ Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -15,72 +15,39 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
         "http://java.sun.com/dtd/web-app_2_3.dtd" >
-
 <web-app>
-    <!--  Custom Page configurations -->
-    <!-- *************** Application specific configurations ********************** -->
-    <!--context-param>
-        <param-name>ServiceProviderApp-/samlsso_login.do</param-name>
-        <param-value>http://localhost:8080/customauthenticationendpoint/login.do</param-value>
-    </context-param-->
-    <!--context-param>
-        <param-name>ServiceProviderApp-/oauth2_authz.do</param-name>
-        <param-value>http://localhost:8080/authenticationendpoint/oauth2_authz.do</param-value>
-    </context-param-->
-    <!--context-param>
-        <param-name>ServiceProviderApp-/oauth2_error.do</param-name>
-        <param-value>http://localhost:8080/authenticationendpoint/oauth2_error.do</param-value>
-    </context-param-->
-    <!--context-param>
-        <param-name>ServiceProviderApp-/oauth2_consent.do</param-name>
-        <param-value>http://localhost:8080/authenticationendpoint/oauth2_consent.do</param-value>
-    </context-param-->
-    <!-- **************** End of Application specific configurations ************************* -->
-
-    <!-- *************** Global configurations ********************** -->
-    <!--context-param>
-        <param-name>/retry.do</param-name>
-        <param-value>http://localhost:8080/customauthenticationendpoint/retry.do?type=retry.do</param-value>
-    </context-param-->
-    <!-- *************** End of Global configurations ********************** -->
     <filter>
         <filter-name>AuthenticationEndpointFilter</filter-name>
-        <filter-class>org.wso2.carbon.identity.application.authentication.endpoint.util.filter.AuthenticationEndpointFilter</filter-class>
+        <filter-class>
+            org.wso2.carbon.identity.application.authentication.endpoint.util.filter.AuthenticationEndpointFilter
+        </filter-class>
     </filter>
-
     <filter-mapping>
         <filter-name>AuthenticationEndpointFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
     <filter>
         <filter-name>CRLFPreventionFilter</filter-name>
         <filter-class>org.wso2.carbon.ui.filters.CRLFPreventionFilter</filter-class>
     </filter>
-
     <filter-mapping>
         <filter-name>CRLFPreventionFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
     <listener>
         <listener-class>
             org.wso2.carbon.identity.application.authentication.endpoint.util.listener.AuthenticationEndpointContextListener
         </listener-class>
     </listener>
-
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>
         <location>/generic-exception-response.jsp</location>
     </error-page>
-
     <session-config>
         <cookie-config>
             <secure>true</secure>
         </cookie-config>
     </session-config>
-
 </web-app>
