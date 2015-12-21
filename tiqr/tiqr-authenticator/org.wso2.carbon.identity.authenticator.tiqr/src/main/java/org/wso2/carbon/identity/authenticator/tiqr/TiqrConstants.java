@@ -52,4 +52,6 @@ public class TiqrConstants {
     public static final String SESSIONID_NULL = "Session ID is null";
     public static final String INVALID_USERNAME_PASSWORD_ERROR = "Authentication Failed: Invalid username or password";
     public static final String FAILED = "Failed: ";
+    public static final String LOGIN_PAGE = "authenticationendpoint/login.do";
+    public static final String TIQR_PAGE = "tiqrauthenticationendpoint/tiqr.jsp";
 }
