@@ -27,7 +27,43 @@
     <packaging>pom</packaging>
     <name>Building wso2 CARBON authenticators and provisioning connectors</name>
     <url>http://wso2.org</url>
- 
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.idp.mgt</artifactId>
+            <version>${carbon.identity.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.logging</artifactId>
+            <version>${commons-logging.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.identity.application.common</artifactId>
+            <version>${carbon.identity.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.identity.user.profile</artifactId>
+            <version>${carbon.identity.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.identity.user.account.association</artifactId>
+            <version>${carbon.identity.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.identity.core</artifactId>
+            <version>${carbon.identity.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.identity.application.authentication.framework</artifactId>
+            <version>${carbon.identity.version}</version>
+        </dependency>
+    </dependencies>
     <profiles>
         <profile>
             <id>default</id>
@@ -104,6 +140,8 @@
         </snapshotRepository>
     </distributionManagement>
     <properties>
+        <carbon.identity.version>5.0.7</carbon.identity.version>
+        <commons-logging.version>4.4.3</commons-logging.version>
         <carbon.kernel.version>4.4.1</carbon.kernel.version>
     </properties>
 </project>
