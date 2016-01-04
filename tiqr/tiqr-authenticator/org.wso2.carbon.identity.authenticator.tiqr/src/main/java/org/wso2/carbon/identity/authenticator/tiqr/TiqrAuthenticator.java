@@ -186,7 +186,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
                     || StringUtils.isEmpty(request.getParameter(TiqrConstants.AUTH_USERNAME))
                     || StringUtils.isEmpty(request.getParameter(TiqrConstants.AUTH_PASSWORD)))) {
                 log.error("Required fields cannot not be null");
-                throw new InvalidCredentialsException();
+                throw new InvalidCredentialsException("Required fields cannot not be null");
             } else if (request.getParameter(TiqrConstants.TIQR_ACTION).equals(TiqrConstants.TIQR_ACTION_ENROLLMENT)
                     && StringUtils.isEmpty(request.getParameter(TiqrConstants.ENROLL_SESSIONID))) {
                 log.error(TiqrConstants.UNABLE_TO_CONNECT + ":" + TiqrConstants.SESSIONID_NULL);
@@ -198,7 +198,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             String userId = "";
             int status = 0;
             int retry = 0;
-            int retryInterval = 1000;
+            int retryInterval = Integer.parseInt(TiqrConstants.RETRYINTERVAL);
             int maxCount = 120;
             int waitTime = StringUtils.isEmpty(authenticatorProperties.get(TiqrConstants.TIQR_WAIT_TIME))
                     ? maxCount : Integer.parseInt(authenticatorProperties.get(TiqrConstants.TIQR_WAIT_TIME));
@@ -322,7 +322,7 @@ public class TiqrAuthenticator extends AbstractApplicationAuthenticator implemen
             log.error("Unable to set the subject: " + e.getMessage(), e);
             throw new AuthenticationFailedException("Unable to set the subject: " + e.getMessage(), e);
         } catch (UserProfileException e) {
-            throw new InvalidCredentialsException();
+            throw new InvalidCredentialsException("Unable to access the user profile: " + e.getMessage(), e);
         } catch (UserStoreException e) {
             log.error("Unable to get the user store manager: " + e.getMessage(), e);
             throw new AuthenticationFailedException("Unable to get the user store manager: " + e.getMessage(), e);
