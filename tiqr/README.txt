@@ -12,24 +12,13 @@ Tested Platform:
 
 Do the following:
 
-1. Build org.wso2.carbon.identity.application.authentication.endpoint.tiqr and place the jar into <IS_HOME>/repository/deployment/server/webapps
+1. Start the IS server and create Identity provider and service provider in IS via the IS console.
 
-2. Patch 5.0.2-beta versioned org.wso2.carbon.identity.application.authentication.endpoint.util jar into <IS_HOME>/repository/components/patches
-
-3. Put the jars given in https://github.com/Shakila/Tiqr-IS-5.1.0/tree/master/tiqr-authenticator/org.wso2.carbon.identity.authenticator.tiqr/src/main/resources into TIQR_AUTHENTICATOR_HOME>/org.wso2.carbon.identity.authenticator/src/main/resources
-
-4. Patch the jars given in TIQR_AUTHENTICATOR_HOME>/org.wso2.carbon.identity.authenticator/src/main/resources into <IS_HOME>/repository/components/patches
-
-5. Start the IS server and create Identity provider and service provider in IS via the IS console.
-
-6. Navigate to tiqr-client/ by issuing the command mentioned below.
-cd tiqr-client
-
-7. Install dependencies using Composer:
+2. Navigate to tiqr-client/ and install dependencies using Composer:
 curl -sS https://getcomposer.org/installer | php
 ./composer.phar install
 
-8. Run from the command line using PHP 5.4+ built-in HTTP server:
+3. Run from the command line using PHP 5.4+ built-in HTTP server:
 php -S <IP>:<port> -t www
 
 Note: tiqr-client project is used to access the tiqr php library. It can be run with the php builtin web server.
