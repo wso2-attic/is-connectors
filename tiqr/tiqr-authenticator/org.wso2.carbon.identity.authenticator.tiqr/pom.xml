@@ -25,17 +25,16 @@
     <url>http://wso2.org</url>
     <properties>
         <!--Carbon identity version-->
-        <carbon.identity.version>5.0.2-beta</carbon.identity.version>
-        <!--<carbon.identity.version>5.0.3-SNAPSHOT</carbon.identity.version>-->
+        <carbon.identity.version>5.0.7</carbon.identity.version>
         <!-- Carbon kernel version -->
         <carbon.kernel.version>4.4.2</carbon.kernel.version>
-        <commons-logging.version>4.2.0</commons-logging.version>
+        <commons-logging.version>4.4.3</commons-logging.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.idp.mgt</artifactId>
-            <version>5.0.2-beta</version>
+            <version>${carbon.identity.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -43,49 +42,31 @@
             <version>${commons-logging.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.identity.application.authentication.framework</artifactId>
-            <version>${carbon.identity.version}</version>
-            <scope>system</scope>
-            <systemPath>
-                ${basedir}/src/main/resources/org.wso2.carbon.identity.application.authentication.framework-${carbon.identity.version}.jar
-            </systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.application.common</artifactId>
             <version>${carbon.identity.version}</version>
-            <scope>system</scope>
-            <systemPath>
-                ${basedir}/src/main/resources/org.wso2.carbon.identity.application.common-${carbon.identity.version}.jar
-            </systemPath>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.user.profile</artifactId>
             <version>${carbon.identity.version}</version>
-            <scope>system</scope>
-            <systemPath>
-                ${basedir}/src/main/resources/org.wso2.carbon.identity.user.profile-${carbon.identity.version}.jar
-            </systemPath>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.user.account.association</artifactId>
             <version>${carbon.identity.version}</version>
-            <scope>system</scope>
-            <systemPath>
-                ${basedir}/src/main/resources/org.wso2.carbon.identity.user.account.association-${carbon.identity.version}.jar
-            </systemPath>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.core</artifactId>
             <version>${carbon.identity.version}</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/src/main/resources/org.wso2.carbon.identity.core-${carbon.identity.version}.jar
-            </systemPath>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.identity.application.authentication.framework</artifactId>
+            <version>${carbon.identity.version}</version>
+        </dependency>
+
     </dependencies>
     <repositories>
         <repository>

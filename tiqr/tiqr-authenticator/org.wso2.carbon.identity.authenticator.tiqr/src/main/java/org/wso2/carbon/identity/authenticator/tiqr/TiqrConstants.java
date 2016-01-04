@@ -24,6 +24,7 @@ public class TiqrConstants {
     public static final String AUTHENTICATOR_FRIENDLY_NAME = "Tiqr";
     public static final String AUTH_USERNAME = "username";
     public static final String AUTH_PASSWORD = "password";
+
     public static final String TIQR_CLIENT_IP = "clientIP";
     public static final String TIQR_ACTION = "tiqrAction";
     public static final String TIQR_ACTION_AUTHENTICATION = "authentication";
@@ -34,18 +35,19 @@ public class TiqrConstants {
     public static final String ENROLLMENT_FAILED_STATUS = "1";
     public static final String ENROLLMENT_SUCCESS_STATUS = "5";
     public static final String TIQR_WAIT_TIME = "waitTime";
-    public static final String HTTP_POST = "POST";
-    public static final String HTTP_CONTENT_TYPE = "Content-Type";
-    public static final String HTTP_CONTENT_TYPE_XWFUE = "application/x-www-form-urlencoded";
-    public static final String PROTOCOL = "http://";
-    public static final String CHARSET = "UTF-8";
     public static final String TIQR_CLIENT_PORT = "port";
     public static final String TIQR_CLIENT_AUTH_STATE = "authState";
     public static final String TIQR_CLIENT_NEW_USER_URL = "/module.php/authTiqr/newuser.php?AuthState=";
     public static final String TIQR_CLIENT_AUTHENTICATE_URL = "/module.php/authTiqr/login.php?AuthState=";
 
+    public static final String HTTP_POST = "POST";
+    public static final String HTTP_CONTENT_TYPE = "Content-Type";
+    public static final String HTTP_CONTENT_TYPE_XWFUE = "application/x-www-form-urlencoded";
+    public static final String PROTOCOL = "http://";
+    public static final String CHARSET = "UTF-8";
     public static final String AUTHENTICATORS = "&authenticators=";
     public static final String LOCAL = "LOCAL";
+    public static final String RETRYINTERVAL = "1000";
 
     public static final String UNABLE_TO_CONNECT = "Unable to connect the tiqr client";
     public static final String REQUEST_FAILED = "Request to tiqr client is failed";
