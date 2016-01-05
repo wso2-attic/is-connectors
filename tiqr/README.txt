@@ -12,13 +12,21 @@ Tested Platform:
 
 Do the following:
 
-1. Start the IS server and create Identity provider and service provider in IS via the IS console.
+1. Navigate to authentication-endpoint/org.wso2.carbon.identity.application.authentication.endpoint.tiqr and build.
 
-2. Navigate to tiqr-client/ and install dependencies using Composer:
+2. place org.wso2.carbon.identity.application.authentication.endpoint.tiqr war into <IS_HOME>/repository/deployment/server/webapps.
+
+3. Navigate to tiqr-authenticator/org.wso2.carbon.identity.authenticator.tiqr and build.
+
+4. place org.wso2.carbon.identity.authenticator.tiqr jar into <IS_HOME>/repository/components/dropins.
+
+5. Start the IS server and create Identity provider and service provider in IS via the IS console.
+
+6. Navigate to tiqr-client/ and install dependencies using Composer:
 curl -sS https://getcomposer.org/installer | php
 ./composer.phar install
 
-3. Run from the command line using PHP 5.4+ built-in HTTP server:
+7. Run from the command line using PHP 5.4+ built-in HTTP server:
 php -S <IP>:<port> -t www
 
 Note: tiqr-client project is used to access the tiqr php library. It can be run with the php builtin web server.
