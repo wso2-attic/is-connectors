@@ -14,11 +14,11 @@ Do the following:
 
 1. Navigate to authentication-endpoint/org.wso2.carbon.identity.application.authentication.endpoint.tiqr and build.
 
-2. place org.wso2.carbon.identity.application.authentication.endpoint.tiqr war into <IS_HOME>/repository/deployment/server/webapps.
+2. Place org.wso2.carbon.identity.application.authentication.endpoint.tiqr war into <IS_HOME>/repository/deployment/server/webapps.
 
 3. Navigate to tiqr-authenticator/org.wso2.carbon.identity.authenticator.tiqr and build.
 
-4. place org.wso2.carbon.identity.authenticator.tiqr jar into <IS_HOME>/repository/components/dropins.
+4. Place org.wso2.carbon.identity.authenticator.tiqr jar into <IS_HOME>/repository/components/dropins.
 
 5. Start the IS server and create Identity provider and service provider in IS via the IS console.
 
