@@ -75,7 +75,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
                                                  HttpServletResponse response, AuthenticationContext context)
             throws AuthenticationFailedException {
         String loginPage = ConfigurationFacade.getInstance().getAuthenticationEndpointURL();
-        loginPage = loginPage.replace("login.do", "inwebo.jsp");
+        loginPage = loginPage.replace("authenticationendpoint/login.do", "inweboauthenticationendpoint/inwebo.jsp");
         try {
             response.sendRedirect(response.encodeRedirectURL(loginPage + "?" + FrameworkConstants.SESSION_DATA_KEY + "="
                             + context.getContextIdentifier()
