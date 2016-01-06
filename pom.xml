@@ -142,6 +142,6 @@
     <properties>
         <carbon.identity.version>5.0.7</carbon.identity.version>
         <commons-logging.version>4.4.3</commons-logging.version>
-        <carbon.kernel.version>4.4.3</carbon.kernel.version>
+        <carbon.kernel.version>4.4.1</carbon.kernel.version>
     </properties>
 </project>
