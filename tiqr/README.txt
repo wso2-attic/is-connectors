@@ -7,7 +7,7 @@ Pre-requisites:
 Tested Platform: 
 
 - Mac OSx 10.9
-- WSO2 IS 5.1.0-beta
+- WSO2 IS 5.1.0
 - Java 1.7
 
 Do the following:
@@ -22,7 +22,7 @@ Do the following:
 
 5. Start the IS server and create Identity provider and service provider in IS via the IS console.
 
-6. Navigate to tiqr-client/ and install dependencies using Composer:
+6. For updating the dependencies: Navigate to tiqr-client/ and install dependencies using Composer.
 curl -sS https://getcomposer.org/installer | php
 ./composer.phar install
 
@@ -30,3 +30,4 @@ curl -sS https://getcomposer.org/installer | php
 php -S <IP>:<port> -t www
 
 Note: tiqr-client project is used to access the tiqr php library. It can be run with the php builtin web server.
+      You can skip step 6.
