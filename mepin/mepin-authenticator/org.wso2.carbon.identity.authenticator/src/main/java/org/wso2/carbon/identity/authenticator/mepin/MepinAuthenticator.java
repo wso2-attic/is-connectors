@@ -305,7 +305,6 @@ public class MepinAuthenticator extends AbstractApplicationAuthenticator
                 String mePinId = null;
                 mePinId = getMepinIdAssociatedWithUsername(idpName, username);
                 boolean isAuthenticated = false;
-                //JsonObject transactionResponse = null;
                 String transactionResponseString = new MepinTransactions().createTransaction(mePinId, context.getContextIdentifier(),
                                                                                              MepinConstants.MEPIN_CREATE_TRANSACTION_URL,
                                                                                              authenticatorProperties.get(MepinConstants.MEPIN_USERNAME),
