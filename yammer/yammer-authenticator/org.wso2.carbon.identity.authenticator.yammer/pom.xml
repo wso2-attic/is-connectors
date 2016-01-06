@@ -28,14 +28,9 @@
         <groupId>org.wso2.carbon</groupId>
         <artifactId>is-connectors</artifactId>
         <version>1.0.0</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
 
-    <properties>
-        <oltu.version>1.0.0.wso2v2</oltu.version>
-        <org.apache.oltu.oauth2.client.version>1.0.0</org.apache.oltu.oauth2.client.version>
-        <oltu.package.import.version.range>[1.0.0, 2.0.0)</oltu.package.import.version.range>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.oltu.oauth2</groupId>
