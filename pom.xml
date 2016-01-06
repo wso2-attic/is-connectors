@@ -123,7 +123,19 @@
             <modules>
                 <module>org.wso2.carbon.provisioning.connector-archetype</module>
                 <module>org.wso2.carbon.authenticator.connector-archetype</module>
+                <module>foursquare/foursquare-authenticator/org.wso2.carbon.identity.authenticator</module>
+                <module>mepin/mepin-authenticator/org.wso2.carbon.identity.authenticator</module>
+                <module>smsotp/smsotp-authenticator/org.wso2.carbon.identity.authenticator</module>
+                <module>tiqr/tiqr-authenticator/org.wso2.carbon.identity.authenticator.tiqr</module>
                 <module>yammer/yammer-authenticator/org.wso2.carbon.identity.authenticator.yammer</module>
+                <module>
+                    mepin/authentication-endpoint/org.wso2.carbon.identity.application.authentication.endpoint.mepin
+                </module>
+                <module>
+                    smsotp/authentication-endpoint/org.wso2.carbon.identity.application.authentication.endpoint.smsotp
+                </module>
+                <module>tiqr/authentication-endpoint/org.wso2.carbon.identity.application.authentication.endpoint.tiqr
+                </module>
             </modules>
         </profile>
     </profiles>
