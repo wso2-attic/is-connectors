@@ -63,7 +63,6 @@
 
         <script src="js/scripts.js"></script>
         <script src="assets/js/jquery-1.7.1.min.js"></script>
-	<script src="https://mepin.com/javascripts/mepinlogin.js"></script>
         <!--[if lt IE 9]>
         <script src="js/html5shiv.min.js"></script>
         <script src="js/respond.min.js"></script>
@@ -96,8 +95,7 @@
                 <div class="container col-xs-10 col-sm-6 col-md-6 col-lg-4 col-centered wr-content wr-login col-centered">
                     <div>
                         <h2 class="wr-title blue-bg padding-double white boarder-bottom-blue margin-none">
-                            Authenticating with Inwebo &nbsp;&nbsp;<img src="images/inwebo.png" width="50" height="50"/></h2>
-
+                            Authenticating with Inwebo &nbsp;&nbsp;<a href="http://www.inwebo.com/" target="blank"><img src="images/inwebo.png" width="50" height="50"/></h2>
                     </div>
                     <div class="boarder-all ">
                         <div class="clearfix"></div>
