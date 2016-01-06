@@ -21,8 +21,8 @@
     <groupId>org.wso2.carbon.identity</groupId>
     <artifactId>org.wso2.carbon.identity.application.authentication.endpoint.tiqr</artifactId>
     <packaging>war</packaging>
-    <name>WSO2 Carbon - Identity Application Authentication Endpoint</name>
-    <description>Identity Application Authentication Endpoint</description>
+    <name>WSO2 Carbon - Identity Application Authentication Tiqr Endpoint</name>
+    <description>Identity Application Authentication Tiqr Endpoint</description>
     <url>http://wso2.org</url>
     <dependencies>
         <dependency>
