@@ -194,21 +194,21 @@ public class MepinAuthenticator extends AbstractApplicationAuthenticator
         header.setDisplayOrder(8);
         configProperties.add(header);
 
-        Property shortMessage = new Property();
-        shortMessage.setName(MepinConstants.MEPIN_SHORT_MESSAGE);
-        shortMessage.setDisplayName("Short Message");
-        shortMessage.setRequired(true);
-        shortMessage.setDescription("Enter Short Message");
-        shortMessage.setDisplayOrder(9);
-        configProperties.add(shortMessage);
-
         Property message = new Property();
         message.setName(MepinConstants.MEPIN_MESSAGE);
         message.setDisplayName("Message");
         message.setRequired(true);
         message.setDescription("Enter Message");
-        message.setDisplayOrder(10);
+        message.setDisplayOrder(9);
         configProperties.add(message);
+
+        Property shortMessage = new Property();
+        shortMessage.setName(MepinConstants.MEPIN_SHORT_MESSAGE);
+        shortMessage.setDisplayName("Short Message");
+        shortMessage.setRequired(true);
+        shortMessage.setDescription("Enter Short Message");
+        shortMessage.setDisplayOrder(10);
+        configProperties.add(shortMessage);
 
         return configProperties;
     }

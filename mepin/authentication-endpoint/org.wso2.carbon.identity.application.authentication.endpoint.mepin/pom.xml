@@ -16,13 +16,13 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <version>5.0.2-beta</version>
+    <version>1.0.0</version>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.identity</groupId>
     <artifactId>org.wso2.carbon.identity.application.authentication.endpoint.mepin</artifactId>
     <packaging>war</packaging>
-    <name>WSO2 Carbon - Identity Application Authentication Endpoint</name>
-    <description>Identity Application Authentication Endpoint</description>
+    <name>WSO2 Carbon - Identity Application Authentication MePIN Endpoint</name>
+    <description>Identity Application Authentication MePIN Endpoint</description>
     <url>http://wso2.org</url>
     <dependencies>
         <dependency>
@@ -129,7 +129,6 @@
         </repository>
     </repositories>
     <properties>
-        <carbon.identity.version>5.0.2-beta</carbon.identity.version>
         <javax.servlet-api.version>3.0-alpha-1</javax.servlet-api.version>
         <javax.servelet.jstl.version>1.2</javax.servelet.jstl.version>
         <commons-codec.version>1.4.0.wso2v1</commons-codec.version>
