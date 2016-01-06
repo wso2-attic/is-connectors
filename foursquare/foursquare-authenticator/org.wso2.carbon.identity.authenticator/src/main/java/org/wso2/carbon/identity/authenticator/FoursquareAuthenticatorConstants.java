@@ -22,29 +22,30 @@ package org.wso2.carbon.identity.authenticator;
 public class FoursquareAuthenticatorConstants {
     public static final String FOURSQUARE_OAUTH_ENDPOINT = "https://foursquare.com/oauth2/authenticate";
     public static final String FOURSQUARE_TOKEN_ENDPOINT = "https://foursquare.com/oauth2/access_token";
-    public static final String FOURSQUARE_USER_INFO_ENDPOINT = "https://api.foursquare.com/v2/users/self?v=20151014";
-    public static final String FOURSQUARE_CONNECTOR_FRIENDLY_NAME = "Foursquare ";
+    public static final String FOURSQUARE_USER_INFO_ENDPOINT = "https://api.foursquare.com/v2/users/self?v=";
+    public static final String FOURSQUARE_CONNECTOR_FRIENDLY_NAME = "Foursquare";
     public static final String FOURSQUARE_CONNECTOR_NAME = "Foursquare";
     public static final String FOURSQUARE_USER_ID = "id";
     public static final String FOURSQUARE_OAUTH2_ACCESS_TOKEN_PARAMETER = "oauth_token";
-    public static final String HTTP_METHOD="GET";
+    public static final String HTTP_METHOD = "GET";
 
-    public static final String FOURSQUARE_LOGIN_TYPE = "foursquare";
-    public static final String OAUTH2_GRANT_TYPE_CODE = "code";
-    public static final String OAUTH2_PARAM_STATE = "state";
     public static final String ACCESS_TOKEN = "access_token";
-    public static final String CLIENT_ID = "ClientId";
-    public static final String CLIENT_SECRET = "ClientSecret";
-    public static final String OAUTH2_AUTHZ_URL = "OAuth2AuthUrl";
-    public static final String OAUTH2_TOKEN_URL = "OAUTH2TokenUrl";
+    public static final String PROFILE_VERSION = "profileVersion";
 
-    public static class Claim  {
+    public static class Claim {
         public static final String ID = "id";
         public static final String FIRST_NAME = "firstName";
         public static final String LAST_NAME = "lastName";
-        public static final String USER = "user";
-        public static final String CONTACT= "contact";
+        public static final String CONTACT = "contact";
         public static final String EMAIL = "email";
-        public static final String RESPONSE="response";
+        public static final String BIO = "bio";
+        public static final String GENDER = "gender";
+        public static final String RELATIONSHIP = "relationship";
+        public static final String HOME_CITY = "homeCity";
+        public static final String CANONICAL_URL = "canonicalUrl";
+        public static final String RESPONSE = "response";
+        public static final String USER = "user";
     }
 }
+
+
