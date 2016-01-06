@@ -12,6 +12,7 @@ Tested Platform:
 
 Do the following:
 
+Deploying and Configuring Tiqr artifacts:
 1. Navigate to authentication-endpoint/org.wso2.carbon.identity.application.authentication.endpoint.tiqr and build.
 
 2. Place org.wso2.carbon.identity.application.authentication.endpoint.tiqr war into <IS_HOME>/repository/deployment/server/webapps.
@@ -22,6 +23,7 @@ Do the following:
 
 5. Start the IS server and create Identity provider and service provider in IS via the IS console.
 
+Configuring the Tiqr app:
 6. For updating the dependencies: Navigate to tiqr-client/ and install dependencies using Composer.
 curl -sS https://getcomposer.org/installer | php
 ./composer.phar install
