@@ -229,8 +229,7 @@ public class FoursquareAuthenticator extends OpenIDConnectAuthenticator implemen
         if (log.isDebugEnabled()) {
             log.debug("Claim URL: " + url + " & Access-Token : " + accessToken);
         }
-
-        if (url == null) {
+        if (StringUtils.isEmpty(url)) {
             return "";
         } else {
             URL obj = new URL(url + "&" + FoursquareAuthenticatorConstants.FOURSQUARE_OAUTH2_ACCESS_TOKEN_PARAMETER +
@@ -306,7 +305,6 @@ public class FoursquareAuthenticator extends OpenIDConnectAuthenticator implemen
                     + FoursquareAuthenticatorConstants.Claim.EMAIL + "\":\"" + email + "\"}";
 
             userClaims = JSONUtils.parseJSON(jsonClaim);
-
             return userClaims;
         } catch (IOException e) {
             log.error("Exception while sending the request with access token to the use information URL"
@@ -338,6 +336,5 @@ public class FoursquareAuthenticator extends OpenIDConnectAuthenticator implemen
         }
         return claims;
     }
-
 }
 
