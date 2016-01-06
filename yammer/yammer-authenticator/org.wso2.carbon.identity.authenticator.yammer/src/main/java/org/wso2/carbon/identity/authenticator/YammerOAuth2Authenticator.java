@@ -103,9 +103,8 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
                                                  HttpServletResponse response,
                                                  AuthenticationContext context)
             throws AuthenticationFailedException {
-
         try {
-            Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
+            Map< String, String > authenticatorProperties = context.getAuthenticatorProperties();
 
             String clientId = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_ID);
             String clientSecret = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_SECRET);
@@ -117,7 +116,6 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
 
             OAuthClientRequest accessRequest =
                     getAccessRequest(tokenEndPoint, clientId, code, clientSecret, callbackUrl);
-
             OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
             OAuthClientResponse oAuthResponse = getOauthResponse(oAuthClient, accessRequest);
             String token = oAuthResponse.getParam("access_token");
@@ -134,7 +132,6 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
             claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
             authenticatedUserObj.setUserAttributes(claims);
             context.setSubject(authenticatedUserObj);
-
         } catch (OAuthProblemException e) {
             throw new AuthenticationFailedException("Authentication process failed", e);
         }
@@ -143,7 +140,6 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
     private OAuthClientRequest getAccessRequest(String tokenEndPoint, String clientId, String code, String clientSecret,
                                                 String callbackurl)
             throws AuthenticationFailedException {
-
         OAuthClientRequest accessRequest;
         try {
             accessRequest = OAuthClientRequest.tokenLocation(tokenEndPoint)
@@ -158,7 +154,6 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
 
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
             throws AuthenticationFailedException {
-
         OAuthClientResponse oAuthResponse = null;
         try {
             oAuthResponse = oAuthClient.accessToken(accessRequest);
@@ -181,11 +176,9 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
     protected Map< ClaimMapping, String > getSubjectAttributes(OAuthClientResponse token,
                                                                Map< String, String > authenticatorProperties) {
         Map< ClaimMapping, String > claims = new HashMap<>();
-
         try {
             String jsonString = token.getParam("access_token");
             String accessToken = JSONUtils.parseJSON(jsonString).get(YammerOAuth2AuthenticatorConstants.ACCESS_TOKEN).toString();
-
             String url = getUserInfoEndpoint(token, authenticatorProperties);
 
             String json = sendRequest(url, accessToken);
@@ -195,10 +188,8 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
                 }
                 return claims;
             }
-
-            Map<String, Object> jsonObject = JSONUtils.parseJSON(json);
-
-            for (Map.Entry<String, Object> data : jsonObject.entrySet()) {
+            Map< String, Object > jsonObject = JSONUtils.parseJSON(json);
+            for (Map.Entry< String, Object > data : jsonObject.entrySet()) {
                 String key = data.getKey();
                 claims.put(ClaimMapping.build(key, key, null, false), jsonObject.get(key).toString());
                 if (log.isDebugEnabled()) {
@@ -214,7 +205,6 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
 
     @Override
     public List< Property > getConfigurationProperties() {
-
         List< Property > configProperties = new ArrayList< Property >();
 
         Property clientId = new Property();
