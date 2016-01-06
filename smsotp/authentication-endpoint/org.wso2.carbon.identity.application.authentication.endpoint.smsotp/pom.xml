@@ -52,12 +52,6 @@
             <version>${axiom.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
-            <artifactId>org.wso2.carbon.identity.application.authentication.endpoint.util</artifactId>
-            <version>${carbon.identity.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.securevault</groupId>
             <artifactId>org.wso2.securevault</artifactId>
             <version>${org.wso2.securevault.version}</version>
@@ -135,7 +129,6 @@
         </repository>
     </repositories>
     <properties>
-        <carbon.identity.version>5.0.2-beta</carbon.identity.version>
         <javax.servlet-api.version>3.0-alpha-1</javax.servlet-api.version>
         <javax.servelet.jstl.version>1.2</javax.servelet.jstl.version>
         <commons-codec.version>1.4.0.wso2v1</commons-codec.version>
