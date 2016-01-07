@@ -38,4 +38,7 @@ public class InweboConstants {
     public static final String RETRYINTERVAL_DEFAULT = "1000";
     public static final String WAITTIME_DEFAULT = "10";
     public static final String INWEBO_USERID = "http://wso2.org/claims/authentication/inwebo/userId";
+    public static final String INWEBO_LOGINPAGE="authenticationendpoint/login.do";
+    public static final String INWEBO_PAGE="inweboauthenticationendpoint/inwebo.jsp";
+    public static final String RETRY_PARAM="&authFailure=true&authFailureMsg=authentication.fail.message";
 }
