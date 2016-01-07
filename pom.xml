@@ -128,12 +128,7 @@
                 <module>smsotp/smsotp-authenticator/org.wso2.carbon.identity.authenticator</module>
                 <module>tiqr</module>
                 <module>yammer/yammer-authenticator/org.wso2.carbon.identity.authenticator.yammer</module>
-                <module>
-                    mepin/authentication-endpoint/org.wso2.carbon.identity.application.authentication.endpoint.mepin
-                </module>
-                <module>
-                    smsotp/authentication-endpoint/org.wso2.carbon.identity.application.authentication.endpoint.smsotp
-                </module>
+                <module>mepin</module>
             </modules>
         </profile>
     </profiles>
