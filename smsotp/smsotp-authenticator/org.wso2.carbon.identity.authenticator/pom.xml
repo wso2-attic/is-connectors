@@ -17,23 +17,19 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.wso2.carbon.identity.authenticator</groupId>
     <artifactId>org.wso2.carbon.identity.authenticator.SMSOTP</artifactId>
     <version>1.0.0</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Authenticator Library For SMSOTP</name>
     <url>http://wso2.org</url>
-
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>is-connectors</artifactId>
+        <artifactId>smsotp</artifactId>
         <version>1.0.0</version>
-        <relativePath>../../../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.identity</groupId>
@@ -58,7 +54,6 @@
             </releases>
         </repository>
     </repositories>
-
     <build>
         <pluginManagement>
             <plugins>
