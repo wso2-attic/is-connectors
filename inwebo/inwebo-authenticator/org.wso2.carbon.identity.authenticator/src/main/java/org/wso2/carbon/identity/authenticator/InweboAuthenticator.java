@@ -61,6 +61,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
      */
     @Override
     public boolean canHandle(HttpServletRequest request) {
+
         if (log.isDebugEnabled()) {
             log.debug("Inside InweboAuthenticator.canHandle()");
         }
@@ -75,11 +76,14 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
                                                  HttpServletResponse response, AuthenticationContext context)
             throws AuthenticationFailedException {
         String loginPage = ConfigurationFacade.getInstance().getAuthenticationEndpointURL();
-        loginPage = loginPage.replace("authenticationendpoint/login.do", "inweboauthenticationendpoint/inwebo.jsp");
+        loginPage = loginPage.replace(InweboConstants.INWEBO_LOGINPAGE, InweboConstants.INWEBO_PAGE);
         try {
+            String retryParam = "";
+            if (context.isRetrying()) {
+                retryParam = InweboConstants.RETRY_PARAM;
+            }
             response.sendRedirect(response.encodeRedirectURL(loginPage + "?" + FrameworkConstants.SESSION_DATA_KEY + "="
-                            + context.getContextIdentifier()
-            ));
+                            + context.getContextIdentifier()+retryParam));
         } catch (IOException e) {
             throw new AuthenticationFailedException("Error while redirecting", e);
         }
@@ -197,6 +201,10 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         } else {
             throw new AuthenticationFailedException("Required parameters are empty");
         }
+    }
+    @Override
+    protected boolean retryAuthenticationEnabled() {
+        return true;
     }
 
     /**
