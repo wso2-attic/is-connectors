@@ -20,7 +20,7 @@
 package org.wso2.carbon.identity.authenticator.tiqr;
 
 public class TiqrConstants {
-    public static final String AUTHENTICATOR_NAME = "Tiqr";
+    public static final String AUTHENTICATOR_NAME = "TiqrAuthenticator";
     public static final String AUTHENTICATOR_FRIENDLY_NAME = "Tiqr";
     public static final String AUTH_USERNAME = "username";
     public static final String AUTH_PASSWORD = "password";
