@@ -72,8 +72,8 @@
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
-                            !org.wso2.carbon.identity.authenticator.internal,
-                            org.wso2.carbon.identity.authenticator.*
+                            !${package}.internal,
+                            ${package}.*
                         </Export-Package>
                     </instructions>
                 </configuration>
