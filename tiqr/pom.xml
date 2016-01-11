@@ -40,7 +40,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <module>tiqr-authenticator/org.wso2.carbon.identity.authenticator.tiqr</module>
+                <module>tiqr-authenticator/org.wso2.carbon.identity.authenticator</module>
                 <module>
                     authentication-endpoint/org.wso2.carbon.identity.application.authentication.endpoint.tiqr
                 </module>
