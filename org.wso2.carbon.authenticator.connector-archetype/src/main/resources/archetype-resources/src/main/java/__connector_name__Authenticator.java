@@ -21,6 +21,7 @@ package ${package};
 
 import org.apache.oltu.oauth2.client.response.OAuthClientResponse;
 import org.wso2.carbon.identity.application.authenticator.oidc.OpenIDConnectAuthenticator;
+import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
