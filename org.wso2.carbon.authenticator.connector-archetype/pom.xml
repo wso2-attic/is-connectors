@@ -21,7 +21,7 @@
 
     <groupId>org.wso2.carbon</groupId>
     <artifactId>org.wso2.carbon.authenticator.connector-archetype</artifactId>
-    <version>4.2.0</version>
+    <version>4.4.3</version>
     <packaging>maven-archetype</packaging>
 
     <name>WSO2 Carbon - Authenticator Archetype for Template</name>
