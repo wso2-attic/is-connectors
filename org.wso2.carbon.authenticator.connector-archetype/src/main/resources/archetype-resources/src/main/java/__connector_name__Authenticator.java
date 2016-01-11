@@ -19,64 +19,54 @@
 
 package ${package};
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.wso2.carbon.identity.application.authentication.framework.AbstractApplicationAuthenticator;
+import org.apache.oltu.oauth2.client.response.OAuthClientResponse;
+import org.wso2.carbon.identity.application.authenticator.oidc.OpenIDConnectAuthenticator;
+import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
+import org.wso2.carbon.identity.application.common.model.Property;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
-import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
-import org.wso2.carbon.identity.application.common.model.Property;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Authenticator of ${connector_name}
  */
-public class ${connector_name}Authenticator extends AbstractApplicationAuthenticator {
+public class ${connector_name}Authenticator extends OpenIDConnectAuthenticator implements FederatedApplicationAuthenticator {
 
     private static Log log = LogFactory.getLog(${connector_name}Authenticator.class);
 
     /**
-     * Check whether the authentication or logout request can be handled by the authenticator
+     * Get ${connector_name} authorization endpoint.
      */
     @Override
-    public boolean canHandle(HttpServletRequest request) {
-        if (log.isDebugEnabled()) {
-            log.debug("Inside ${connector_name}Authenticator.canHandle()");
-        }
-        //Add your code here
+    protected String getAuthorizationServerEndpoint(Map< String, String > authenticatorProperties) {
+        return ${connector_name}AuthenticatorConstants.${connector_name}_OAUTH_ENDPOINT;
+    }
+
+    /**
+     * Get ${connector_name} token endpoint.
+     */
+    @Override
+    protected String getTokenEndpoint(Map< String, String > authenticatorProperties) {
+        return ${connector_name}AuthenticatorConstants.${connector_name}_TOKEN_ENDPOINT;
+    }
+
+    /**
+     * Get ${connector_name} user info endpoint.
+     */
+    @Override
+    protected String getUserInfoEndpoint(OAuthClientResponse token, Map< String, String > authenticatorProperties) {
+        return ${connector_name}AuthenticatorConstants.${connector_name}_USERINFO_ENDPOINT;
+    }
+
+    /**
+     * Check ID token in ${connector_name} OAuth.
+     */
+    @Override
+    protected boolean requiredIDToken(Map< String, String > authenticatorProperties) {
         return false;
-    }
-
-    /**
-     * initiate the authentication request
-     */
-    @Override
-    protected void initiateAuthenticationRequest(HttpServletRequest request,
-                                                 HttpServletResponse response, AuthenticationContext context)
-            throws AuthenticationFailedException {
-        //Add your code here to initiate the request
-    }
-
-    /**
-     * Get the configuration properties of UI
-     */
-    @Override
-    public List<Property> getConfigurationProperties() {
-        List<Property> configProperties = new ArrayList<Property>();
-        //Add your code here for UI fields
-        return configProperties;
-    }
-
-    /**
-     * Process the response of the ${connector_name} end-point
-     */
-    @Override
-    protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
-        AuthenticationContext context) throws AuthenticationFailedException {
-        //Add your code here
     }
 
     /**
@@ -84,7 +74,7 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
      */
     @Override
     public String getFriendlyName() {
-        return ${connector_name}Constants.AUTHENTICATOR_FRIENDLY_NAME;
+        return ${connector_name}AuthenticatorConstants.AUTHENTICATOR_FRIENDLY_NAME;
     }
 
     /**
@@ -92,15 +82,19 @@ public class ${connector_name}Authenticator extends AbstractApplicationAuthentic
      */
     @Override
     public String getName() {
-        return ${connector_name}Constants.AUTHENTICATOR_NAME;
+        return ${connector_name}AuthenticatorConstants.AUTHENTICATOR_NAME;
     }
 
     /**
-     * Get the Context identifier sent with the request.
+     * Get Configuration Properties
      */
-    public String getContextIdentifier(HttpServletRequest httpServletRequest) {
-        //Add your code here
-        return null;
+    @Override
+    public List<Property> getConfigurationProperties() {
+
+        List<Property> configProperties = new ArrayList<Property>();
+        //Add your configuration properties
+        return configProperties;
     }
+
 }
 
