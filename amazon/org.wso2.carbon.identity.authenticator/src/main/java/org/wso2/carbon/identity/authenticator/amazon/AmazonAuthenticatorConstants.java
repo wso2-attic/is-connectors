@@ -36,4 +36,5 @@ public class AmazonAuthenticatorConstants {
     public static final String USER_ID="user_id";
     public static final String CALLBACKURL_ENDPOINT="callbackurl";
     public static final String DOMAIN="domain";
+    public static final String PROFILE="profile";
 }

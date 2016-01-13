@@ -32,6 +32,7 @@ import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.utils.JSONUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
@@ -165,17 +166,17 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
                 OAuthClientRequest oAuthClientRequest = OAuthClientRequest
                         .authorizationLocation(authorizationEP)
                         .setClientId(clientId)
-                        .setScope("profile")
-                        .setResponseType("code")
+                        .setScope(AmazonAuthenticatorConstants.PROFILE)
+                        .setResponseType(OIDCAuthenticatorConstants.OAUTH2_GRANT_TYPE_CODE)
                         .setState(state)
                         .setRedirectURI(callbackurl)
                         .buildQueryMessage();
                 String locationUri = oAuthClientRequest.getLocationUri();
                 String domain = request.getParameter(AmazonAuthenticatorConstants.DOMAIN);
-                if (domain != null) {
+                if (!StringUtils.isEmpty(domain)) {
                     locationUri = locationUri + "&fidp=" + domain;
                 }
-                if (queryString != null) {
+                if (!StringUtils.isEmpty(queryString)) {
                     if (!queryString.startsWith("&")) {
                         locationUri = locationUri + "&" + queryString;
                     } else {
@@ -223,10 +224,8 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
             claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
             authenticatedUserObj.setUserAttributes(claims);
             context.setSubject(authenticatedUserObj);
-        } catch (OAuthProblemException e) {
+        } catch (OAuthProblemException | IOException | JSONException e) {
             throw new AuthenticationFailedException("Authentication process failed", e);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
