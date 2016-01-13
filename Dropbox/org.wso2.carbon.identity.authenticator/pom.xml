@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- ~ Copyright (c) 2015 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~ Copyright (c) 2016 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ Licensed under the Apache License, Version 2.0 (the "License");
  ~ you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
     <groupId>org.wso2.carbon.identity.authenticator.dropbox</groupId>
     <artifactId>org.wso2.carbon.identity.authenticator.Dropbox</artifactId>
     <version>1.0.0</version>
-
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Authenticator Library For Dropbox</name>
     <url>http://wso2.org</url>
@@ -31,13 +30,6 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <dependencies>
-        <dependency>
-            <groupId>org.json.wso2</groupId>
-            <artifactId>json</artifactId>
-            <version>${wso2.json}</version>
-        </dependency>
-    </dependencies>
     <build>
         <pluginManagement>
             <plugins>

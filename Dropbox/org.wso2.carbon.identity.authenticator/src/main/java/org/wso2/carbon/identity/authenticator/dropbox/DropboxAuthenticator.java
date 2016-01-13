@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -113,7 +113,7 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
         clientId.setName(OIDCAuthenticatorConstants.CLIENT_ID);
         clientId.setDisplayName(DropboxAuthenticatorConstants.CLIENT_ID);
         clientId.setRequired(true);
-        clientId.setDescription("Enter Foursquare client identifier value");
+        clientId.setDescription("Enter Dropbox client identifier value");
         clientId.setDisplayOrder(0);
         configProperties.add(clientId);
 
@@ -122,7 +122,7 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
         clientSecret.setDisplayName(DropboxAuthenticatorConstants.CLIENT_SECRET);
         clientSecret.setRequired(true);
         clientSecret.setConfidential(true);
-        clientSecret.setDescription("Enter Foursquare client secret value");
+        clientSecret.setDescription("Enter Dropbox client secret value");
         clientSecret.setDisplayOrder(1);
         configProperties.add(clientSecret);
 
@@ -231,16 +231,17 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
                 String queryString = this.getQueryString(authenticatorProperties);
                 OAuthClientRequest oAuthClientRequest = OAuthClientRequest
                         .authorizationLocation(authorizationEP)
-                        .setClientId(clientId).setRedirectURI(callbackurl)
+                        .setClientId(clientId)
+                        .setRedirectURI(callbackurl)
                         .setResponseType(OIDCAuthenticatorConstants.OAUTH2_GRANT_TYPE_CODE)
                         .setState(state)
                         .buildQueryMessage();
                 String locationUri = oAuthClientRequest.getLocationUri();
                 String domain = request.getParameter(DropboxAuthenticatorConstants.DOMAIN);
-                if (domain != null) {
+                if (!StringUtils.isEmpty(domain)) {
                     locationUri = locationUri + "&fidp=" + domain;
                 }
-                if (queryString != null) {
+                if (!StringUtils.isEmpty(queryString)) {
                     if (!queryString.startsWith("&")) {
                         locationUri = locationUri + "&" + queryString;
                     } else {
@@ -258,4 +259,3 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
         }
     }
 }
-
