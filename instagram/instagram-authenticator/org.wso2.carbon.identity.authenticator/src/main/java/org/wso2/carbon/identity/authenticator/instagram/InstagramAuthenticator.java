@@ -61,7 +61,7 @@ public class InstagramAuthenticator extends OpenIDConnectAuthenticator implement
     private static Log log = LogFactory.getLog(InstagramAuthenticator.class);
 
     /**
-     * @return
+     * Get Instagram authorization endpoint
      */
     @Override
     protected String getAuthorizationServerEndpoint(Map<String, String> authenticatorProperties) {
@@ -69,7 +69,7 @@ public class InstagramAuthenticator extends OpenIDConnectAuthenticator implement
     }
 
     /**
-     * @return
+     * Get Instagram access token endpoint
      */
     @Override
     protected String getTokenEndpoint(Map<String, String> authenticatorProperties) {
@@ -77,7 +77,7 @@ public class InstagramAuthenticator extends OpenIDConnectAuthenticator implement
     }
 
     /**
-     * @return
+     * Get Instagram user info endpoint
      */
     @Override
     protected String getUserInfoEndpoint(OAuthClientResponse token, Map<String, String> authenticatorProperties) {
@@ -95,16 +95,25 @@ public class InstagramAuthenticator extends OpenIDConnectAuthenticator implement
         return false;
     }
 
+    /**
+     * Get friendly name of the Authenticator
+     */
     @Override
     public String getFriendlyName() {
         return InstagramAuthenticatorConstants.INSTAGRAM_CONNECTOR_FRIENDLY_NAME;
     }
 
+    /**
+     * Get name of the Authenticator
+     */
     @Override
     public String getName() {
         return InstagramAuthenticatorConstants.INSTAGRAM_CONNECTOR_NAME;
     }
 
+    /**
+     * initiate the authentication request
+     */
     @Override
     protected void initiateAuthenticationRequest(HttpServletRequest request, HttpServletResponse response, AuthenticationContext context) throws AuthenticationFailedException {
         try {
@@ -160,6 +169,9 @@ public class InstagramAuthenticator extends OpenIDConnectAuthenticator implement
         }
     }
 
+    /**
+     * Process the response of first call
+     */
     @Override
     protected void processAuthenticationResponse(HttpServletRequest request,
                                                  HttpServletResponse response,
@@ -293,6 +305,9 @@ public class InstagramAuthenticator extends OpenIDConnectAuthenticator implement
         }
     }
 
+    /**
+     * Get the configuration properties of UI
+     */
     @Override
     public List<Property> getConfigurationProperties() {
         List<Property> configProperties = new ArrayList<Property>();
