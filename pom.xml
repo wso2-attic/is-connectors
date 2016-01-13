@@ -113,6 +113,11 @@
             <artifactId>org.wso2.carbon.ui</artifactId>
             <version>${carbon.kernel.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.json.wso2</groupId>
+            <artifactId>json</artifactId>
+            <version>${wso2.json}</version>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>
