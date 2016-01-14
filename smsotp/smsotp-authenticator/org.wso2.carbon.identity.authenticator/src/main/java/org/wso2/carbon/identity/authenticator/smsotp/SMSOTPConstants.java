@@ -17,7 +17,7 @@
  *
  */
 
-package org.wso2.carbon.identity.authenticator;
+package org.wso2.carbon.identity.authenticator.smsotp;
 
 import java.lang.String;
 

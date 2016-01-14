@@ -17,7 +17,7 @@
  *
  */
 
-package org.wso2.carbon.identity.authenticator;
+package org.wso2.carbon.identity.authenticator.smsotp;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
