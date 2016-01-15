@@ -28,7 +28,7 @@ public class MailChimpAuthenticatorConstants {
     //MailChimp token  endpoint URL
     public static final String MailChimp_TOKEN_ENDPOINT = "https://login.mailchimp.com/oauth2/token";
     //MailChimp user info endpoint URL
-    public static final String MailChimp_USERINFO_ENDPOINT = "https://us12.mailchimp.com/account/profile/";
+    public static final String MailChimp_USERINFO_ENDPOINT = "https://us12.api.mailchimp.com/2.0/users/profile";
 
     public static final String USER_ID="id";
 }

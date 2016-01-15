@@ -22,6 +22,11 @@ package org.wso2.carbon.identity.authenticator.mailChimp;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
 import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
@@ -30,6 +35,8 @@ import org.apache.oltu.oauth2.client.response.OAuthClientResponse;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
+import org.apache.oltu.oauth2.common.utils.JSONUtils;
+import org.json.JSONObject;
 import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
 import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
@@ -43,8 +50,14 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -54,12 +67,13 @@ import java.util.Map;
 public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implements FederatedApplicationAuthenticator {
 
     private static Log log = LogFactory.getLog(MailChimpAuthenticator.class);
+    private static final long serialVersionUID = -1636321794842883885L;
 
     /**
      * Get MailChimp authorization endpoint.
      */
     @Override
-    protected String getAuthorizationServerEndpoint(Map< String, String > authenticatorProperties) {
+    protected String getAuthorizationServerEndpoint(Map<String, String> authenticatorProperties) {
         return MailChimpAuthenticatorConstants.MailChimp_OAUTH_ENDPOINT;
     }
 
@@ -67,7 +81,7 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
      * Get MailChimp token endpoint.
      */
     @Override
-    protected String getTokenEndpoint(Map< String, String > authenticatorProperties) {
+    protected String getTokenEndpoint(Map<String, String> authenticatorProperties) {
         return MailChimpAuthenticatorConstants.MailChimp_TOKEN_ENDPOINT;
     }
 
@@ -75,16 +89,16 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
      * Get MailChimp user info endpoint.
      */
     @Override
-    protected String getUserInfoEndpoint(OAuthClientResponse token, Map< String, String > authenticatorProperties) {
-//        return MailChimpAuthenticatorConstants.MailChimp_USERINFO_ENDPOINT;
-        return null;
+    protected String getUserInfoEndpoint(OAuthClientResponse token, Map<String, String> authenticatorProperties) {
+        return MailChimpAuthenticatorConstants.MailChimp_USERINFO_ENDPOINT;
+
     }
 
     /**
      * Check ID token in MailChimp OAuth.
      */
     @Override
-    protected boolean requiredIDToken(Map< String, String > authenticatorProperties) {
+    protected boolean requiredIDToken(Map<String, String> authenticatorProperties) {
         return false;
     }
 
@@ -108,8 +122,8 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
      * Get Configuration Properties
      */
     @Override
-    public List< Property > getConfigurationProperties() {
-        List< Property > configProperties = new ArrayList< Property >();
+    public List<Property> getConfigurationProperties() {
+        List<Property> configProperties = new ArrayList<Property>();
 
         Property clientId = new Property();
         clientId.setName(OIDCAuthenticatorConstants.CLIENT_ID);
@@ -159,17 +173,81 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
             }
             context.setProperty(OIDCAuthenticatorConstants.ACCESS_TOKEN, accessToken);
             Map<ClaimMapping, String> claims;
-//            AuthenticatedUser authenticatedUserObj;
-//            log.info("XXXXXXXXXXXXXXXXXXXXX"+oAuthResponse.getParam(MailChimpAuthenticatorConstants.USER_ID));
-//            authenticatedUserObj = AuthenticatedUser.createFederateAuthenticatedUserFromSubjectIdentifier(oAuthResponse
-//                    .getParam(MailChimpAuthenticatorConstants.USER_ID));
-//            authenticatedUserObj.setAuthenticatedSubjectIdentifier(oAuthResponse
-//                    .getParam(MailChimpAuthenticatorConstants.USER_ID));
-//            claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
-//            authenticatedUserObj.setUserAttributes(claims);
-//            context.setSubject(authenticatedUserObj);
+            AuthenticatedUser authenticatedUserObj;
+            authenticatedUserObj = AuthenticatedUser.createFederateAuthenticatedUserFromSubjectIdentifier("User");
+            authenticatedUserObj.setAuthenticatedSubjectIdentifier("User");
+            claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
+            authenticatedUserObj.setUserAttributes(claims);
+            context.setSubject(authenticatedUserObj);
         } catch (OAuthProblemException e) {
             throw new AuthenticationFailedException("Authentication process failed", e);
+        }
+    }
+
+    @Override
+    protected Map<ClaimMapping, String> getSubjectAttributes(OAuthClientResponse token, Map<String, String> authenticatorProperties) {
+        HashMap claims = new HashMap();
+
+        try {
+            String e = token.getParam("access_token");
+            String url = this.getUserInfoEndpoint(token, authenticatorProperties);
+            String json = sendRequest(url, e);
+            JSONObject obj = new JSONObject(json);
+            if(StringUtils.isBlank(json)) {
+                if(log.isDebugEnabled()) {
+                    log.debug("Unable to fetch user claims. Proceeding without user claims");
+                }
+
+                return claims;
+            }
+
+            Map jsonObject = JSONUtils.parseJSON(json);
+            Iterator i$ = jsonObject.entrySet().iterator();
+
+            while(i$.hasNext()) {
+                Map.Entry data = (Map.Entry)i$.next();
+                String key = (String)data.getKey();
+                claims.put(ClaimMapping.build(key, key, (String)null, false), jsonObject.get(key).toString());
+                if(log.isDebugEnabled() && IdentityUtil.isTokenLoggable("UserClaims")) {
+                    log.debug("Adding claims from end-point data mapping : " + key + " - " + jsonObject.get(key).toString());
+                }
+            }
+        } catch (Exception var11) {
+            log.error("Error occurred while accessing user info endpoint", var11);
+        }
+
+        return claims;
+    }
+
+    protected String sendRequest(String url, String accessToken) throws IOException {
+        if(log.isDebugEnabled()) {
+            log.debug("Claim URL: " + url);
+        }
+
+        if(url == null) {
+            return "";
+        } else {
+            URL obj = new URL(url);
+            HttpURLConnection urlConnection = (HttpURLConnection)obj.openConnection();
+            urlConnection.setRequestMethod("POST");
+            HttpClient httpClient = HttpClientBuilder.create().build(); //Use this instead
+            HttpPost p = new HttpPost(url);
+
+            p.setEntity(new StringEntity("{\"apikey\":\""+ accessToken +"\""+"}"));
+
+            HttpResponse r = httpClient.execute(p);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(r.getEntity().getContent()));
+            StringBuilder builder = new StringBuilder();
+
+            for(String inputLine = reader.readLine(); inputLine != null; inputLine = reader.readLine()) {
+                builder.append(inputLine).append("\n");
+            }
+
+            reader.close();
+            if(log.isDebugEnabled() && IdentityUtil.isTokenLoggable("UserIdToken")) {
+                log.debug("response: " + builder.toString());
+            }
+            return builder.toString();
         }
     }
 
