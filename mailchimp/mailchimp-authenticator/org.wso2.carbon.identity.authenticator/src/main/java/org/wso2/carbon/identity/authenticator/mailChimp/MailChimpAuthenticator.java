@@ -193,8 +193,8 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
             String url = this.getUserInfoEndpoint(token, authenticatorProperties);
             String json = sendRequest(url, e);
             JSONObject obj = new JSONObject(json);
-            if(StringUtils.isBlank(json)) {
-                if(log.isDebugEnabled()) {
+            if (StringUtils.isBlank(json)) {
+                if (log.isDebugEnabled()) {
                     log.debug("Unable to fetch user claims. Proceeding without user claims");
                 }
 
@@ -204,11 +204,11 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
             Map jsonObject = JSONUtils.parseJSON(json);
             Iterator i$ = jsonObject.entrySet().iterator();
 
-            while(i$.hasNext()) {
-                Map.Entry data = (Map.Entry)i$.next();
-                String key = (String)data.getKey();
-                claims.put(ClaimMapping.build(key, key, (String)null, false), jsonObject.get(key).toString());
-                if(log.isDebugEnabled() && IdentityUtil.isTokenLoggable("UserClaims")) {
+            while (i$.hasNext()) {
+                Map.Entry data = (Map.Entry) i$.next();
+                String key = (String) data.getKey();
+                claims.put(ClaimMapping.build(key, key, (String) null, false), jsonObject.get(key).toString());
+                if (log.isDebugEnabled() && IdentityUtil.isTokenLoggable("UserClaims")) {
                     log.debug("Adding claims from end-point data mapping : " + key + " - " + jsonObject.get(key).toString());
                 }
             }
@@ -220,31 +220,31 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
     }
 
     protected String sendRequest(String url, String accessToken) throws IOException {
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("Claim URL: " + url);
         }
 
-        if(url == null) {
+        if (url == null) {
             return "";
         } else {
             URL obj = new URL(url);
-            HttpURLConnection urlConnection = (HttpURLConnection)obj.openConnection();
+            HttpURLConnection urlConnection = (HttpURLConnection) obj.openConnection();
             urlConnection.setRequestMethod("POST");
-            HttpClient httpClient = HttpClientBuilder.create().build(); //Use this instead
+            HttpClient httpClient = HttpClientBuilder.create().build();
             HttpPost p = new HttpPost(url);
 
-            p.setEntity(new StringEntity("{\"apikey\":\""+ accessToken +"\""+"}"));
+            p.setEntity(new StringEntity("{\"apikey\":\"" + accessToken + "\"" + "}"));
 
             HttpResponse r = httpClient.execute(p);
             BufferedReader reader = new BufferedReader(new InputStreamReader(r.getEntity().getContent()));
             StringBuilder builder = new StringBuilder();
 
-            for(String inputLine = reader.readLine(); inputLine != null; inputLine = reader.readLine()) {
+            for (String inputLine = reader.readLine(); inputLine != null; inputLine = reader.readLine()) {
                 builder.append(inputLine).append("\n");
             }
 
             reader.close();
-            if(log.isDebugEnabled() && IdentityUtil.isTokenLoggable("UserIdToken")) {
+            if (log.isDebugEnabled() && IdentityUtil.isTokenLoggable("UserIdToken")) {
                 log.debug("response: " + builder.toString());
             }
             return builder.toString();
