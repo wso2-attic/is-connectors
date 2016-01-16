@@ -110,6 +110,29 @@ public class InstagramAuthenticator extends OpenIDConnectAuthenticator implement
     public String getName() {
         return InstagramAuthenticatorConstants.INSTAGRAM_CONNECTOR_NAME;
     }
+    
+    @Override
+    public AuthenticatorFlowStatus process(HttpServletRequest request, HttpServletResponse response, AuthenticationContext context) throws AuthenticationFailedException, LogoutFailedException {
+        if (context.isLogoutRequest()) {
+            try {
+                if (!this.canHandle(request)) {
+                    context.setCurrentAuthenticator(this.getName());
+                    initiateLogoutRequest(request, response, context);
+                    return AuthenticatorFlowStatus.INCOMPLETE;
+                } else {
+                    processLogoutResponse(request, response, context);
+                    return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
+                }
+            } catch (UnsupportedOperationException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Ignoring UnsupportedOperationException.", e);
+                }
+                return AuthenticatorFlowStatus.SUCCESS_COMPLETED;
+            }
+        } else {
+            return super.process(request, response, context);
+        }
+    }
 
     /**
      * initiate the authentication request
