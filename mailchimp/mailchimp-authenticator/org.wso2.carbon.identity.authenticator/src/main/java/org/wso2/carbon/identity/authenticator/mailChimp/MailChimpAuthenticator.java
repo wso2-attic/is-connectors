@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -111,6 +111,19 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
     }
 
     /**
+     * Get OAuth2 Scope
+     *
+     * @param scope                   Scope
+     * @param authenticatorProperties Authentication properties.
+     * @return OAuth2 Scope
+     */
+    @Override
+    protected String getScope(String scope, Map<String, String> authenticatorProperties) {
+
+        return "";
+    }
+
+    /**
      * Get the name of the Authenticator
      */
     @Override
@@ -172,11 +185,11 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
                 throw new AuthenticationFailedException("Access token is empty or null");
             }
             context.setProperty(OIDCAuthenticatorConstants.ACCESS_TOKEN, accessToken);
-            Map<ClaimMapping, String> claims;
-            AuthenticatedUser authenticatedUserObj;
-            authenticatedUserObj = AuthenticatedUser.createFederateAuthenticatedUserFromSubjectIdentifier("User");
-            authenticatedUserObj.setAuthenticatedSubjectIdentifier("User");
-            claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
+            Map<ClaimMapping, String> claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
+            String email = claims.get(ClaimMapping.build(MailChimpAuthenticatorConstants.MailChimp_EMAIL, MailChimpAuthenticatorConstants.MailChimp_EMAIL, (String) null, false));
+            AuthenticatedUser authenticatedUserObj =
+                    AuthenticatedUser.createFederateAuthenticatedUserFromSubjectIdentifier(email);
+            authenticatedUserObj.setAuthenticatedSubjectIdentifier(email);
             authenticatedUserObj.setUserAttributes(claims);
             context.setSubject(authenticatedUserObj);
         } catch (OAuthProblemException e) {
@@ -287,58 +300,6 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
             throw new AuthenticationFailedException(e.getMessage(), e);
         }
         return accessRequest;
-    }
-
-    protected void initiateAuthenticationRequest(HttpServletRequest request, HttpServletResponse response,
-                                                 AuthenticationContext context) throws AuthenticationFailedException {
-        try {
-            Map authenticatorProperties = context.getAuthenticatorProperties();
-            if (authenticatorProperties == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Error while retrieving properties. Authenticator Properties cannot be null");
-                }
-                throw new AuthenticationFailedException("Error while retrieving properties. Authenticator Properties cannot be null");
-            } else {
-                String clientId = (String) authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_ID);
-                String authorizationEP = this.getAuthorizationServerEndpoint(authenticatorProperties);
-                if (authorizationEP == null) {
-                    authorizationEP = (String) authenticatorProperties.get(OIDCAuthenticatorConstants.OAUTH2_AUTHZ_URL);
-                }
-                String callbackurl = this.getCallbackUrl(authenticatorProperties);
-                if (StringUtils.isBlank(callbackurl)) {
-                    callbackurl = IdentityUtil.getServerURL("redirectUri", true, true);
-                }
-                String state = context.getContextIdentifier() + "," + OIDCAuthenticatorConstants.LOGIN_TYPE;
-                state = this.getState(state, authenticatorProperties);
-                String queryString = this.getQueryString(authenticatorProperties);
-                OAuthClientRequest oAuthClientRequest = OAuthClientRequest
-                        .authorizationLocation(authorizationEP)
-                        .setClientId(clientId)
-                        .setRedirectURI(callbackurl)
-                        .setResponseType(OIDCAuthenticatorConstants.OAUTH2_GRANT_TYPE_CODE)
-                        .setState(state)
-                        .buildQueryMessage();
-                String locationUri = oAuthClientRequest.getLocationUri();
-                String domain = request.getParameter("domain");
-                if (!StringUtils.isEmpty(domain)) {
-                    locationUri = locationUri + "&fidp=" + domain;
-                }
-                if (!StringUtils.isEmpty(queryString)) {
-                    if (!queryString.startsWith("&")) {
-                        locationUri = locationUri + "&" + queryString;
-                    } else {
-                        locationUri = locationUri + queryString;
-                    }
-                }
-                response.sendRedirect(locationUri);
-            }
-        } catch (IOException e) {
-            log.error("Exception while sending to the login page", e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
-        } catch (OAuthSystemException e1) {
-            log.error("Exception while building authorization code request", e1);
-            throw new AuthenticationFailedException(e1.getMessage(), e1);
-        }
     }
 
 }

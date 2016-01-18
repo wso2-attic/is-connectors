@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -29,5 +29,7 @@ public class MailChimpAuthenticatorConstants {
     public static final String MailChimp_TOKEN_ENDPOINT = "https://login.mailchimp.com/oauth2/token";
     //MailChimp user info endpoint URL
     public static final String MailChimp_USERINFO_ENDPOINT = "https://us12.api.mailchimp.com/2.0/users/profile";
+
+    public static final String MailChimp_EMAIL="email";
 
 }
