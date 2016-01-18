@@ -30,6 +30,6 @@ public class MailChimpAuthenticatorConstants {
     //MailChimp user info endpoint URL
     public static final String MailChimp_USERINFO_ENDPOINT = "https://us12.api.mailchimp.com/2.0/users/profile";
 
-    public static final String MailChimp_EMAIL="email";
+    public static final String MailChimp_EMAIL = "email";
 
 }
