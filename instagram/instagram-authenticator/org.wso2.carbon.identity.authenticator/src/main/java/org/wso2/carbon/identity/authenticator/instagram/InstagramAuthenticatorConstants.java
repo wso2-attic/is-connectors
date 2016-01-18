@@ -19,7 +19,7 @@
 
 package org.wso2.carbon.identity.authenticator.instagram;
 
-public class InstagramAuthenticatorConstants{
+public class InstagramAuthenticatorConstants {
 
     public static final String INSTAGRAM_OAUTH_ENDPOINT = "https://api.instagram.com/oauth/authorize/";
     public static final String INSTAGRAM_TOKEN_ENDPOINT = "https://api.instagram.com/oauth/access_token";
@@ -28,10 +28,8 @@ public class InstagramAuthenticatorConstants{
     public static final String INSTAGRAM_CONNECTOR_FRIENDLY_NAME = "Instagram ";
     public static final String INSTAGRAM_CONNECTOR_NAME = "Instagram";
 
-
-    public static final String SCOPE = "Scope";
-    public static final String BASIC_SCOPE = "basic";
     public static final String HTTP_GET_METHOD = "GET";
     public static final String INSTAGRAM_USERNAME = "username";
     public static final String INSTAGRAM_USER = "user";
+    public static final String INSTAGRAM_BASIC_SCOPE = "basic";
 }

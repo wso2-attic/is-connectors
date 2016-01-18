@@ -112,7 +112,7 @@ public class InstagramAuthenticator extends OpenIDConnectAuthenticator implement
     public String getName() {
         return InstagramAuthenticatorConstants.INSTAGRAM_CONNECTOR_NAME;
     }
-    
+
     @Override
     public AuthenticatorFlowStatus process(HttpServletRequest request, HttpServletResponse response, AuthenticationContext context) throws AuthenticationFailedException, LogoutFailedException {
         if (context.isLogoutRequest()) {
@@ -137,61 +137,16 @@ public class InstagramAuthenticator extends OpenIDConnectAuthenticator implement
     }
 
     /**
-     * initiate the authentication request
+     * Get OAuth2 Scope
+     *
+     * @param scope                   Scope
+     * @param authenticatorProperties Authentication properties.
+     * @return OAuth2 Scope
      */
     @Override
-    protected void initiateAuthenticationRequest(HttpServletRequest request, HttpServletResponse response, AuthenticationContext context) throws AuthenticationFailedException {
-        try {
-            Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
+    protected String getScope(String scope, Map<String, String> authenticatorProperties) {
 
-            if (authenticatorProperties == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Error while retrieving properties. Authenticator Properties cannot be null");
-                }
-                throw new AuthenticationFailedException("Error while retrieving properties. Authenticator Properties cannot be null");
-            } else {
-                String clientId = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_ID);
-                String authorizationEP = this.getAuthorizationServerEndpoint(authenticatorProperties);
-                if (StringUtils.isEmpty(authorizationEP)) {
-                    authorizationEP = authenticatorProperties.get(OIDCAuthenticatorConstants.OAUTH2_AUTHZ_URL);
-                }
-
-                String callbackurl = this.getCallbackUrl(authenticatorProperties);
-                if (StringUtils.isBlank(callbackurl)) {
-                    callbackurl = IdentityUtil.getServerURL("commonauth", true, true);
-                }
-
-                String state = context.getContextIdentifier() + "," + OIDCAuthenticatorConstants.LOGIN_TYPE;
-                state = this.getState(state, authenticatorProperties);
-
-                String scope = authenticatorProperties.get(InstagramAuthenticatorConstants.SCOPE);
-                if (StringUtils.isEmpty(scope)) {
-                    scope = InstagramAuthenticatorConstants.BASIC_SCOPE;
-                }
-                scope = this.getScope(scope, authenticatorProperties);
-
-                String queryString = this.getQueryString(authenticatorProperties);
-                OAuthClientRequest authzRequest = OAuthClientRequest.authorizationLocation(authorizationEP)
-                        .setClientId(clientId).setRedirectURI(callbackurl)
-                        .setResponseType(OIDCAuthenticatorConstants.OAUTH2_GRANT_TYPE_CODE).setState(state)
-                        .setScope(scope).buildQueryMessage();
-                String redirectURL = authzRequest.getLocationUri();
-                if (!StringUtils.isEmpty(queryString)) {
-                    if (!queryString.startsWith("&")) {
-                        redirectURL = redirectURL + "&" + queryString;
-                    } else {
-                        redirectURL = redirectURL + queryString;
-                    }
-                }
-                response.sendRedirect(redirectURL);
-            }
-        } catch (IOException e) {
-            log.error("Exception while sending to the login page", e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
-        } catch (OAuthSystemException e) {
-            log.error("Exception while building authorization code request", e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
-        }
+        return InstagramAuthenticatorConstants.INSTAGRAM_BASIC_SCOPE;
     }
 
     /**
@@ -354,19 +309,11 @@ public class InstagramAuthenticator extends OpenIDConnectAuthenticator implement
         clientSecret.setDisplayOrder(1);
         configProperties.add(clientSecret);
 
-        Property scope = new Property();
-        scope.setName(InstagramAuthenticatorConstants.SCOPE);
-        scope.setDisplayName("Scope");
-        scope.setRequired(false);
-        scope.setDescription("Enter scope for the user access");
-        scope.setDisplayOrder(2);
-        configProperties.add(scope);
-
         Property callbackUrl = new Property();
         callbackUrl.setDisplayName("Callback URL");
         callbackUrl.setName(IdentityApplicationConstants.OAuth2.CALLBACK_URL);
         callbackUrl.setDescription("Enter the callback url");
-        callbackUrl.setDisplayOrder(3);
+        callbackUrl.setDisplayOrder(2);
         configProperties.add(callbackUrl);
 
         return configProperties;
