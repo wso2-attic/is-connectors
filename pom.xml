@@ -129,6 +129,7 @@
                 <module>org.wso2.carbon.provisioning.connector-archetype</module>
                 <module>org.wso2.carbon.authenticator.connector-archetype</module>
                 <module>foursquare/foursquare-authenticator/org.wso2.carbon.identity.authenticator</module>
+                <module>instagram/instagram-authenticator/org.wso2.carbon.identity.authenticator</module>
                 <module>inwebo</module>
                 <module>mepin</module>
                 <module>smsotp</module>
