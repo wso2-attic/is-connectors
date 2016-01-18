@@ -52,7 +52,12 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Iterator;
 
 /**
  * Authenticator of Basecamp
