@@ -58,7 +58,7 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
      */
     @Override
     protected String getAuthorizationServerEndpoint(Map<String, String> authenticatorProperties) {
-        return WordpressAuthenticatorConstants.Wordpress_OAUTH_ENDPOINT;
+        return WordpressAuthenticatorConstants.WORDPRESS_OAUTH_ENDPOINT;
     }
 
     /**
@@ -66,7 +66,7 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
      */
     @Override
     protected String getTokenEndpoint(Map<String, String> authenticatorProperties) {
-        return WordpressAuthenticatorConstants.Wordpress_TOKEN_ENDPOINT;
+        return WordpressAuthenticatorConstants.WORDPRESS_TOKEN_ENDPOINT;
     }
 
     /**
@@ -74,7 +74,7 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
      */
     @Override
     protected String getUserInfoEndpoint(OAuthClientResponse token, Map<String, String> authenticatorProperties) {
-        return WordpressAuthenticatorConstants.Wordpress_USERINFO_ENDPOINT;
+        return WordpressAuthenticatorConstants.WORDPRESS_USERINFO_ENDPOINT;
     }
 
     /**

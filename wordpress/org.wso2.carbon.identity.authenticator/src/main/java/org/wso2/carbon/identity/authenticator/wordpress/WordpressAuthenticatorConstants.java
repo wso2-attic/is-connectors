@@ -24,11 +24,11 @@ public class WordpressAuthenticatorConstants {
     public static final String AUTHENTICATOR_FRIENDLY_NAME = "Wordpress";
 
     //Wordpress authorize endpoint URL
-    public static final String Wordpress_OAUTH_ENDPOINT = "https://public-api.wordpress.com/oauth2/authorize";
+    public static final String WORDPRESS_OAUTH_ENDPOINT = "https://public-api.wordpress.com/oauth2/authorize";
     //Wordpress token  endpoint URL
-    public static final String Wordpress_TOKEN_ENDPOINT = "https://public-api.wordpress.com/oauth2/token";
+    public static final String WORDPRESS_TOKEN_ENDPOINT = "https://public-api.wordpress.com/oauth2/token";
     //Wordpress user info endpoint URL
-    public static final String Wordpress_USERINFO_ENDPOINT = "https://public-api.wordpress.com/rest/v1/me";
+    public static final String WORDPRESS_USERINFO_ENDPOINT = "https://public-api.wordpress.com/rest/v1/me";
 
     public static final String CLIENT_ID="Client Id";
     public static final String CLIENT_SECRET="Client Secret";
