@@ -33,8 +33,5 @@ public class DropboxAuthenticatorConstants {
     public static final String CLIENT_SECRET="Client Secret";
     public static final String CALLBACK_URL="Callback URL";
     public static final String USER_ID="uid";
-    public static final String CALLBACKURL_ENDPOINT="callbackurl";
-    public static final String DOMAIN="domain";
-
-
+    public static final String DROPBOX_BASIC_SCOPE ="";
 }
