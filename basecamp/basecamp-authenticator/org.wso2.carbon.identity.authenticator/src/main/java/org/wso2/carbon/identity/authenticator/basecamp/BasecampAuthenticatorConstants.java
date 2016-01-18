@@ -20,8 +20,8 @@
 package org.wso2.carbon.identity.authenticator.basecamp;
 
 public class BasecampAuthenticatorConstants {
-    public static final String AUTHENTICATOR_NAME = "Basecamp";
-    public static final String AUTHENTICATOR_FRIENDLY_NAME = "BasecampAuthenticator";
+    public static final String AUTHENTICATOR_NAME = "BasecampAuthenticator";
+    public static final String AUTHENTICATOR_FRIENDLY_NAME = "Basecamp";
 
     //Basecamp authorize endpoint URL
     public static final String BASECAMP_OAUTH_ENDPOINT = "https://launchpad.37signals.com/authorization/new";
@@ -29,5 +29,6 @@ public class BasecampAuthenticatorConstants {
     public static final String BASECAMP_TOKEN_ENDPOINT = "https://launchpad.37signals.com/authorization/token";
     //Basecamp user info endpoint URL
     public static final String BASECAMP_USERINFO_ENDPOINT = "https://launchpad.37signals.com/authorization.json";
+    public static final String BASECAMP_EMAIL_ADDRESS = "email_address";
     public static final String OAUTH2_TYPE_WEB_SERVER = "web_server";
 }
