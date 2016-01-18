@@ -18,18 +18,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.identity.authenticator.wordpress</groupId>
-    <artifactId>org.wso2.carbon.identity.authenticator.Wordpress</artifactId>
+    <groupId>org.wso2.carbon.identity.authenticator.amazon</groupId>
+    <artifactId>org.wso2.carbon.identity.authenticator.Amazon</artifactId>
     <version>1.0.0</version>
-
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - Authenticator Library For Wordpress</name>
+    <name>WSO2 Carbon - Authenticator Library For Amazon</name>
     <url>http://wso2.org</url>
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>is-connectors</artifactId>
         <version>1.0.0</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
     <build>
         <pluginManagement>
@@ -60,7 +59,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package>org.wso2.carbon.identity.authenticator.wordpress.internal</Private-Package>
+                        <Private-Package>org.wso2.carbon.identity.authenticator.amazon.internal</Private-Package>
                         <Import-Package>
                             org.apache.commons.logging.*; version="1.0.4",
                             org.osgi.framework,
@@ -71,7 +70,7 @@
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
-                            !org.wso2.carbon.identity.authenticator.wordpress.internal,
+                            !org.wso2.carbon.identity.authenticator.amazon.internal,
                             org.wso2.carbon.identity.authenticator.*
                         </Export-Package>
                     </instructions>
