@@ -31,7 +31,6 @@ import org.apache.oltu.oauth2.client.response.OAuthClientResponse;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.apache.oltu.oauth2.common.utils.JSONUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
@@ -43,13 +42,11 @@ import org.wso2.carbon.identity.application.authenticator.oidc.OpenIDConnectAuth
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
-import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +62,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
      */
     @Override
     protected String getAuthorizationServerEndpoint(Map<String, String> authenticatorProperties) {
-        return AmazonAuthenticatorConstants.Amazon_OAUTH_ENDPOINT;
+        return AmazonAuthenticatorConstants.AMAZON_OAUTH_ENDPOINT;
     }
 
     /**
@@ -73,7 +70,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
      */
     @Override
     protected String getTokenEndpoint(Map<String, String> authenticatorProperties) {
-        return AmazonAuthenticatorConstants.Amazon_TOKEN_ENDPOINT;
+        return AmazonAuthenticatorConstants.AMAZON_TOKEN_ENDPOINT;
     }
 
     /**
@@ -81,7 +78,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
      */
     @Override
     protected String getUserInfoEndpoint(OAuthClientResponse token, Map<String, String> authenticatorProperties) {
-        return AmazonAuthenticatorConstants.Amazon_USERINFO_ENDPOINT;
+        return AmazonAuthenticatorConstants.AMAZON_USERINFO_ENDPOINT;
     }
 
     /**
@@ -141,57 +138,17 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
         return configProperties;
     }
 
-    protected void initiateAuthenticationRequest(HttpServletRequest request, HttpServletResponse response,
-                                                 AuthenticationContext context) throws AuthenticationFailedException {
-        try {
-            Map authenticatorProperties = context.getAuthenticatorProperties();
-            if (authenticatorProperties == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Error while retrieving properties. Authenticator Properties cannot be null");
-                }
-                throw new AuthenticationFailedException("Error while retrieving properties. Authenticator Properties cannot be null");
-            } else {
-                String clientId = (String) authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_ID);
-                String authorizationEP = this.getAuthorizationServerEndpoint(authenticatorProperties);
-                if (authorizationEP == null) {
-                    authorizationEP = (String) authenticatorProperties.get(OIDCAuthenticatorConstants.OAUTH2_AUTHZ_URL);
-                }
-                String callbackurl = this.getCallbackUrl(authenticatorProperties);
-                if (StringUtils.isBlank(callbackurl)) {
-                    callbackurl = IdentityUtil.getServerURL(AmazonAuthenticatorConstants.CALLBACKURL_ENDPOINT, true, true);
-                }
-                String state = context.getContextIdentifier() + "," + OIDCAuthenticatorConstants.LOGIN_TYPE;
-                state = this.getState(state, authenticatorProperties);
-                String queryString = this.getQueryString(authenticatorProperties);
-                OAuthClientRequest oAuthClientRequest = OAuthClientRequest
-                        .authorizationLocation(authorizationEP)
-                        .setClientId(clientId)
-                        .setScope(AmazonAuthenticatorConstants.PROFILE)
-                        .setResponseType(OIDCAuthenticatorConstants.OAUTH2_GRANT_TYPE_CODE)
-                        .setState(state)
-                        .setRedirectURI(callbackurl)
-                        .buildQueryMessage();
-                String locationUri = oAuthClientRequest.getLocationUri();
-                String domain = request.getParameter(AmazonAuthenticatorConstants.DOMAIN);
-                if (!StringUtils.isEmpty(domain)) {
-                    locationUri = locationUri + "&fidp=" + domain;
-                }
-                if (!StringUtils.isEmpty(queryString)) {
-                    if (!queryString.startsWith("&")) {
-                        locationUri = locationUri + "&" + queryString;
-                    } else {
-                        locationUri = locationUri + queryString;
-                    }
-                }
-                response.sendRedirect(locationUri);
-            }
-        } catch (IOException e) {
-            log.error("Exception while sending to the login page", e);
-            throw new AuthenticationFailedException(e.getMessage(), e);
-        } catch (OAuthSystemException e1) {
-            log.error("Exception while building authorization code request", e1);
-            throw new AuthenticationFailedException(e1.getMessage(), e1);
-        }
+
+    /**
+     * Get OAuth2 Scope
+     *
+     * @param scope                   Scope
+     * @param authenticatorProperties Authentication properties.
+     * @return OAuth2 Scope
+     */
+    @Override
+    protected String getScope(String scope, Map<String, String> authenticatorProperties) {
+        return AmazonAuthenticatorConstants.AMAZON_BASIC_SCOPE;
     }
 
     @Override
@@ -216,7 +173,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
             context.setProperty(OIDCAuthenticatorConstants.ACCESS_TOKEN, accessToken);
             Map<ClaimMapping, String> claims;
             AuthenticatedUser authenticatedUserObj;
-            String json = sendRequest(AmazonAuthenticatorConstants.Amazon_USERINFO_ENDPOINT,
+            String json = sendRequest(AmazonAuthenticatorConstants.AMAZON_USERINFO_ENDPOINT,
                     oAuthResponse.getParam(OIDCAuthenticatorConstants.ACCESS_TOKEN));
             JSONObject obj = new JSONObject(json);
             authenticatedUserObj = AuthenticatedUser.createFederateAuthenticatedUserFromSubjectIdentifier((String) obj.get(AmazonAuthenticatorConstants.USER_ID));

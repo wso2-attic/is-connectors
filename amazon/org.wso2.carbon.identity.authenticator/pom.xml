@@ -31,6 +31,13 @@
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
+    <dependencies>
+    <dependency>
+        <groupId>org.json.wso2</groupId>
+        <artifactId>json</artifactId>
+        <version>${wso2.json}</version>
+    </dependency>
+</dependencies>
     <build>
         <pluginManagement>
             <plugins>
