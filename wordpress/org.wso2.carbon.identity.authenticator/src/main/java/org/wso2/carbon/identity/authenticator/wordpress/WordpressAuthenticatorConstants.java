@@ -20,8 +20,8 @@
 package org.wso2.carbon.identity.authenticator.wordpress;
 
 public class WordpressAuthenticatorConstants {
-    public static final String AUTHENTICATOR_NAME = "Wordpress";
-    public static final String AUTHENTICATOR_FRIENDLY_NAME = "WordpressAuthenticator";
+    public static final String AUTHENTICATOR_NAME = "WordpressAuthenticator";
+    public static final String AUTHENTICATOR_FRIENDLY_NAME = "Wordpress";
 
     //Wordpress authorize endpoint URL
     public static final String Wordpress_OAUTH_ENDPOINT = "https://public-api.wordpress.com/oauth2/authorize";
