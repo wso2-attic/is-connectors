@@ -34,5 +34,5 @@ public class AmazonAuthenticatorConstants {
     public static final String CLIENT_SECRET="Client Secret";
     public static final String CALLBACK_URL="Callback URL";
     public static final String USER_ID="user_id";
-    public static final String AMAZON_BASIC_SCOPE = "profile";
+    public static final String AMAZON_SCOPE_PROFILE = "profile";
 }

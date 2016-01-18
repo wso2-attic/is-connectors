@@ -148,7 +148,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
      */
     @Override
     protected String getScope(String scope, Map<String, String> authenticatorProperties) {
-        return AmazonAuthenticatorConstants.AMAZON_BASIC_SCOPE;
+        return AmazonAuthenticatorConstants.AMAZON_SCOPE_PROFILE;
     }
 
     @Override
