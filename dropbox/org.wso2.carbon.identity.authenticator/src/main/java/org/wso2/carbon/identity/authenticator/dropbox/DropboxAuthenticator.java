@@ -58,7 +58,7 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
      */
     @Override
     protected String getAuthorizationServerEndpoint(Map<String, String> authenticatorProperties) {
-        return DropboxAuthenticatorConstants.Dropbox_OAUTH_ENDPOINT;
+        return DropboxAuthenticatorConstants.DROPBOX_OAUTH_ENDPOINT;
     }
 
     /**
@@ -66,7 +66,7 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
      */
     @Override
     protected String getTokenEndpoint(Map<String, String> authenticatorProperties) {
-        return DropboxAuthenticatorConstants.Dropbox_TOKEN_ENDPOINT;
+        return DropboxAuthenticatorConstants.DROPBOX_TOKEN_ENDPOINT;
     }
 
     /**
@@ -74,7 +74,7 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
      */
     @Override
     protected String getUserInfoEndpoint(OAuthClientResponse token, Map<String, String> authenticatorProperties) {
-        return DropboxAuthenticatorConstants.Dropbox_USERINFO_ENDPOINT;
+        return DropboxAuthenticatorConstants.DROPBOX_USERINFO_ENDPOINT;
     }
 
     /**
