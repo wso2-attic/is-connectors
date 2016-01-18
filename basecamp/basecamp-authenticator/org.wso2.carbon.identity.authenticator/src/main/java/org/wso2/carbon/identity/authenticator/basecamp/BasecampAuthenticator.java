@@ -210,7 +210,8 @@ public class BasecampAuthenticator extends OpenIDConnectAuthenticator implements
             }
             context.setProperty(OIDCAuthenticatorConstants.ACCESS_TOKEN, accessToken);
             Map<ClaimMapping, String> claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
-            String email = claims.get(ClaimMapping.build("email_address", "email_address", (String) null, false));
+            String email = claims.get(ClaimMapping.build(BasecampAuthenticatorConstants.BASECAMP_EMAIL_ADDRESS
+                    , BasecampAuthenticatorConstants.BASECAMP_EMAIL_ADDRESS, (String) null, false));
             AuthenticatedUser authenticatedUserObj =
                     AuthenticatedUser.createFederateAuthenticatedUserFromSubjectIdentifier(email);
             authenticatedUserObj.setAuthenticatedSubjectIdentifier(email);
