@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -112,8 +112,8 @@ public class GithubAuthenticator extends OpenIDConnectAuthenticator implements F
     /**
      * Get the scope
      */
-    public String getScope(String scope1, Map<String, String> authenticatorProperties) {
-        String scope = authenticatorProperties.get(GithubAuthenticatorConstants.SCOPE);
+    public String getScope(String scope, Map<String, String> authenticatorProperties) {
+        scope = authenticatorProperties.get(GithubAuthenticatorConstants.SCOPE);
         if (StringUtils.isEmpty(scope)) {
             scope = GithubAuthenticatorConstants.USER_SCOPE;
         }
