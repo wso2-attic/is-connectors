@@ -65,7 +65,7 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
         if (log.isDebugEnabled()) {
             log.debug("Inside InweboAuthenticator.canHandle()");
         }
-        return (!StringUtils.isEmpty(request.getParameter("inwebo")));
+        return (StringUtils.isNotEmpty(request.getParameter("inwebo")));
     }
 
     /**
@@ -174,12 +174,12 @@ public class InweboAuthenticator extends AbstractApplicationAuthenticator implem
             String serviceId = authenticatorProperties.get(InweboConstants.SERVICE_ID);
             String p12file = authenticatorProperties.get(InweboConstants.INWEBO_P12FILE);
             String p12password = authenticatorProperties.get(InweboConstants.INWEBO_P12PASSWORD);
-            if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_COUNT))) {
+            if (StringUtils.isNotEmpty(authenticatorProperties.get(InweboConstants.RETRY_COUNT))) {
                 waitTime = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_COUNT));
             } else {
                 waitTime = Integer.parseInt(InweboConstants.WAITTIME_DEFAULT);
             }
-            if (!StringUtils.isEmpty(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL))) {
+            if (StringUtils.isNotEmpty(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL))) {
                 retryInterval = Integer.parseInt(authenticatorProperties.get(InweboConstants.RETRY_INTERVAL
                 ));
             } else {
