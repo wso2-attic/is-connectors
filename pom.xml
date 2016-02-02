@@ -132,6 +132,7 @@
                 <module>basecamp/basecamp-authenticator/org.wso2.carbon.identity.authenticator</module>
                 <module>dropbox/dropbox-authenticator/org.wso2.carbon.identity.authenticator</module>
                 <module>foursquare/foursquare-authenticator/org.wso2.carbon.identity.authenticator</module>
+                <module>github/github-authenticator/org.wso2.carbon.identity.authenticator</module>
                 <module>instagram/instagram-authenticator/org.wso2.carbon.identity.authenticator</module>
                 <module>inwebo</module>
                 <module>mailchimp/mailchimp-authenticator/org.wso2.carbon.identity.authenticator</module>
