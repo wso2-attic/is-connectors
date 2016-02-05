@@ -1,0 +1,11 @@
+{
+    "name": "tiqr/tiqr-server-libphp",
+    "description": "php library for tiqr authentication.",
+    "type": "library",
+    "license": "BSD-3-Clause",
+    "require": {
+        "zendframework/zendframework1": "~1.12",
+        "kairos/phpqrcode": "~1.0",
+        "ext-gd": "*"
+    }
+}

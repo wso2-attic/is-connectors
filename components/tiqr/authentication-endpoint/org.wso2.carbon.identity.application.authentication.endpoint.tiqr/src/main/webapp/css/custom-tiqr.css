@@ -1,0 +1,18 @@
+/* unvisited link */
+a:link {
+    color: #337ab7;
+}
+
+/* mouse over link */
+a:hover {
+    color: rgba(51, 122, 183, 0.99)
+    text-shadow: 0 0 5px rgba(51, 122, 183, 0.58);
+    cursor:pointer;
+    text-decoration: none;
+}
+
+/* selected link */
+a:active {
+    color: blue;
+    text-decoration: none;
+}
