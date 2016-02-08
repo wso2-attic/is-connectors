@@ -134,6 +134,8 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
+                <module>connector-archetypes/org.wso2.carbon.authenticator.connector-archetype</module>
+                <module>connector-archetypes/org.wso2.carbon.provisioning.connector-archetype</module>
                 <module>components/amazon/amazon-authenticator/org.wso2.carbon.identity.authenticator</module>
                 <module>components/basecamp/basecamp-authenticator/org.wso2.carbon.identity.authenticator</module>
                 <module>components/dropbox/dropbox-authenticator/org.wso2.carbon.identity.authenticator</module>
