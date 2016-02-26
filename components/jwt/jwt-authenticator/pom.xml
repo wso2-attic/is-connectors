@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.wso2.carbon.identity</groupId>
+    <artifactId>org.wso2.carbon.identity.oauth.jwt</artifactId>
+    <version>1.0.0</version>
+    <packaging>bundle</packaging>
+    <name>JWT grant type for OAuth2</name>
+    <url>http://wso2.org</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nimbusds.wso2</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>${nimbusds.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.oltu.oauth2</groupId>
+            <artifactId>oltu</artifactId>
+            <version>${oltu.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.identity.application.authentication.framework</artifactId>
+            <version>${carbon.identity.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.identity.oauth</artifactId>
+            <version>${carbon.identity.version}</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>wso2-nexus</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </repository>
+    </repositories>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Import-Package>
+                            org.apache.oltu.oauth2.common.validators; version="${oltu.package.import.version.range}",
+                            org.wso2.carbon.identity.base; version="${carbon.identity.package.import.version.range}"
+                        </Import-Package>
+                        <Export-Package>
+                            org.wso2.carbon.identity.oauth.jwt.*;
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <properties>
+        <carbon.identity.version>5.0.7</carbon.identity.version>
+        <nimbusds.version>2.26.1.wso2v2</nimbusds.version>
+        <oltu.version>1.0.0.wso2v3</oltu.version>
+        <org.apache.oltu.oauth2.client.version>1.0.0</org.apache.oltu.oauth2.client.version>
+        <oltu.package.import.version.range>[1.0.0, 2.0.0)</oltu.package.import.version.range>
+        <carbon.identity.package.import.version.range>[5.0.0, 6.0.0)</carbon.identity.package.import.version.range>
+    </properties>
+</project>
