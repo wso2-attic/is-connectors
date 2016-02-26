@@ -15,26 +15,12 @@
  * specific language governing permissions and limitations
  * under the License
  */
+package org.wso2.carbon.identity.oauth.jwt;
 
-package org.wso2.carbon.identity.oauth.jwt.cache;
+public class JWTConstants {
 
-import com.nimbusds.jwt.SignedJWT;
-import org.wso2.carbon.identity.application.common.cache.CacheEntry;
-
-import java.text.ParseException;
-
-public class JWTCacheEntry extends CacheEntry {
-    private String encodedJWT;
-
-    public JWTCacheEntry(SignedJWT jwt) {
-        this.encodedJWT = jwt.serialize();
-    }
-
-    public SignedJWT getJwt() throws ParseException {
-        return SignedJWT.parse(this.encodedJWT);
-    }
-
-    public String getEncodedJWt() {
-        return this.encodedJWT;
-    }
+    public static final String OAUTH_JWT_BEARER_GRANT_TYPE = "urn:ietf:params:oauth:grant-type:jwt-bearer";
+    public static final String OAUTH_JWT_ASSERTION = "assertion";
+    public static final int VALIDITY_PERIOD = 30;
+    public static final boolean CACHE_USED_JTI = true;
 }

@@ -46,5 +46,4 @@ public class JWTCache extends BaseCache {
     public void clearCacheEntry(String key) {
         super.clearCacheEntry(key);
     }
-
 }

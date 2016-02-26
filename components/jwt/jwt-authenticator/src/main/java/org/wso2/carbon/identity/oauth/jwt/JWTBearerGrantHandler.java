@@ -59,10 +59,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
 
     private static Log log = LogFactory.getLog(JWTBearerGrantHandler.class);
 
-    private static final String OAUTH_JWT_BEARER_GRANT_TYPE = "urn:ietf:params:oauth:grant-type:jwt-bearer";
-    private static final String OAUTH_JWT_ASSERTION = "assertion";
-    private static final int VALIDITY_PERIOD = 30;
-    private static final boolean CACHE_USED_JTI = true;
+
     private static String tenantDomain;
     private JWTCache jwtCache;
 
@@ -73,7 +70,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      */
     public void init() throws IdentityOAuth2Exception {
         super.init();
-        if (CACHE_USED_JTI) {
+        if (JWTConstants.CACHE_USED_JTI) {
             this.jwtCache = JWTCache.getInstance();
         }
     }
@@ -191,19 +188,16 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                     log.debug("Expiration Time(exp) of JWT was validated successfully");
                 }
             }
-
             if (checkNotBeforeTime(notBeforeTime, currentTimeInMillis, timeStampSkewMillis)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Not Before Time(nbf) of JWT was validated successfully");
                 }
             }
-
             if (checkValidityOfTheToken(issuedAtTime, currentTimeInMillis, timeStampSkewMillis)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Issued At Time(iat) of JWT was validated successfully");
                 }
             }
-
             if (jti != null) {
                 JWTCacheEntry entry = (JWTCacheEntry) jwtCache.getValueFromCache(jti);
                 if (entry != null) {
@@ -219,7 +213,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                     log.debug("JSON Web Token ID(jti) not found in JWT. Continuing Validation");
                 }
             }
-
             if (customClaims == null) {
                 if (log.isDebugEnabled()) {
                     log.debug("No custom claims found. Continue validating other claims.");
@@ -233,11 +226,9 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                     return false;
                 }
             }
-
             if (log.isDebugEnabled()) {
                 log.debug("JWT Token was validated successfully");
             }
-
             jwtCache.addToCache(jti, new JWTCacheEntry(signedJWT));
 
             if (log.isDebugEnabled()) {
@@ -253,7 +244,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
         if (log.isDebugEnabled()) {
             log.debug("Issuer(iss) of the JWT validated successfully");
         }
-
         return true;
     }
 
@@ -266,13 +256,13 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
         String assertion = null;
         SignedJWT signedJWT;
         for (RequestParameter param : params) {
-            if (param.getKey().equals(OAUTH_JWT_ASSERTION)) {
+            if (param.getKey().equals(JWTConstants.OAUTH_JWT_ASSERTION)) {
                 assertion = param.getValue()[0];
                 break;
             }
         }
         if (StringUtils.isEmpty(assertion)) {
-            log.error("No Valid Assertion was found for " + OAUTH_JWT_BEARER_GRANT_TYPE);
+            log.error("No Valid Assertion was found for " + JWTConstants.OAUTH_JWT_BEARER_GRANT_TYPE);
             return null;
         }
 
@@ -281,7 +271,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             if (log.isDebugEnabled()) {
                 logJWT(signedJWT);
             }
-
         } catch (ParseException e) {
             log.error("Error while parsing the JWT" + e.getMessage());
             return null;
@@ -322,10 +311,8 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                     log.debug("Error while getting Resident IDP :" + e.getMessage());
                 }
             }
-
             FederatedAuthenticatorConfig[] fedAuthnConfigs =
                     identityProvider.getFederatedAuthenticatorConfigs();
-
             FederatedAuthenticatorConfig oauthAuthenticatorConfig =
                     IdentityApplicationManagementUtil.getFederatedAuthenticator(fedAuthnConfigs,
                             IdentityApplicationConstants.Authenticator.OIDC.NAME);
@@ -335,7 +322,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                         oauthAuthenticatorConfig.getProperties(),
                         IdentityApplicationConstants.Authenticator.OIDC.OAUTH2_TOKEN_URL);
             }
-
             if (oauthTokenURL != null) {
                 tokenEndPointAlias = oauthTokenURL.getValue();
                 if (log.isDebugEnabled()) {
@@ -365,7 +351,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      */
     private boolean checkExpirationTime(Date expirationTime, long currentTimeInMillis, long timeStampSkewMillis) {
         long expirationTimeInMillis = expirationTime.getTime();
-
         if ((currentTimeInMillis + timeStampSkewMillis) > expirationTimeInMillis) {
             if (log.isDebugEnabled()) {
                 log.debug("JSON Web Token is expired." +
@@ -374,7 +359,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                         ", Current Time : " + currentTimeInMillis);
                 log.debug("JWT Rejected and validation terminated");
             }
-
             return false;
         }
         return true;
@@ -416,7 +400,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      */
     private boolean checkValidityOfTheToken(Date issuedAtTime, long currentTimeInMillis, long timeStampSkewMillis) {
         long issuedAtTimeMillis = issuedAtTime.getTime();
-        long rejectBeforeMillis = VALIDITY_PERIOD * 60 * 1000;
+        long rejectBeforeMillis = JWTConstants.VALIDITY_PERIOD * 60 * 1000;
         if (currentTimeInMillis + timeStampSkewMillis - issuedAtTimeMillis >
                 rejectBeforeMillis) {
             if (log.isDebugEnabled()) {
@@ -505,7 +489,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             throw new IdentityOAuth2Exception("Error occurred while decoding public certificate of Identity Provider "
                     + idp.getIdentityProviderName() + " for tenant domain " + tenantDomain);
         }
-
         String alg = signedJWT.getHeader().getAlgorithm().getName();
         if (log.isDebugEnabled()) {
             log.debug("Signature Algorithm found in the JWT Header: " + alg);
@@ -526,7 +509,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             }
             return false;
         }
-
         return signedJWT.verify(verifier);
     }
 
@@ -550,6 +532,4 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
     protected boolean validateCustomClaims(Map< String, Object > customClaims) {
         return true;
     }
-
 }
-
