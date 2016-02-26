@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015-2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -59,6 +59,7 @@ public class InweboProvisioningConnectorFactory extends AbstractProvisioningConn
         userId.setDisplayName("UserId");
         userId.setRequired(true);
         userId.setDescription("Enter your Inwebo UserId(random number)");
+        userId.setDisplayOrder(0);
         configProperties.add(userId);
 
         Property serviceId = new Property();
@@ -66,6 +67,7 @@ public class InweboProvisioningConnectorFactory extends AbstractProvisioningConn
         serviceId.setDisplayName("Service Id");
         serviceId.setRequired(true);
         serviceId.setDescription("Enter your service Id");
+        serviceId.setDisplayOrder(1);
         configProperties.add(serviceId);
 
         Property p12file = new Property();
@@ -73,27 +75,24 @@ public class InweboProvisioningConnectorFactory extends AbstractProvisioningConn
         p12file.setDisplayName("P12FILE");
         p12file.setRequired(true);
         p12file.setDescription("Enter your p12_file path");
+        p12file.setDisplayOrder(2);
         configProperties.add(p12file);
 
         Property p12password = new Property();
         p12password.setName(InweboConnectorConstants.INWEBO_P12PASSWORD);
         p12password.setDisplayName("P12Password");
+        p12password.setConfidential(true);
         p12password.setRequired(true);
         p12password.setDescription("Enter your p12_password");
+        p12password.setDisplayOrder(3);
         configProperties.add(p12password);
-
-        Property test = new Property();
-        test.setName(InweboConnectorConstants.INWEBO_TEST);
-        test.setDisplayName("test");
-        test.setRequired(true);
-        test.setDescription("Enter your password");
-        configProperties.add(test);
 
         Property firstName = new Property();
         firstName.setName(InweboConnectorConstants.INWEBO_FIRSTNAME);
         firstName.setDisplayName("FirstName");
         firstName.setRequired(true);
         firstName.setDescription("Enter your firstname");
+        firstName.setDisplayOrder(4);
         configProperties.add(firstName);
 
         Property name = new Property();
@@ -101,6 +100,7 @@ public class InweboProvisioningConnectorFactory extends AbstractProvisioningConn
         name.setDisplayName("Name");
         name.setRequired(true);
         name.setDescription("Enter your name");
+        name.setDisplayOrder(5);
         configProperties.add(name);
 
         Property mail = new Property();
@@ -108,6 +108,7 @@ public class InweboProvisioningConnectorFactory extends AbstractProvisioningConn
         mail.setDisplayName("Mail");
         mail.setRequired(true);
         mail.setDescription("Enter your mail address");
+        mail.setDisplayOrder(6);
         configProperties.add(mail);
 
         Property phone = new Property();
@@ -115,6 +116,7 @@ public class InweboProvisioningConnectorFactory extends AbstractProvisioningConn
         phone.setDisplayName("Phone Number");
         phone.setRequired(true);
         phone.setDescription("Enter your phone number");
+        phone.setDisplayOrder(7);
         configProperties.add(phone);
 
         Property status = new Property();
@@ -122,6 +124,7 @@ public class InweboProvisioningConnectorFactory extends AbstractProvisioningConn
         status.setDisplayName("Status");
         status.setRequired(true);
         status.setDescription("Enter the status");
+        status.setDisplayOrder(8);
         configProperties.add(status);
 
         Property role = new Property();
@@ -129,6 +132,7 @@ public class InweboProvisioningConnectorFactory extends AbstractProvisioningConn
         role.setDisplayName("Role");
         role.setRequired(true);
         role.setDescription("Enter the role");
+        role.setDisplayOrder(9);
         configProperties.add(role);
 
         Property access = new Property();
@@ -136,6 +140,7 @@ public class InweboProvisioningConnectorFactory extends AbstractProvisioningConn
         access.setDisplayName("Access");
         access.setRequired(true);
         access.setDescription("Enter the access level");
+        access.setDisplayOrder(10);
         configProperties.add(access);
 
         Property codeType = new Property();
@@ -143,7 +148,23 @@ public class InweboProvisioningConnectorFactory extends AbstractProvisioningConn
         codeType.setDisplayName("Code Type");
         codeType.setRequired(true);
         codeType.setDescription("Enter the code type");
+        codeType.setDisplayOrder(11);
         configProperties.add(codeType);
+
+        Property language = new Property();
+        language.setName(InweboConnectorConstants.INWEBO_LANG);
+        language.setDisplayName("Language");
+        language.setDescription("Enter the language");
+        language.setDisplayOrder(12);
+        configProperties.add(language);
+
+        Property extraFields = new Property();
+        extraFields.setName(InweboConnectorConstants.INWEBO_EXTRAFIELDS);
+        extraFields.setDisplayName("Extra Fields");
+        extraFields.setDescription("Enter the extra fields");
+        extraFields.setDisplayOrder(13);
+        configProperties.add(extraFields);
+
         return configProperties;
     }
 }
