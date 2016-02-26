@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015-2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *   WSO2 Inc. licenses this file to you under the Apache License,
  *   Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.provisioning.connector;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.provisioning.IdentityProvisioningException;
 
 import javax.xml.soap.MimeHeaders;
@@ -32,27 +33,31 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPException;
 
 public class UserDeletion {
-    public static String loginId;
-    public static String serviceId;
 
-    public UserDeletion(String userId, String serviceId) {
-        this.loginId = userId;
-        this.serviceId = serviceId;
-    }
-
-    public void deleteUser() throws IdentityProvisioningException {
+    public boolean deleteUser(String loginId, String userId, String serviceId) throws IdentityProvisioningException {
         try {
             SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
             SOAPConnection soapConnection = soapConnectionFactory.createConnection();
             String url = InweboConnectorConstants.INWEBO_URL;
-            soapConnection.call(deleteUsers(), url);
+            SOAPMessage soapResponse = soapConnection.call(deleteUsers(loginId, userId, serviceId), url);
+            String deletionStatus = soapResponse.getSOAPBody().getElementsByTagName("loginDeleteReturn").item(0)
+                    .getTextContent().toString();
             soapConnection.close();
+            boolean processStatus = StringUtils.equals("OK", deletionStatus);
+            if (!processStatus) {
+                String error = soapResponse.getSOAPBody().getElementsByTagName("loginDeleteReturn").item(0)
+                        .getTextContent().toString();
+                throw new IdentityProvisioningException("Error occurred while deleting the user from InWebo:" + error);
+            }
+            return processStatus;
         } catch (SOAPException e) {
+            throw new IdentityProvisioningException("Error occurred while sending SOAP Request to Server",e);
+        } catch (IdentityProvisioningException e) {
             throw new IdentityProvisioningException("Error occurred while sending SOAP Request to Server",e);
         }
     }
 
-    private static SOAPMessage deleteUsers() throws SOAPException, IdentityProvisioningException {
+    private static SOAPMessage deleteUsers(String loginId, String userId, String serviceId) throws SOAPException, IdentityProvisioningException {
 
             MessageFactory messageFactory = MessageFactory.newInstance();
             SOAPMessage soapMessage = messageFactory.createMessage();
@@ -64,11 +69,11 @@ public class UserDeletion {
             SOAPBody soapBody = envelope.getBody();
             SOAPElement soapBodyElem = soapBody.addChildElement("loginDelete", "con");
             SOAPElement soapBodyElem1 = soapBodyElem.addChildElement("userid", "con");
-            soapBodyElem1.addTextNode("123456");
+            soapBodyElem1.addTextNode(userId);
             SOAPElement soapBodyElem2 = soapBodyElem.addChildElement("serviceid", "con");
-            soapBodyElem2.addTextNode(UserDeletion.serviceId);
+            soapBodyElem2.addTextNode(serviceId);
             SOAPElement soapBodyElem3 = soapBodyElem.addChildElement("loginid", "con");
-            soapBodyElem3.addTextNode(UserDeletion.loginId);
+            soapBodyElem3.addTextNode(loginId);
             MimeHeaders headers = soapMessage.getMimeHeaders();
             headers.addHeader("SOAPAction", serverURI + "/services/ConsoleAdmin");
             soapMessage.saveChanges();
