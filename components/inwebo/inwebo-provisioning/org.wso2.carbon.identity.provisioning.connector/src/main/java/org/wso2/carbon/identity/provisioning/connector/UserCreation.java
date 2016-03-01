@@ -54,7 +54,7 @@ public class UserCreation {
             SOAPMessage soapResponse = soapConnection.call(createUser(userId, serviceId, login, firstName, name, mail, phone, status,
                     role, access, codeType, language, extraFields), url);
             provisionedId = soapResponse.getSOAPBody().getElementsByTagName("id").item(0).getTextContent().toString();
-            if (StringUtils.isEmpty(provisionedId) || provisionedId.equals("0")) {
+            if (StringUtils.isEmpty(provisionedId) || "0".equals(provisionedId)) {
                 String error = soapResponse.getSOAPBody().getElementsByTagName("loginCreateReturn").item(0)
                         .getTextContent().toString();
                 throw new IdentityProvisioningException("Error occurred while creating the user in InWebo:" + error);
