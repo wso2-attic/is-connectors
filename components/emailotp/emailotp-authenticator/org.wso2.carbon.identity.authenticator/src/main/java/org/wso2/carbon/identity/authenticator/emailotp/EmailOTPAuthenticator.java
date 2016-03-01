@@ -117,20 +117,6 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                     && StringUtils.isEmpty(request.getParameter(EmailOTPAuthenticatorConstants.RESEND)))
                     || (context.isRetrying()
                     && Boolean.parseBoolean(request.getParameter(EmailOTPAuthenticatorConstants.RESEND)))) {
-                if (isAccessTokenRequired(emailOTPProperties, authenticatorProperties)) {
-                    String tokenResponse = sendTokenRequest(authenticatorProperties, emailOTPProperties);
-                    if (StringUtils.isEmpty(tokenResponse)
-                            || tokenResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)) {
-                        log.error("Unable to get the access token");
-                        throw new AuthenticationFailedException("Unable to get the access token");
-                    } else {
-                        JSONObject tokenObj = new JSONObject(tokenResponse);
-                        String accessToken = tokenObj.getString(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN);
-                        context.getAuthenticatorProperties().put(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN
-                                , accessToken);
-                        authenticatorProperties = context.getAuthenticatorProperties();
-                    }
-                }
                 String username = null;
                 String email = null;
                 for (Integer stepMap : context.getSequenceConfig().getStepMap().keySet()) {
@@ -175,6 +161,20 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                         sendOTP(username, myToken, email);
                     } else if (StringUtils.isNotEmpty(email)) {
                         String failureString = null;
+                        if (isAccessTokenRequired(emailOTPProperties, authenticatorProperties)) {
+                            String tokenResponse = sendTokenRequest(authenticatorProperties, emailOTPProperties);
+                            if (StringUtils.isEmpty(tokenResponse)
+                                    || tokenResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)) {
+                                log.error("Unable to get the access token");
+                                throw new AuthenticationFailedException("Unable to get the access token");
+                            } else {
+                                JSONObject tokenObj = new JSONObject(tokenResponse);
+                                String accessToken = tokenObj.getString(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN);
+                                context.getAuthenticatorProperties().put(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN
+                                        , accessToken);
+                                authenticatorProperties = context.getAuthenticatorProperties();
+                            }
+                        }
                         String payload = preparePayload(authenticatorProperties, emailOTPProperties, email, myToken);
                         String formData = prepareFormData(authenticatorProperties, emailOTPProperties, email, myToken);
                         String urlParams = prepareURLParams(authenticatorProperties, emailOTPProperties, email, myToken);
@@ -186,7 +186,7 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                         }
                         if (StringUtils.isEmpty(sendCodeResponse)
                                 || sendCodeResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)
-                                ||  (StringUtils.isNotEmpty(failureString)
+                                || (StringUtils.isNotEmpty(failureString)
                                 && sendCodeResponse.contains(failureString))) {
                             log.error("Unable to send the code");
                             throw new AuthenticationFailedException("Unable to send the code");
@@ -374,18 +374,22 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
 
     private boolean isAccessTokenRequired(Properties emailOTPProperties, Map<String, String> authenticatorProperties) {
         boolean isRequired = false;
-        if (emailOTPProperties.containsKey(EmailOTPAuthenticatorConstants.ACCESS_TOKEN_REQUIRED_APIS)) {
+        String api = getAPI(authenticatorProperties);
+        if (StringUtils.isNotEmpty(api)
+                && emailOTPProperties.containsKey(EmailOTPAuthenticatorConstants.ACCESS_TOKEN_REQUIRED_APIS)) {
             isRequired = emailOTPProperties.get(EmailOTPAuthenticatorConstants.ACCESS_TOKEN_REQUIRED_APIS).toString()
-                    .contains(getAPI(authenticatorProperties));
+                    .contains(api);
         }
         return isRequired;
     }
 
     private boolean isAPIKeyHeaderRequired(Properties emailOTPProperties, Map<String, String> authenticatorProperties) {
         boolean isRequired = false;
-        if (emailOTPProperties.containsKey(EmailOTPAuthenticatorConstants.API_KEY_HEADER_REQUIRED_APIS)) {
+        String api = getAPI(authenticatorProperties);
+        if (StringUtils.isNotEmpty(api)
+                && emailOTPProperties.containsKey(EmailOTPAuthenticatorConstants.API_KEY_HEADER_REQUIRED_APIS)) {
             isRequired = emailOTPProperties.get(EmailOTPAuthenticatorConstants.API_KEY_HEADER_REQUIRED_APIS).toString()
-                    .contains(getAPI(authenticatorProperties));
+                    .contains(api);
         }
         return isRequired;
     }
