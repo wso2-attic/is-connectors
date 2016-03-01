@@ -123,7 +123,6 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                     if (context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser() != null &&
                             context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedAutenticator()
                                     .getApplicationAuthenticator() instanceof LocalApplicationAuthenticator) {
-
                         username = String.valueOf(context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser());
                         break;
                     }
