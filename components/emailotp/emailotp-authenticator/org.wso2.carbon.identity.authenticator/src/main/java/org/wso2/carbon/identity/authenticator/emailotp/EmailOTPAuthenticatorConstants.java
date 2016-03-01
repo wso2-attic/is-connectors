@@ -30,15 +30,14 @@ public class EmailOTPAuthenticatorConstants {
     public static final int NUMBER_BASE = 2;
     public static final int NUMBER_DIGIT = 6;
 
+    public static final String EMAIL_API = "EmailAPI";
+
     public static final String ACCESS_TOKEN_REQUIRED_APIS = "accessTokenRequiredAPIs";
     public static final String API_KEY_HEADER_REQUIRED_APIS = "apiKeyHeaderRequiredAPIs";
 
     public static final String API_GMAIL = "Gmail";
-    public static final String GMAIL_HOST = "www.googleapis.com";
     public static final String API_MANDRILL = "Mandrill";
-    public static final String MANDRILL_HOST = "mandrillapp.com";
     public static final String API_SENDGRID = "Sendgrid";
-    public static final String SENDGRID_HOST = "api.sendgrid.com";
 
     public static final String CODE = "OTPCode";
     public static final String EMAILOTP_TOKEN_ENDPOINT = "TokenEndpoint";

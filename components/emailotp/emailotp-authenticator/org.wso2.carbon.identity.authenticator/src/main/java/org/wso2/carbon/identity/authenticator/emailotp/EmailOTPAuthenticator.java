@@ -118,9 +118,9 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                     || (context.isRetrying()
                     && Boolean.parseBoolean(request.getParameter(EmailOTPAuthenticatorConstants.RESEND)))) {
                 if (isAccessTokenRequired(emailOTPProperties, authenticatorProperties)) {
-                    String tokenResponse = sendTokenRequest(authenticatorProperties);
-                    if (tokenResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)
-                            || StringUtils.isEmpty(tokenResponse)) {
+                    String tokenResponse = sendTokenRequest(authenticatorProperties, emailOTPProperties);
+                    if (StringUtils.isEmpty(tokenResponse)
+                            || tokenResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)) {
                         log.error("Unable to get the access token");
                         throw new AuthenticationFailedException("Unable to get the access token");
                     } else {
@@ -174,15 +174,20 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                     if (isSMTP(emailOTPProperties, authenticatorProperties)) {
                         sendOTP(username, myToken, email);
                     } else if (StringUtils.isNotEmpty(email)) {
+                        String failureString = null;
                         String payload = preparePayload(authenticatorProperties, emailOTPProperties, email, myToken);
                         String formData = prepareFormData(authenticatorProperties, emailOTPProperties, email, myToken);
                         String urlParams = prepareURLParams(authenticatorProperties, emailOTPProperties, email, myToken);
                         String sendCodeResponse = sendMailUsingAPIs(authenticatorProperties, emailOTPProperties, urlParams,
                                 payload, formData);
-                        String failureString = emailOTPProperties.get(getAPI(authenticatorProperties)
-                                + EmailOTPAuthenticatorConstants.FAILURE).toString();
-                        if (sendCodeResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)
-                                || StringUtils.isEmpty(sendCodeResponse) || sendCodeResponse.contains(failureString)) {
+                        String api = getAPI(authenticatorProperties);
+                        if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.FAILURE)) {
+                            failureString = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.FAILURE).toString();
+                        }
+                        if (StringUtils.isEmpty(sendCodeResponse)
+                                || sendCodeResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)
+                                ||  (StringUtils.isNotEmpty(failureString)
+                                && sendCodeResponse.contains(failureString))) {
                             log.error("Unable to send the code");
                             throw new AuthenticationFailedException("Unable to send the code");
                         }
@@ -211,9 +216,7 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                 }
             }
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Error while retrieving properties. Authenticator Properties cannot be null");
-            }
+            log.error("Error while retrieving properties. Authenticator Properties cannot be null");
             throw new AuthenticationFailedException(
                     "Error while retrieving properties. Authenticator Properties cannot be null");
         }
@@ -318,18 +321,22 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
     private String preparePayload(Map<String, String> authenticatorProperties, Properties emailOTPProperties,
                                   String email, String otp) {
         String payload = null;
-        if (getAPI(authenticatorProperties).equals(EmailOTPAuthenticatorConstants.API_GMAIL)) {
+        String api = getAPI(authenticatorProperties);
+        if (api.equals(EmailOTPAuthenticatorConstants.API_GMAIL)) {
             payload = "to:" + email + "\n" +
                     "subject:OTP Code\n" +
                     "from:" + authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_EMAIL) + "\n\n" +
                     otp;
             payload = "{\"raw\":\"" + new String(Base64.encode(payload.getBytes())) + "\"}";
         } else {
-            String propertyName = getAPI(authenticatorProperties) + EmailOTPAuthenticatorConstants.PAYLOAD;
+            String propertyName = api + EmailOTPAuthenticatorConstants.PAYLOAD;
             payload = emailOTPProperties.getProperty(propertyName);
             if (StringUtils.isNotEmpty(payload)) {
+                String apiKey = null;
                 String fromMail = authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_EMAIL);
-                String apiKey = authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY);
+                if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY)) {
+                    apiKey = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY).toString();
+                }
                 payload = payload.replace(EmailOTPAuthenticatorConstants.MAIL_FROM_EMAIL, fromMail);
                 payload = payload.replace(EmailOTPAuthenticatorConstants.MAIL_TO_EMAIL, email);
                 payload = payload.replace(EmailOTPAuthenticatorConstants.MAIL_BODY, otp);
@@ -348,11 +355,15 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
 
     private String prepareFormData(Map<String, String> authenticatorProperties, Properties emailOTPProperties,
                                    String email, String otp) {
-        String propertyName = getAPI(authenticatorProperties) + EmailOTPAuthenticatorConstants.FORM_DATA;
+        String api = getAPI(authenticatorProperties);
+        String propertyName = api + EmailOTPAuthenticatorConstants.FORM_DATA;
         String formData = emailOTPProperties.getProperty(propertyName);
         if (StringUtils.isNotEmpty(formData)) {
+            String apiKey = null;
             String fromMail = authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_EMAIL);
-            String apiKey = authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY);
+            if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY)) {
+                apiKey = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY).toString();
+            }
             formData = formData.replace(EmailOTPAuthenticatorConstants.MAIL_FROM_EMAIL, fromMail);
             formData = formData.replace(EmailOTPAuthenticatorConstants.MAIL_TO_EMAIL, email);
             formData = formData.replace(EmailOTPAuthenticatorConstants.MAIL_BODY, otp);
@@ -362,67 +373,90 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
     }
 
     private boolean isAccessTokenRequired(Properties emailOTPProperties, Map<String, String> authenticatorProperties) {
-        return emailOTPProperties.get(EmailOTPAuthenticatorConstants.ACCESS_TOKEN_REQUIRED_APIS).toString()
-                .contains(getAPI(authenticatorProperties));
+        boolean isRequired = false;
+        if (emailOTPProperties.containsKey(EmailOTPAuthenticatorConstants.ACCESS_TOKEN_REQUIRED_APIS)) {
+            isRequired = emailOTPProperties.get(EmailOTPAuthenticatorConstants.ACCESS_TOKEN_REQUIRED_APIS).toString()
+                    .contains(getAPI(authenticatorProperties));
+        }
+        return isRequired;
     }
 
     private boolean isAPIKeyHeaderRequired(Properties emailOTPProperties, Map<String, String> authenticatorProperties) {
-        return emailOTPProperties.get(EmailOTPAuthenticatorConstants.API_KEY_HEADER_REQUIRED_APIS).toString()
-                .contains(getAPI(authenticatorProperties));
+        boolean isRequired = false;
+        if (emailOTPProperties.containsKey(EmailOTPAuthenticatorConstants.API_KEY_HEADER_REQUIRED_APIS)) {
+            isRequired = emailOTPProperties.get(EmailOTPAuthenticatorConstants.API_KEY_HEADER_REQUIRED_APIS).toString()
+                    .contains(getAPI(authenticatorProperties));
+        }
+        return isRequired;
     }
 
     private String getAPI(Map<String, String> authenticatorProperties) {
-        String api = null;
-        if (authenticatorProperties.get(EmailOTPAuthenticatorConstants.MAILING_ENDPOINT)
-                .contains(EmailOTPAuthenticatorConstants.GMAIL_HOST)) {
-            api = EmailOTPAuthenticatorConstants.API_GMAIL;
-        } else if (authenticatorProperties.get(EmailOTPAuthenticatorConstants.MAILING_ENDPOINT)
-                .contains(EmailOTPAuthenticatorConstants.MANDRILL_HOST)) {
-            api = EmailOTPAuthenticatorConstants.API_MANDRILL;
-        } else if (authenticatorProperties.get(EmailOTPAuthenticatorConstants.MAILING_ENDPOINT)
-                .contains(EmailOTPAuthenticatorConstants.SENDGRID_HOST)) {
-            api = EmailOTPAuthenticatorConstants.API_SENDGRID;
-        }
-        return api;
+        return authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAIL_API).trim();
     }
 
     private String sendMailUsingAPIs(Map<String, String> authenticatorProperties, Properties emailOTPProperties, String urlParams,
                                      String payload, String formData) {
         String response = null;
+        String apiKey = null;
+        String endpoint = null;
+        String api = getAPI(authenticatorProperties);
+        if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY)) {
+            apiKey = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY).toString();
+        }
+        if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.MAILING_ENDPOINT)) {
+            endpoint = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.MAILING_ENDPOINT).toString();
+        }
         if ((isAccessTokenRequired(emailOTPProperties, authenticatorProperties)
                 && StringUtils.isEmpty(authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN)))
                 || (isAPIKeyHeaderRequired(emailOTPProperties, authenticatorProperties)
-                && StringUtils.isEmpty(authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY)))) {
+                && StringUtils.isEmpty(apiKey))) {
             log.error("Required param '" + (isAccessTokenRequired(emailOTPProperties, authenticatorProperties)
                     ? EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN
                     : EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY) + "' cannot be null");
             return null;
         } else if (isAccessTokenRequired(emailOTPProperties, authenticatorProperties)
                 || isAPIKeyHeaderRequired(emailOTPProperties, authenticatorProperties)) {
-            response = sendRESTCall(
-                    authenticatorProperties.get(EmailOTPAuthenticatorConstants.MAILING_ENDPOINT)
-                            .replace(EmailOTPAuthenticatorConstants.ADMIN_EMAIL
-                                    , authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_EMAIL))
-                    , StringUtils.isNotEmpty(urlParams) ? urlParams : ""
-                    , emailOTPProperties.get(getAPI(authenticatorProperties)
-                            + EmailOTPAuthenticatorConstants.HTTP_AUTH_TOKEN_TYPE) + " "
-                            + (isAccessTokenRequired(emailOTPProperties, authenticatorProperties)
-                            ? authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN)
-                            : authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY)), formData
-                    , payload, EmailOTPAuthenticatorConstants.HTTP_POST);
+            String tokenType = null;
+            if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.HTTP_AUTH_TOKEN_TYPE)) {
+                tokenType = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.HTTP_AUTH_TOKEN_TYPE).toString();
+            }
+            if (StringUtils.isNotEmpty(endpoint) && StringUtils.isNotEmpty(tokenType)) {
+                response = sendRESTCall(endpoint.replace(EmailOTPAuthenticatorConstants.ADMIN_EMAIL
+                                , authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_EMAIL))
+                        , StringUtils.isNotEmpty(urlParams) ? urlParams : ""
+                        , tokenType + " " + (isAccessTokenRequired(emailOTPProperties, authenticatorProperties)
+                                ? authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN) : apiKey),
+                        formData, payload, EmailOTPAuthenticatorConstants.HTTP_POST);
+            } else {
+                log.error("The endpoint or access token type is empty");
+                return null;
+            }
         } else {
-            response = sendRESTCall(
-                    authenticatorProperties.get(EmailOTPAuthenticatorConstants.MAILING_ENDPOINT)
-                    , StringUtils.isNotEmpty(urlParams) ? urlParams : "", "", "", payload,
-                    EmailOTPAuthenticatorConstants.HTTP_POST);
+            if (StringUtils.isNotEmpty(endpoint)) {
+                response = sendRESTCall(endpoint, StringUtils.isNotEmpty(urlParams) ? urlParams : "", "", "", payload,
+                        EmailOTPAuthenticatorConstants.HTTP_POST);
+            } else {
+                log.error("The endpoint in required to send OTP via API");
+                return null;
+            }
         }
         return response;
     }
 
-    private String sendTokenRequest(Map<String, String> authenticatorProperties) {
-        String clientId = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_ID);
-        String clientSecret = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_SECRET);
-        String refreshToken = authenticatorProperties.get(EmailOTPAuthenticatorConstants.REFRESH_TOKEN);
+    private String sendTokenRequest(Map<String, String> authenticatorProperties, Properties emailOTPProperties) {
+        String api = getAPI(authenticatorProperties);
+        String refreshToken = null;
+        String clientId = null;
+        String clientSecret = null;
+        if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.REFRESH_TOKEN)) {
+            refreshToken = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.REFRESH_TOKEN).toString();
+        }
+        if (emailOTPProperties.containsKey(api + OIDCAuthenticatorConstants.CLIENT_ID)) {
+            clientId = emailOTPProperties.get(api + OIDCAuthenticatorConstants.CLIENT_ID).toString();
+        }
+        if (emailOTPProperties.containsKey(api + OIDCAuthenticatorConstants.CLIENT_SECRET)) {
+            clientSecret = emailOTPProperties.get(api + OIDCAuthenticatorConstants.CLIENT_SECRET).toString();
+        }
         String response = null;
         if (StringUtils.isNotEmpty(clientId) && StringUtils.isNotEmpty(clientSecret)
                 && StringUtils.isNotEmpty(refreshToken)) {
@@ -454,8 +488,12 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
         } catch (IOException e) {
             log.error("Can not find the file", e);
         }
-        String tokenEndpoint = emailOTPProperties.get(getAPI(authenticatorProperties)
-                + EmailOTPAuthenticatorConstants.EMAILOTP_TOKEN_ENDPOINT).toString();
+        String tokenEndpoint = null;
+        String api = getAPI(authenticatorProperties);
+        if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.EMAILOTP_TOKEN_ENDPOINT)) {
+            tokenEndpoint = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.EMAILOTP_TOKEN_ENDPOINT).toString();
+        }
+
         return StringUtils.isNotEmpty(tokenEndpoint) ? tokenEndpoint : null;
     }
 
@@ -512,13 +550,29 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
     }
 
     private boolean isSMTP(Properties emailOTPProperties, Map<String, String> authenticatorProperties) {
-        String mailingEndpoint = authenticatorProperties.get(EmailOTPAuthenticatorConstants.MAILING_ENDPOINT);
-        String apiKey = authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY);
-        String refreshToken = authenticatorProperties.get(EmailOTPAuthenticatorConstants.REFRESH_TOKEN);
-        String clientId = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_ID);
-        String clientSecret = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_SECRET);
+        String apiKey = null;
+        String refreshToken = null;
+        String clientId = null;
+        String clientSecret = null;
+        String api = getAPI(authenticatorProperties);
+        String mailingEndpoint = null;
+        if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.MAILING_ENDPOINT)) {
+            mailingEndpoint = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.MAILING_ENDPOINT).toString();
+        }
+        if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY)) {
+            apiKey = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY).toString();
+        }
+        if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.REFRESH_TOKEN)) {
+            refreshToken = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.REFRESH_TOKEN).toString();
+        }
+        if (emailOTPProperties.containsKey(api + OIDCAuthenticatorConstants.CLIENT_ID)) {
+            clientId = emailOTPProperties.get(api + OIDCAuthenticatorConstants.CLIENT_ID).toString();
+        }
+        if (emailOTPProperties.containsKey(api + OIDCAuthenticatorConstants.CLIENT_SECRET)) {
+            clientSecret = emailOTPProperties.get(api + OIDCAuthenticatorConstants.CLIENT_SECRET).toString();
+        }
         String email = authenticatorProperties.get(EmailOTPAuthenticatorConstants.EMAILOTP_EMAIL);
-        if (StringUtils.isEmpty(email) || StringUtils.isEmpty(mailingEndpoint)
+        if (StringUtils.isEmpty(email) || StringUtils.isEmpty(api) || StringUtils.isEmpty(mailingEndpoint)
                 || (!isAccessTokenRequired(emailOTPProperties, authenticatorProperties) && StringUtils.isEmpty(apiKey))
                 || (isAccessTokenRequired(emailOTPProperties, authenticatorProperties)
                 && (StringUtils.isEmpty(refreshToken) || StringUtils.isEmpty(clientId)
@@ -564,51 +618,20 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
     public List<Property> getConfigurationProperties() {
 
         List<Property> configProperties = new ArrayList<Property>();
-
-        Property clientId = new Property();
-        clientId.setName(OIDCAuthenticatorConstants.CLIENT_ID);
-        clientId.setDisplayName("Client Id");
-        clientId.setDescription("Enter client identifier value");
-        clientId.setDisplayOrder(0);
-        configProperties.add(clientId);
-
-        Property clientSecret = new Property();
-        clientSecret.setName(OIDCAuthenticatorConstants.CLIENT_SECRET);
-        clientSecret.setDisplayName("Client Secret");
-        clientSecret.setConfidential(true);
-        clientSecret.setDescription("Enter client secret value");
-        clientSecret.setDisplayOrder(1);
-        configProperties.add(clientSecret);
+        Property emailAPI = new Property();
+        emailAPI.setName(EmailOTPAuthenticatorConstants.EMAIL_API);
+        emailAPI.setDisplayName("Email API");
+        emailAPI.setDescription("Enter API to send OTP (E.g: Gmail, Sendgrid, Mandrill etc)");
+        emailAPI.setDisplayOrder(0);
+        configProperties.add(emailAPI);
 
         Property email = new Property();
         email.setName(EmailOTPAuthenticatorConstants.EMAILOTP_EMAIL);
         email.setDisplayName("Email");
         email.setDescription("Email address of the sender");
-        email.setDisplayOrder(2);
+        email.setDisplayOrder(1);
         configProperties.add(email);
 
-        Property apiKey = new Property();
-        apiKey.setName(EmailOTPAuthenticatorConstants.EMAILOTP_API_KEY);
-        apiKey.setDisplayName("API key");
-        apiKey.setConfidential(true);
-        apiKey.setDescription("Enter API key");
-        apiKey.setDisplayOrder(3);
-        configProperties.add(apiKey);
-
-        Property refreshToken = new Property();
-        refreshToken.setDisplayName("Refresh Token");
-        refreshToken.setName(EmailOTPAuthenticatorConstants.REFRESH_TOKEN);
-        refreshToken.setDescription("Enter the refreshToken to refress the access token");
-        refreshToken.setDisplayOrder(4);
-        configProperties.add(refreshToken);
-
-        Property endpoint = new Property();
-        endpoint.setDisplayName("Email Endpoint");
-        endpoint.setName(EmailOTPAuthenticatorConstants.MAILING_ENDPOINT);
-        endpoint.setDescription("Give the API method endpoint to send email" +
-                "(E.g:- for gmail: https://www.googleapis.com/gmail/v1/users/[userId]/messages/send)");
-        endpoint.setDisplayOrder(5);
-        configProperties.add(endpoint);
         return configProperties;
     }
 }
