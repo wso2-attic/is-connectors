@@ -35,15 +35,44 @@ public class InweboConnectorConstants {
     public static final String INWEBO_EXTRAFIELDS = "ExtraFields";
     public static final String INWEBO_LANG = "Language";
 
-    public static final String INWEBO_URL="https://api.myinwebo.com/services/ConsoleAdmin";
-    public static final String INWEBO_URI="http://console.inwebo.com";
+    public static final String INWEBO_URL = "https://api.myinwebo.com/services/ConsoleAdmin";
+    public static final String INWEBO_URI = "http://console.inwebo.com";
     public static final String AXIS2 = "axis2.xml";
-    public static final String AXIS2_FILE = "repository/conf/axis2/axis2_default.xml";
+    public static final String AXIS2_FILE = "repository/conf/axis2/axis2_inwebo.xml";
     public static final String INWEBO_LANG_ENGLISH = "En";
 
-    public static final String USERNAME_CLAIM = "org:wso2:carbon:identity:provisioning:claim:username";
-    public static final String FIRST_NAME_CLAIM = "http://wso2.org/claims/givenname";
-    public static final String LAST_NAME_CLAIM = "http://wso2.org/claims/lastname";
-    public static final String MAIL_CLAIM = "http://wso2.org/claims/emailaddress";
-    public static final String PHONE_CLAIM = "http://wso2.org/claims/telephone";
+    class InweboConnectorClaims {
+        public static final String IDP_CLAIM_URI_FIRSTNAME = "firstName";
+        public static final String IDP_CLAIM_URI_LARSTNAME = "lastName";
+        public static final String IDP_CLAIM_URI_EMAIL = "email";
+        public static final String IDP_CLAIM_URI_PHONE = "phone";
+        public static final String USERNAME_CLAIM = "org:wso2:carbon:identity:provisioning:claim:username";
+        public static final String FIRST_NAME_CLAIM = "http://wso2.org/claims/givenname";
+        public static final String LAST_NAME_CLAIM = "http://wso2.org/claims/lastname";
+        public static final String MAIL_CLAIM = "http://wso2.org/claims/emailaddress";
+        public static final String PHONE_CLAIM = "http://wso2.org/claims/telephone";
+    }
+
+    class InweboConnectorSOAPMessageConstants {
+        public static final String SOAP_ACTION = "SOAPAction";
+        public static final String SOAP_ACTION_HEADER = "/services/ConsoleAdmin";
+        public static final String SOAP_NAMESPACE_PREFIX = "con";
+        public static final String SOAP_ACTION_LOGIN_CREATE = "loginCreate";
+        public static final String SOAP_ACTION_LOGIN_DELETE = "loginDelete";
+        public static final String SOAP_ACTION_LOGIN_UPDATE = "loginUpdate";
+        public static final String SOAP_USER_ID = "userid";
+        public static final String SOAP_SERVICE_ID = "serviceid";
+        public static final String SOAP_LOGIN = "login";
+        public static final String SOAP_FIRST_NAME = "firstname";
+        public static final String SOAP_NAME = "name";
+        public static final String SOAP_MAIL = "mail";
+        public static final String SOAP_PHONE = "phone";
+        public static final String SOAP_STATUS = "status";
+        public static final String SOAP_ROLE = "role";
+        public static final String SOAP_ACCESS = "access";
+        public static final String SOAP_CONTENT_TYPE = "codetype";
+        public static final String SOAP_LANG = "lang";
+        public static final String SOAP_EXTRA_FIELDS = "extrafields";
+        public static final String SOAP_LOGIN_ID = "loginid";
+    }
 }
