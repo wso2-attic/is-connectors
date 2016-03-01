@@ -25,7 +25,7 @@
     <url>http://wso2.org</url>
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>is-connectors</artifactId>
+        <artifactId>emailotp</artifactId>
         <version>1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
