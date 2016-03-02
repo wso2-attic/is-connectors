@@ -19,6 +19,12 @@
 
 package org.wso2.carbon.identity.authenticator.emailotp;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.deployment.DeploymentEngine;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.util.Loader;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.application.authentication.framework.LocalApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.config.ConfigurationFacade;
@@ -102,17 +108,18 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
     protected void initiateAuthenticationRequest(HttpServletRequest request,
                                                  HttpServletResponse response, AuthenticationContext context)
             throws AuthenticationFailedException {
-        Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
-        Properties emailOTPProperties = new Properties();
-        String resourceName = EmailOTPAuthenticatorConstants.PROPERTIES_FILE;
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        InputStream resourceStream = loader.getResourceAsStream(resourceName);
         try {
-            emailOTPProperties.load(resourceStream);
-        } catch (IOException e) {
-            throw new AuthenticationFailedException("Can not find the file", e);
-        }
-        if (authenticatorProperties != null) {
+            Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
+            Properties emailOTPProperties = new Properties();
+            String resourceName = EmailOTPAuthenticatorConstants.PROPERTIES_FILE;
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            InputStream resourceStream = loader.getResourceAsStream(resourceName);
+            try {
+                emailOTPProperties.load(resourceStream);
+            } catch (IOException e) {
+                log.error("Unable to load the properties file", e);
+                throw new AuthenticationFailedException("Unable to load the properties file", e);
+            }
             if (!context.isRetrying() || (context.isRetrying()
                     && StringUtils.isEmpty(request.getParameter(EmailOTPAuthenticatorConstants.RESEND)))
                     || (context.isRetrying()
@@ -129,24 +136,25 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                 }
                 if (StringUtils.isNotEmpty(username)) {
                     UserRealm userRealm = null;
+                    String tenantDomain = MultitenantUtils.getTenantDomain(username);
+                    int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
+                    RealmService realmService = IdentityTenantUtil.getRealmService();
                     try {
-                        String tenantDomain = MultitenantUtils.getTenantDomain(username);
-                        int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
-                        RealmService realmService = IdentityTenantUtil.getRealmService();
                         userRealm = (UserRealm) realmService.getTenantUserRealm(tenantId);
-                    } catch (Exception e) {
+                    } catch (org.wso2.carbon.user.api.UserStoreException e) {
                         throw new AuthenticationFailedException("Cannot find the user realm", e);
                     }
                     username = MultitenantUtils.getTenantAwareUsername(String.valueOf(username));
                     if (userRealm != null) {
-                        try {
-                            email = userRealm.getUserStoreManager()
-                                    .getUserClaimValue(username, EmailOTPAuthenticatorConstants.EMAIL_CLAIM, null).toString();
+                        email = userRealm.getUserStoreManager()
+                                .getUserClaimValue(username, EmailOTPAuthenticatorConstants.EMAIL_CLAIM, null).toString();
+                        if (StringUtils.isEmpty(email)) {
+                            log.error("Receiver's email ID can not be null.");
+                            throw new AuthenticationFailedException("Receiver's email ID can not be null.");
+                        } else {
                             context.setProperty(EmailOTPAuthenticatorConstants.RECEIVER_EMAIL, email);
-                        } catch (UserStoreException e) {
-                            log.error("Cannot find the user claim for email", e);
-                            throw new AuthenticationFailedException("Cannot find the user claim for email " + e.getMessage(), e);
                         }
+
                     }
                 }
                 OneTimePassword token = new OneTimePassword();
@@ -155,42 +163,48 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                         , EmailOTPAuthenticatorConstants.NUMBER_DIGIT);
                 context.setProperty(EmailOTPAuthenticatorConstants.OTP_TOKEN, myToken);
 
-                if (StringUtils.isNotEmpty(myToken)) {
-                    if (isSMTP(emailOTPProperties, authenticatorProperties)) {
-                        sendOTP(username, myToken, email);
-                    } else if (StringUtils.isNotEmpty(email)) {
-                        String failureString = null;
-                        if (isAccessTokenRequired(emailOTPProperties, authenticatorProperties)) {
-                            String tokenResponse = sendTokenRequest(authenticatorProperties, emailOTPProperties);
-                            if (StringUtils.isEmpty(tokenResponse)
-                                    || tokenResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)) {
-                                log.error("Unable to get the access token");
-                                throw new AuthenticationFailedException("Unable to get the access token");
-                            } else {
-                                JSONObject tokenObj = new JSONObject(tokenResponse);
-                                String accessToken = tokenObj.getString(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN);
-                                context.getAuthenticatorProperties().put(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN
-                                        , accessToken);
-                                authenticatorProperties = context.getAuthenticatorProperties();
+                if (authenticatorProperties != null) {
+                    if (StringUtils.isNotEmpty(myToken)) {
+                        if (isSMTP(emailOTPProperties, authenticatorProperties)) {
+                            sendOTP(username, myToken, email);
+                        } else if (StringUtils.isNotEmpty(email)) {
+                            String failureString = null;
+                            if (isAccessTokenRequired(emailOTPProperties, authenticatorProperties)) {
+                                String tokenResponse = sendTokenRequest(authenticatorProperties, emailOTPProperties);
+                                if (StringUtils.isEmpty(tokenResponse)
+                                        || tokenResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)) {
+                                    log.error("Unable to get the access token");
+                                    throw new AuthenticationFailedException("Unable to get the access token");
+                                } else {
+                                    JSONObject tokenObj = new JSONObject(tokenResponse);
+                                    String accessToken = tokenObj.getString(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN);
+                                    context.getAuthenticatorProperties().put(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN
+                                            , accessToken);
+                                    authenticatorProperties = context.getAuthenticatorProperties();
+                                }
+                            }
+                            String payload = preparePayload(authenticatorProperties, emailOTPProperties, email, myToken);
+                            String formData = prepareFormData(authenticatorProperties, emailOTPProperties, email, myToken);
+                            String urlParams = prepareURLParams(authenticatorProperties, emailOTPProperties, email, myToken);
+                            String sendCodeResponse = sendMailUsingAPIs(authenticatorProperties, emailOTPProperties,
+                                    urlParams, payload, formData);
+                            String api = getAPI(authenticatorProperties);
+                            if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.FAILURE)) {
+                                failureString = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.FAILURE).toString();
+                            }
+                            if (StringUtils.isEmpty(sendCodeResponse)
+                                    || sendCodeResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)
+                                    || (StringUtils.isNotEmpty(failureString)
+                                    && sendCodeResponse.contains(failureString))) {
+                                log.error("Unable to send the code");
+                                throw new AuthenticationFailedException("Unable to send the code");
                             }
                         }
-                        String payload = preparePayload(authenticatorProperties, emailOTPProperties, email, myToken);
-                        String formData = prepareFormData(authenticatorProperties, emailOTPProperties, email, myToken);
-                        String urlParams = prepareURLParams(authenticatorProperties, emailOTPProperties, email, myToken);
-                        String sendCodeResponse = sendMailUsingAPIs(authenticatorProperties, emailOTPProperties, urlParams,
-                                payload, formData);
-                        String api = getAPI(authenticatorProperties);
-                        if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.FAILURE)) {
-                            failureString = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.FAILURE).toString();
-                        }
-                        if (StringUtils.isEmpty(sendCodeResponse)
-                                || sendCodeResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)
-                                || (StringUtils.isNotEmpty(failureString)
-                                && sendCodeResponse.contains(failureString))) {
-                            log.error("Unable to send the code");
-                            throw new AuthenticationFailedException("Unable to send the code");
-                        }
                     }
+                } else {
+                    log.error("Error while retrieving properties. Authenticator Properties cannot be null");
+                    throw new AuthenticationFailedException(
+                            "Error while retrieving properties. Authenticator Properties cannot be null");
                 }
             }
             if (context.isRetrying()
@@ -214,10 +228,12 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                     throw new AuthenticationFailedException(e.getMessage(), e);
                 }
             }
-        } else {
-            log.error("Error while retrieving properties. Authenticator Properties cannot be null");
-            throw new AuthenticationFailedException(
-                    "Error while retrieving properties. Authenticator Properties cannot be null");
+        } catch (UserStoreException e) {
+            log.error("Cannot find the user claim for email", e);
+            throw new AuthenticationFailedException("Cannot find the user claim for email " + e.getMessage(), e);
+        } catch (AuthenticationFailedException e) {
+            log.error(e.getMessage(), e);
+            throw new AuthenticationFailedException(e.getMessage(), e);
         }
     }
 
@@ -496,59 +512,67 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
         if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.EMAILOTP_TOKEN_ENDPOINT)) {
             tokenEndpoint = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.EMAILOTP_TOKEN_ENDPOINT).toString();
         }
-
         return StringUtils.isNotEmpty(tokenEndpoint) ? tokenEndpoint : null;
     }
 
     private void sendOTP(String username, String otp, String email) throws AuthenticationFailedException {
-        NotificationSender notificationSender = new NotificationSender();
-        NotificationDataDTO notificationData = new NotificationDataDTO();
-        Notification emailNotification = null;
-        NotificationData emailNotificationData = new NotificationData();
-        ConfigBuilder configBuilder = ConfigBuilder.getInstance();
-        String tenantDomain = MultitenantUtils.getTenantDomain(username);
-        int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
-        String emailTemplate;
-        Config config;
-
-        if (MessageContext.getCurrentMessageContext() != null &&
-                MessageContext.getCurrentMessageContext().getProperty(
-                        MessageContext.TRANSPORT_HEADERS) != null) {
-            notificationData.setTransportHeaders(new HashMap(
-                    (Map) MessageContext.getCurrentMessageContext().getProperty(
-                            MessageContext.TRANSPORT_HEADERS)));
-        }
-
+        System.setProperty(EmailOTPAuthenticatorConstants.AXIS2, EmailOTPAuthenticatorConstants.AXIS2_FILE);
         try {
-            config = configBuilder.loadConfiguration(ConfigType.EMAIL,
-                    StorageType.REGISTRY, tenantId);
-        } catch (IdentityMgtConfigException e) {
-            log.error("Error occurred while loading email templates for user : " + username, e);
-            throw new AuthenticationFailedException("Error occurred while loading email templates for user : "
-                    + username, e);
-        }
-
-        emailNotificationData.setTagData(EmailOTPAuthenticatorConstants.CODE, otp);
-        emailNotificationData.setSendTo(email);
-        emailTemplate = config.getProperty(EmailOTPAuthenticatorConstants.AUTHENTICATOR_NAME);
-        try {
-            emailNotification = NotificationBuilder.createNotification("EMAIL", emailTemplate, emailNotificationData);
-        } catch (IdentityMgtServiceException e) {
-            log.error("Error occurred while creating notification from email template : " + emailTemplate, e);
-            throw new AuthenticationFailedException("Error occurred while creating notification from email template : "
-                    + emailTemplate, e);
-        }
-        notificationData.setNotificationAddress(email);
-        NotificationSendingModule module = new DefaultEmailSendingModule();
-
-        if (IdentityMgtConfig.getInstance().isNotificationInternallyManaged()) {
-            module.setNotificationData(notificationData);
-            module.setNotification(emailNotification);
-            notificationSender.sendNotification(module);
-            notificationData.setNotificationSent(true);
-        } else {
-            notificationData.setNotificationSent(false);
-            notificationData.setNotificationCode(otp);
+            ConfigurationContext configurationContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem((String) null, (String) null);
+            if (configurationContext.getAxisConfiguration().getTransportsOut().containsKey(EmailOTPAuthenticatorConstants.TRANSPORT_MAILTO)) {
+                NotificationSender notificationSender = new NotificationSender();
+                NotificationDataDTO notificationData = new NotificationDataDTO();
+                Notification emailNotification = null;
+                NotificationData emailNotificationData = new NotificationData();
+                ConfigBuilder configBuilder = ConfigBuilder.getInstance();
+                String tenantDomain = MultitenantUtils.getTenantDomain(username);
+                int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
+                String emailTemplate;
+                Config config;
+                if (MessageContext.getCurrentMessageContext() != null &&
+                        MessageContext.getCurrentMessageContext().getProperty(
+                                MessageContext.TRANSPORT_HEADERS) != null) {
+                    notificationData.setTransportHeaders(new HashMap(
+                            (Map) MessageContext.getCurrentMessageContext().getProperty(
+                                    MessageContext.TRANSPORT_HEADERS)));
+                }
+                try {
+                    config = configBuilder.loadConfiguration(ConfigType.EMAIL, StorageType.REGISTRY, tenantId);
+                } catch (IdentityMgtConfigException e) {
+                    log.error("Error occurred while loading email templates for user : " + username, e);
+                    throw new AuthenticationFailedException("Error occurred while loading email templates for user : "
+                            + username, e);
+                }
+                emailNotificationData.setTagData(EmailOTPAuthenticatorConstants.CODE, otp);
+                emailNotificationData.setSendTo(email);
+                if (config.getProperties().containsKey(EmailOTPAuthenticatorConstants.AUTHENTICATOR_NAME)) {
+                    emailTemplate = config.getProperty(EmailOTPAuthenticatorConstants.AUTHENTICATOR_NAME);
+                    try {
+                        emailNotification = NotificationBuilder.createNotification("EMAIL", emailTemplate, emailNotificationData);
+                    } catch (IdentityMgtServiceException e) {
+                        log.error("Error occurred while creating notification from email template : " + emailTemplate, e);
+                        throw new AuthenticationFailedException("Error occurred while creating notification from email template : "
+                                + emailTemplate, e);
+                    }
+                    notificationData.setNotificationAddress(email);
+                    NotificationSendingModule module = new DefaultEmailSendingModule();
+                    if (IdentityMgtConfig.getInstance().isNotificationInternallyManaged()) {
+                        module.setNotificationData(notificationData);
+                        module.setNotification(emailNotification);
+                        notificationSender.sendNotification(module);
+                        notificationData.setNotificationSent(true);
+                    } else {
+                        notificationData.setNotificationSent(false);
+                        notificationData.setNotificationCode(otp);
+                    }
+                } else {
+                    throw new AuthenticationFailedException("Unable find the email template");
+                }
+            } else {
+                throw new AuthenticationFailedException("MAILTO transport sender is not defined in axis2 configuration file");
+            }
+        } catch (AxisFault axisFault) {
+            throw new AuthenticationFailedException("Error while getting the SMTP configuration");
         }
     }
 

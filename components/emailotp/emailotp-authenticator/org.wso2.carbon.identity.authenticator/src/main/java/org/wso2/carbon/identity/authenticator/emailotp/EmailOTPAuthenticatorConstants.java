@@ -67,6 +67,9 @@ public class EmailOTPAuthenticatorConstants {
     public static final String OTP_TOKEN = "otpToken";
 
     public static final String PROPERTIES_FILE = "emailprovider.properties";
+    public static final String AXIS2 = "axis2.xml";
+    public static final String AXIS2_FILE = "repository/conf/axis2/axis2.xml";
+    public static final String TRANSPORT_MAILTO = "mailto";
 
     public static final String HTTP_POST = "POST";
     public static final String HTTP_CONTENT_TYPE = "Content-Type";
