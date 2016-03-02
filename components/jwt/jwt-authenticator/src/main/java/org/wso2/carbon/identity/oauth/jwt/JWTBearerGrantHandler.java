@@ -84,7 +84,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
         } catch (IOException e) {
             throw new IdentityOAuth2Exception("Can not find the file", e);
         }
-
         validityPeriod = Integer.parseInt(prop.getProperty(JWTConstants.VALIDITY_PERIOD));
         cacheUsedJTI = Boolean.parseBoolean(prop.getProperty(JWTConstants.CACHE_USED_JTI));
         if (cacheUsedJTI) {
@@ -111,7 +110,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      */
     @Override
     public boolean validateGrant(OAuthTokenReqMessageContext tokReqMsgCtx) throws IdentityOAuth2Exception {
-
         super.validateGrant(tokReqMsgCtx);
 
         SignedJWT signedJWT;
@@ -146,7 +144,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
         long timeStampSkewMillis = OAuthServerConfiguration.getInstance().getTimeStampSkewInSeconds() * 1000;
 
         if (StringUtils.isEmpty(jwtIssuer) || StringUtils.isEmpty(subject) || expirationTime == null) {
-            handleException("Mandatory fields(Issuer, Subject or Expiration time) are empty in the given JSON Web Token");
+            handleException("Mandatory fields(Issuer, Subject or Expiration time) are empty in the given JSON Web Token.");
         }
 
         try {
@@ -160,25 +158,25 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             signatureValid = validateSignature(signedJWT, identityProvider);
             if (signatureValid) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Signature/MAC validated successfully");
+                    log.debug("Signature/MAC validated successfully.");
                 }
             } else {
-                handleException("Signature or Message Authentication invalid");
+                handleException("Signature or Message Authentication invalid.");
             }
 
             tokReqMsgCtx.setAuthorizedUser(AuthenticatedUser.createLocalAuthenticatedUserFromSubjectIdentifier(subject));
             if (log.isDebugEnabled()) {
                 log.debug("Subject(sub) found in JWT: " + subject);
-                log.debug(subject + " set as the Authorized User");
+                log.debug(subject + " set as the Authorized User.");
             }
 
             if (StringUtils.isEmpty(tokenEndPointAlias)) {
-                handleException("Token End Point of the IDP is empty");
+                handleException("Token End Point of the IDP is empty.");
             }
             for (String aud : audience) {
                 if (StringUtils.equals(tokenEndPointAlias, aud)) {
                     if (log.isDebugEnabled()) {
-                        log.debug(tokenEndPointAlias + " of IDP was found in the list of audiences");
+                        log.debug(tokenEndPointAlias + " of IDP was found in the list of audiences.");
                     }
                     audienceFound = true;
                     break;
@@ -190,19 +188,19 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             boolean checkedExpirationTime = checkExpirationTime(expirationTime, currentTimeInMillis, timeStampSkewMillis);
             if (checkedExpirationTime) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Expiration Time(exp) of JWT was validated successfully");
+                    log.debug("Expiration Time(exp) of JWT was validated successfully.");
                 }
             }
             boolean checkedNotBeforeTime = checkNotBeforeTime(notBeforeTime, currentTimeInMillis, timeStampSkewMillis);
             if (checkedNotBeforeTime) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Not Before Time(nbf) of JWT was validated successfully");
+                    log.debug("Not Before Time(nbf) of JWT was validated successfully.");
                 }
             }
             boolean checkedValidityToken = checkValidityOfTheToken(issuedAtTime, currentTimeInMillis, timeStampSkewMillis);
             if (checkedValidityToken) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Issued At Time(iat) of JWT was validated successfully");
+                    log.debug("Issued At Time(iat) of JWT was validated successfully.");
                 }
             }
             if (cacheUsedJTI && (jti != null)) {
@@ -210,8 +208,8 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                 if (entry != null) {
                     if (checkCachedJTI(jti, signedJWT, entry, currentTimeInMillis, timeStampSkewMillis)) {
                         if (log.isDebugEnabled()) {
-                            log.debug("JWT id: " + jti + " not found in the cache");
-                            log.debug("jti of the JWT has been validated successfully");
+                            log.debug("JWT id: " + jti + " not found in the cache.");
+                            log.debug("jti of the JWT has been validated successfully.");
                         }
                     }
                 }
@@ -529,5 +527,4 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
         log.error(errorMessage);
         throw new IdentityOAuth2Exception(errorMessage);
     }
-
 }
