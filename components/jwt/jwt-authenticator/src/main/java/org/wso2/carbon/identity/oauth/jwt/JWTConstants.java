@@ -21,6 +21,8 @@ public class JWTConstants {
 
     public static final String OAUTH_JWT_BEARER_GRANT_TYPE = "urn:ietf:params:oauth:grant-type:jwt-bearer";
     public static final String OAUTH_JWT_ASSERTION = "assertion";
-    public static final int VALIDITY_PERIOD = 30;
-    public static final boolean CACHE_USED_JTI = true;
+    public static final String VALIDITY_PERIOD = "validityPeriod";
+    public static final String CACHE_USED_JTI = "cacheUsed";
+    public static final String PROPERTIES_FILE = "jwt.properties";
+
 }

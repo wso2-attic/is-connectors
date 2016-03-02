@@ -43,6 +43,8 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
@@ -50,6 +52,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 
 /**
@@ -59,9 +62,10 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
 
     private static Log log = LogFactory.getLog(JWTBearerGrantHandler.class);
 
-
     private static String tenantDomain;
     private JWTCache jwtCache;
+    private static int validityPeriod;
+    private boolean cacheUsedJTI;
 
     /**
      * Initialize the JWT cache.
@@ -70,7 +74,20 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      */
     public void init() throws IdentityOAuth2Exception {
         super.init();
-        if (JWTConstants.CACHE_USED_JTI) {
+        String resourceName = JWTConstants.PROPERTIES_FILE;
+
+        ClassLoader loader = JWTBearerGrantHandler.class.getClassLoader();
+        Properties prop = new Properties();
+        InputStream resourceStream = loader.getResourceAsStream(resourceName);
+        try {
+            prop.load(resourceStream);
+        } catch (IOException e) {
+            throw new IdentityOAuth2Exception("Can not find the file", e);
+        }
+
+        validityPeriod = Integer.parseInt(prop.getProperty(JWTConstants.VALIDITY_PERIOD));
+        cacheUsedJTI = Boolean.parseBoolean(prop.getProperty(JWTConstants.CACHE_USED_JTI));
+        if (cacheUsedJTI) {
             this.jwtCache = JWTCache.getInstance();
         }
     }
@@ -99,21 +116,20 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
 
         SignedJWT signedJWT;
         IdentityProvider identityProvider;
-        String tokenEndPointAlias;
+        String tokenEndPointAlias = null;
         ReadOnlyJWTClaimsSet claimsSet;
 
         tenantDomain = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getTenantDomain();
-
         if (StringUtils.isEmpty(tenantDomain)) {
             tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
         }
         signedJWT = getSignedJWT(tokReqMsgCtx);
         if (signedJWT == null) {
-            return false;
+            handleException("No Valid Assertion was found for " + JWTConstants.OAUTH_JWT_BEARER_GRANT_TYPE);
         }
         claimsSet = getClaimSet(signedJWT);
         if (claimsSet == null) {
-            return false;
+            handleException("Claim values are empty in the given JSON Web Token");
         }
 
         String jwtIssuer = claimsSet.getIssuer();
@@ -130,8 +146,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
         long timeStampSkewMillis = OAuthServerConfiguration.getInstance().getTimeStampSkewInSeconds() * 1000;
 
         if (StringUtils.isEmpty(jwtIssuer) || StringUtils.isEmpty(subject) || expirationTime == null) {
-            log.error("Mandatory fields are empty in the JSON Web Token");
-            return false;
+            handleException("Mandatory fields(Issuer, Subject or Expiration time) are empty in the given JSON Web Token");
         }
 
         try {
@@ -139,10 +154,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             if (identityProvider != null) {
                 tokenEndPointAlias = getTokenEndpointAlias(identityProvider);
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("No Registered IDP found for the JWT with issuer name : " + jwtIssuer);
-                }
-                return false;
+                handleException("No Registered IDP found for the JWT with issuer name : " + jwtIssuer);
             }
 
             signatureValid = validateSignature(signedJWT, identityProvider);
@@ -151,11 +163,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                     log.debug("Signature/MAC validated successfully");
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Signature or Message Authentication invalid");
-                    log.debug("JWT Rejected and validation terminated");
-                }
-                return false;
+                handleException("Signature or Message Authentication invalid");
             }
 
             tokReqMsgCtx.setAuthorizedUser(AuthenticatedUser.createLocalAuthenticatedUserFromSubjectIdentifier(subject));
@@ -165,8 +173,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             }
 
             if (StringUtils.isEmpty(tokenEndPointAlias)) {
-                log.debug("Token End Point of the IDP is empty");
-                return false;
+                handleException("Token End Point of the IDP is empty");
             }
             for (String aud : audience) {
                 if (StringUtils.equals(tokenEndPointAlias, aud)) {
@@ -178,27 +185,27 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                 }
             }
             if (!audienceFound) {
-                if (log.isDebugEnabled()) {
-                    log.debug("None of the audience values matched the tokenEndpoint Alias " + tokenEndPointAlias);
-                }
-                return false;
+                handleException("None of the audience values matched the tokenEndpoint Alias " + tokenEndPointAlias);
             }
-            if (checkExpirationTime(expirationTime, currentTimeInMillis, timeStampSkewMillis)) {
+            boolean checkedExpirationTime = checkExpirationTime(expirationTime, currentTimeInMillis, timeStampSkewMillis);
+            if (checkedExpirationTime) {
                 if (log.isDebugEnabled()) {
                     log.debug("Expiration Time(exp) of JWT was validated successfully");
                 }
             }
-            if (checkNotBeforeTime(notBeforeTime, currentTimeInMillis, timeStampSkewMillis)) {
+            boolean checkedNotBeforeTime = checkNotBeforeTime(notBeforeTime, currentTimeInMillis, timeStampSkewMillis);
+            if (checkedNotBeforeTime) {
                 if (log.isDebugEnabled()) {
                     log.debug("Not Before Time(nbf) of JWT was validated successfully");
                 }
             }
-            if (checkValidityOfTheToken(issuedAtTime, currentTimeInMillis, timeStampSkewMillis)) {
+            boolean checkedValidityToken = checkValidityOfTheToken(issuedAtTime, currentTimeInMillis, timeStampSkewMillis);
+            if (checkedValidityToken) {
                 if (log.isDebugEnabled()) {
                     log.debug("Issued At Time(iat) of JWT was validated successfully");
                 }
             }
-            if (jti != null) {
+            if (cacheUsedJTI && (jti != null)) {
                 JWTCacheEntry entry = (JWTCacheEntry) jwtCache.getValueFromCache(jti);
                 if (entry != null) {
                     if (checkCachedJTI(jti, signedJWT, entry, currentTimeInMillis, timeStampSkewMillis)) {
@@ -210,7 +217,12 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("JSON Web Token ID(jti) not found in JWT. Continuing Validation");
+                    if (!cacheUsedJTI) {
+                        log.debug("List of used JSON Web Token IDs are not maintained. Continue Validation");
+                    }
+                    if (jti == null) {
+                        log.debug("JSON Web Token ID(jti) not found in JWT. Continuing Validation");
+                    }
                 }
             }
             if (customClaims == null) {
@@ -220,26 +232,22 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             } else {
                 boolean customClaimsValidated = validateCustomClaims(claimsSet.getCustomClaims());
                 if (!customClaimsValidated) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Custom Claims in the JWT were not validated");
-                    }
-                    return false;
+                    handleException("Custom Claims in the JWT were invalid");
                 }
             }
             if (log.isDebugEnabled()) {
                 log.debug("JWT Token was validated successfully");
             }
-            jwtCache.addToCache(jti, new JWTCacheEntry(signedJWT));
-
+            if(cacheUsedJTI) {
+                jwtCache.addToCache(jti, new JWTCacheEntry(signedJWT));
+            }
             if (log.isDebugEnabled()) {
                 log.debug("JWT Token was added to the cache successfully");
             }
         } catch (IdentityProviderManagementException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error while getting the Federated Identity Provider ", e);
-            }
+            handleException("Error while getting the Federated Identity Provider ");
         } catch (JOSEException e) {
-            log.error("Error when verifying signature", e);
+            handleException("Error when verifying signature");
         }
         if (log.isDebugEnabled()) {
             log.debug("Issuer(iss) of the JWT validated successfully");
@@ -251,10 +259,10 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * @param tokReqMsgCtx
      * @return
      */
-    private SignedJWT getSignedJWT(OAuthTokenReqMessageContext tokReqMsgCtx) {
+    private SignedJWT getSignedJWT(OAuthTokenReqMessageContext tokReqMsgCtx) throws IdentityOAuth2Exception {
         RequestParameter[] params = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getRequestParameters();
         String assertion = null;
-        SignedJWT signedJWT;
+        SignedJWT signedJWT = null;
         for (RequestParameter param : params) {
             if (param.getKey().equals(JWTConstants.OAUTH_JWT_ASSERTION)) {
                 assertion = param.getValue()[0];
@@ -262,7 +270,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             }
         }
         if (StringUtils.isEmpty(assertion)) {
-            log.error("No Valid Assertion was found for " + JWTConstants.OAUTH_JWT_BEARER_GRANT_TYPE);
             return null;
         }
 
@@ -272,8 +279,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                 logJWT(signedJWT);
             }
         } catch (ParseException e) {
-            log.error("Error while parsing the JWT" + e.getMessage());
-            return null;
+            handleException("Error while parsing the JWT" + e.getMessage());
         }
         return signedJWT;
     }
@@ -282,13 +288,12 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * @param signedJWT
      * @return
      */
-    private ReadOnlyJWTClaimsSet getClaimSet(SignedJWT signedJWT) {
-        ReadOnlyJWTClaimsSet claimsSet;
+    private ReadOnlyJWTClaimsSet getClaimSet(SignedJWT signedJWT) throws IdentityOAuth2Exception {
+        ReadOnlyJWTClaimsSet claimsSet = null;
         try {
             claimsSet = signedJWT.getJWTClaimsSet();
         } catch (ParseException e) {
-            log.error("Error when trying to retrieve claimsSet from the JWT", e);
-            return null;
+            handleException("Error when trying to retrieve claimsSet from the JWT");
         }
         return claimsSet;
     }
@@ -349,17 +354,13 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * @param timeStampSkewMillis
      * @return
      */
-    private boolean checkExpirationTime(Date expirationTime, long currentTimeInMillis, long timeStampSkewMillis) {
+    private boolean checkExpirationTime(Date expirationTime, long currentTimeInMillis, long timeStampSkewMillis) throws IdentityOAuth2Exception {
         long expirationTimeInMillis = expirationTime.getTime();
         if ((currentTimeInMillis + timeStampSkewMillis) > expirationTimeInMillis) {
-            if (log.isDebugEnabled()) {
-                log.debug("JSON Web Token is expired." +
-                        ", Expiration Time(ms) : " + expirationTimeInMillis +
-                        ", TimeStamp Skew : " + timeStampSkewMillis +
-                        ", Current Time : " + currentTimeInMillis);
-                log.debug("JWT Rejected and validation terminated");
-            }
-            return false;
+            handleException("JSON Web Token is expired." +
+                    ", Expiration Time(ms) : " + expirationTimeInMillis +
+                    ", TimeStamp Skew : " + timeStampSkewMillis +
+                    ", Current Time : " + currentTimeInMillis + ". JWT Rejected and validation terminated");
         }
         return true;
     }
@@ -373,17 +374,13 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * @param timeStampSkewMillis
      * @return
      */
-    private boolean checkNotBeforeTime(Date notBeforeTime, long currentTimeInMillis, long timeStampSkewMillis) {
+    private boolean checkNotBeforeTime(Date notBeforeTime, long currentTimeInMillis, long timeStampSkewMillis) throws IdentityOAuth2Exception {
         long notBeforeTimeMillis = notBeforeTime.getTime();
         if (currentTimeInMillis + timeStampSkewMillis < notBeforeTimeMillis) {
-            if (log.isDebugEnabled()) {
-                log.debug("JSON Web Token is used before Not_Before_Time." +
-                        ", Not Before Time(ms) : " + notBeforeTimeMillis +
-                        ", TimeStamp Skew : " + timeStampSkewMillis +
-                        ", Current Time : " + currentTimeInMillis);
-                log.debug("JWT Rejected and validation terminated");
-            }
-            return false;
+            handleException("JSON Web Token is used before Not_Before_Time." +
+                    ", Not Before Time(ms) : " + notBeforeTimeMillis +
+                    ", TimeStamp Skew : " + timeStampSkewMillis +
+                    ", Current Time : " + currentTimeInMillis + ". JWT Rejected and validation terminated");
         }
         return true;
     }
@@ -398,20 +395,16 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * @param timeStampSkewMillis
      * @return
      */
-    private boolean checkValidityOfTheToken(Date issuedAtTime, long currentTimeInMillis, long timeStampSkewMillis) {
+    private boolean checkValidityOfTheToken(Date issuedAtTime, long currentTimeInMillis, long timeStampSkewMillis) throws IdentityOAuth2Exception {
         long issuedAtTimeMillis = issuedAtTime.getTime();
-        long rejectBeforeMillis = JWTConstants.VALIDITY_PERIOD * 60 * 1000;
+        long rejectBeforeMillis = validityPeriod * 60 * 1000;
         if (currentTimeInMillis + timeStampSkewMillis - issuedAtTimeMillis >
                 rejectBeforeMillis) {
-            if (log.isDebugEnabled()) {
-                log.debug("JSON Web Token is issued before the allowed time." +
-                        ", Issued At Time(ms) : " + issuedAtTimeMillis +
-                        ", Reject before limit(ms) : " + rejectBeforeMillis +
-                        ", TimeStamp Skew : " + timeStampSkewMillis +
-                        ", Current Time : " + currentTimeInMillis);
-                log.debug("JWT Rejected and validation terminated");
-            }
-            return false;
+            handleException("JSON Web Token is issued before the allowed time." +
+                    ", Issued At Time(ms) : " + issuedAtTimeMillis +
+                    ", Reject before limit(ms) : " + rejectBeforeMillis +
+                    ", TimeStamp Skew : " + timeStampSkewMillis +
+                    ", Current Time : " + currentTimeInMillis + ". JWT Rejected and validation terminated");
         }
         return true;
     }
@@ -427,7 +420,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * @return
      */
     private boolean checkCachedJTI(String jti, SignedJWT signedJWT, JWTCacheEntry entry, long currentTimeInMillis,
-                                   long timeStampSkewMillis) {
+                                   long timeStampSkewMillis) throws IdentityOAuth2Exception {
         try {
             SignedJWT cachedJWT = entry.getJwt();
             long cachedJWTExpiryTimeMillis = cachedJWT.getJWTClaimsSet().getExpirationTime().getTime();
@@ -442,16 +435,14 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
                 if (log.isDebugEnabled()) {
                     log.debug("jti of the JWT has been validated successfully and cache updated");
                 } else {
-                    log.error("JWT Token \n" + signedJWT.getHeader().toJSONObject().toString() + "\n"
+                    handleException("JWT Token \n" + signedJWT.getHeader().toJSONObject().toString() + "\n"
                             + signedJWT.getPayload().toJSONObject().toString() + "\n" +
                             "Has been replayed before the allowed expiry time : "
                             + cachedJWT.getJWTClaimsSet().getExpirationTime());
-                    return false;
                 }
             }
         } catch (ParseException e) {
-            log.error("Unable to parse the cached jwt assertion : " + entry.getEncodedJWt(), e);
-            return false;
+            handleException("Unable to parse the cached jwt assertion : " + entry.getEncodedJWt());
         }
         return true;
     }
@@ -479,14 +470,13 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             throws JOSEException, IdentityOAuth2Exception {
 
         JWSVerifier verifier = null;
-        X509Certificate x509Certificate;
+        X509Certificate x509Certificate = null;
 
         try {
             x509Certificate = (X509Certificate) IdentityApplicationManagementUtil
                     .decodeCertificate(idp.getCertificate());
         } catch (CertificateException e) {
-            log.error(e.getMessage(), e);
-            throw new IdentityOAuth2Exception("Error occurred while decoding public certificate of Identity Provider "
+            handleException("Error occurred while decoding public certificate of Identity Provider "
                     + idp.getIdentityProviderName() + " for tenant domain " + tenantDomain);
         }
         String alg = signedJWT.getHeader().getAlgorithm().getName();
@@ -494,7 +484,12 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             log.debug("Signature Algorithm found in the JWT Header: " + alg);
         }
         if (alg.indexOf("RS") == 0) {
-            RSAPublicKey publicKey = (RSAPublicKey) x509Certificate.getPublicKey();
+            RSAPublicKey publicKey = null;
+            if (x509Certificate != null) {
+                publicKey = (RSAPublicKey) x509Certificate.getPublicKey();
+            } else {
+                handleException("Unable to get certificate");
+            }
             verifier = new RSASSAVerifier(publicKey);
         } else if (alg.indexOf("ES") == 0) {
             // TODO support ECDSA signature verification
@@ -504,10 +499,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             }
         }
         if (verifier == null) {
-            if (log.isDebugEnabled()) {
-                log.error("Could create a signature verifier for algorithm type: " + alg);
-            }
-            return false;
+            handleException("Could not create a signature verifier for algorithm type: " + alg);
         }
         return signedJWT.verify(verifier);
     }
@@ -532,4 +524,10 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
     protected boolean validateCustomClaims(Map< String, Object > customClaims) {
         return true;
     }
+
+    private void handleException(String errorMessage) throws IdentityOAuth2Exception {
+        log.error(errorMessage);
+        throw new IdentityOAuth2Exception(errorMessage);
+    }
+
 }
