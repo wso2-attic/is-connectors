@@ -45,6 +45,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.NumberFormatException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
@@ -81,13 +82,21 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
         InputStream resourceStream = loader.getResourceAsStream(resourceName);
         try {
             prop.load(resourceStream);
+            validityPeriod = Integer.parseInt(prop.getProperty(JWTConstants.VALIDITY_PERIOD));
+            cacheUsedJTI = Boolean.parseBoolean(prop.getProperty(JWTConstants.CACHE_USED_JTI));
+            if (cacheUsedJTI) {
+                this.jwtCache = JWTCache.getInstance();
+            }
         } catch (IOException e) {
             throw new IdentityOAuth2Exception("Can not find the file", e);
-        }
-        validityPeriod = Integer.parseInt(prop.getProperty(JWTConstants.VALIDITY_PERIOD));
-        cacheUsedJTI = Boolean.parseBoolean(prop.getProperty(JWTConstants.CACHE_USED_JTI));
-        if (cacheUsedJTI) {
-            this.jwtCache = JWTCache.getInstance();
+        } catch (NumberFormatException e){
+            throw new IdentityOAuth2Exception("Invalid Validity period", e);
+        } finally {
+            try {
+                resourceStream.close();
+            } catch (IOException e) {
+                log.error("Error while closing the stream");
+            }
         }
     }
 
@@ -254,8 +263,8 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
     }
 
     /**
-     * @param tokReqMsgCtx
-     * @return
+     * @param tokReqMsgCtx Token message request context
+     * @return signedJWT
      */
     private SignedJWT getSignedJWT(OAuthTokenReqMessageContext tokReqMsgCtx) throws IdentityOAuth2Exception {
         RequestParameter[] params = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getRequestParameters();
@@ -283,8 +292,8 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
     }
 
     /**
-     * @param signedJWT
-     * @return
+     * @param signedJWT Signed JWT
+     * @return Claim set
      */
     private ReadOnlyJWTClaimsSet getClaimSet(SignedJWT signedJWT) throws IdentityOAuth2Exception {
         ReadOnlyJWTClaimsSet claimsSet = null;
@@ -299,8 +308,8 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
     /**
      * Get token endpoint alias
      *
-     * @param identityProvider
-     * @return
+     * @param identityProvider Identity provider
+     * @return token endpoint alias
      */
     private String getTokenEndpointAlias(IdentityProvider identityProvider) {
         Property oauthTokenURL = null;
@@ -347,10 +356,10 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * authorization server may reject JWTs with an exp claim value that is unreasonably far in the
      * future.
      *
-     * @param expirationTime
-     * @param currentTimeInMillis
-     * @param timeStampSkewMillis
-     * @return
+     * @param expirationTime Expiration time
+     * @param currentTimeInMillis Current time
+     * @param timeStampSkewMillis Time skew
+     * @return true or false
      */
     private boolean checkExpirationTime(Date expirationTime, long currentTimeInMillis, long timeStampSkewMillis) throws IdentityOAuth2Exception {
         long expirationTimeInMillis = expirationTime.getTime();
@@ -367,10 +376,10 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * The JWT MAY contain an nbf (not before) claim that identifies the time before which the
      * token MUST NOT be accepted for processing.
      *
-     * @param notBeforeTime
-     * @param currentTimeInMillis
-     * @param timeStampSkewMillis
-     * @return
+     * @param notBeforeTime Not before time
+     * @param currentTimeInMillis Current time
+     * @param timeStampSkewMillis Time skew
+     * @return true or false
      */
     private boolean checkNotBeforeTime(Date notBeforeTime, long currentTimeInMillis, long timeStampSkewMillis) throws IdentityOAuth2Exception {
         long notBeforeTimeMillis = notBeforeTime.getTime();
@@ -388,10 +397,10 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * issued. Note that the authorization server may reject JWTs with an iat claim value that is
      * unreasonably far in the past
      *
-     * @param issuedAtTime
-     * @param currentTimeInMillis
-     * @param timeStampSkewMillis
-     * @return
+     * @param issuedAtTime Token issued time
+     * @param currentTimeInMillis Current time
+     * @param timeStampSkewMillis Time skew
+     * @return true or false
      */
     private boolean checkValidityOfTheToken(Date issuedAtTime, long currentTimeInMillis, long timeStampSkewMillis) throws IdentityOAuth2Exception {
         long issuedAtTimeMillis = issuedAtTime.getTime();
@@ -410,12 +419,12 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
     /**
      * Method to check whether the JTI is already in the cache.
      *
-     * @param jti
-     * @param signedJWT
-     * @param entry
-     * @param currentTimeInMillis
-     * @param timeStampSkewMillis
-     * @return
+     * @param jti JSON Token Id
+     * @param signedJWT Signed JWT
+     * @param entry Cache entry
+     * @param currentTimeInMillis Current time
+     * @param timeStampSkewMillis Skew time
+     * @return true or false
      */
     private boolean checkCachedJTI(String jti, SignedJWT signedJWT, JWTCacheEntry entry, long currentTimeInMillis,
                                    long timeStampSkewMillis) throws IdentityOAuth2Exception {
@@ -460,7 +469,6 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * @param signedJWT signed JWT whose signature is to be verified
      * @param idp       Identity provider who issued the signed JWT
      * @return whether signature is valid, true if valid else false
-     * @throws java.security.cert.CertificateException
      * @throws com.nimbusds.jose.JOSEException
      * @throws org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception
      */
@@ -488,9 +496,11 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
             } else {
                 handleException("Unable to get certificate");
             }
-            verifier = new RSASSAVerifier(publicKey);
-        } else if (alg.indexOf("ES") == 0) {
-            // TODO support ECDSA signature verification
+            if (publicKey != null) {
+                verifier = new RSASSAVerifier(publicKey);
+            } else {
+                handleException("Public key is null");
+            }
         } else {
             if (log.isDebugEnabled()) {
                 log.debug("Signature Algorithm not supported yet : " + alg);
@@ -499,7 +509,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
         if (verifier == null) {
             handleException("Could not create a signature verifier for algorithm type: " + alg);
         }
-        return signedJWT.verify(verifier);
+        return verifier != null && signedJWT.verify(verifier);
     }
 
     /**
@@ -519,7 +529,7 @@ public class JWTBearerGrantHandler extends AbstractAuthorizationGrantHandler {
      * @param customClaims a map of custom claims
      * @return whether the token is valid based on other claim values
      */
-    protected boolean validateCustomClaims(Map< String, Object > customClaims) {
+    protected boolean validateCustomClaims(Map<String, Object> customClaims) {
         return true;
     }
 
