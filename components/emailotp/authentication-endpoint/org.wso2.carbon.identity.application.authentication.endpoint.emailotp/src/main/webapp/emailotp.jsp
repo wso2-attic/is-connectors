@@ -88,7 +88,7 @@
                 <div class="container col-xs-10 col-sm-6 col-md-6 col-lg-4 col-centered wr-content wr-login col-centered">
                     <div>
                         <h2 class="wr-title blue-bg padding-double white boarder-bottom-blue margin-none">
-                            Authenticating with EmailOTP &nbsp;&nbsp;</h2>
+                            Email Verification &nbsp;&nbsp;</h2>
                     </div>
                     <div class="boarder-all ">
                         <div class="clearfix"></div>
