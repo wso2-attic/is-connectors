@@ -22,9 +22,6 @@ package org.wso2.carbon.identity.authenticator.emailotp;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.axis2.deployment.DeploymentEngine;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.util.Loader;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.application.authentication.framework.LocalApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.config.ConfigurationFacade;
@@ -60,7 +57,6 @@ import org.wso2.carbon.identity.mgt.mail.NotificationData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.axiom.om.util.Base64;
-import org.apache.axis2.context.MessageContext;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -73,7 +69,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -130,7 +125,8 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                     if (context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser() != null &&
                             context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedAutenticator()
                                     .getApplicationAuthenticator() instanceof LocalApplicationAuthenticator) {
-                        username = String.valueOf(context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser());
+                        username =
+                                String.valueOf(context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser());
                         break;
                     }
                 }
@@ -177,7 +173,8 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                                     throw new AuthenticationFailedException("Unable to get the access token");
                                 } else {
                                     JSONObject tokenObj = new JSONObject(tokenResponse);
-                                    String accessToken = tokenObj.getString(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN);
+                                    String accessToken =
+                                            tokenObj.getString(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN);
                                     context.getAuthenticatorProperties().put(EmailOTPAuthenticatorConstants.EMAILOTP_ACCESS_TOKEN
                                             , accessToken);
                                     authenticatorProperties = context.getAuthenticatorProperties();
@@ -190,7 +187,8 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                                     urlParams, payload, formData);
                             String api = getAPI(authenticatorProperties);
                             if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.FAILURE)) {
-                                failureString = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.FAILURE).toString();
+                                failureString = emailOTPProperties.get(api
+                                        + EmailOTPAuthenticatorConstants.FAILURE).toString();
                             }
                             if (StringUtils.isEmpty(sendCodeResponse)
                                     || sendCodeResponse.startsWith(EmailOTPAuthenticatorConstants.FAILED)
@@ -273,6 +271,8 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
             , String payload, String httpMethod) {
         String line;
         StringBuilder responseString = new StringBuilder();
+        OutputStreamWriter writer = null;
+        BufferedReader br = null;
         HttpURLConnection connection = null;
         try {
             URL emailOTPEP = new URL(url + urlParameters);
@@ -294,21 +294,18 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                 connection.setRequestProperty(EmailOTPAuthenticatorConstants.HTTP_AUTH, accessToken);
             }
             if (httpMethod.toUpperCase().equals(EmailOTPAuthenticatorConstants.HTTP_POST)) {
-                OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream()
-                        , EmailOTPAuthenticatorConstants.CHARSET);
+                writer = new OutputStreamWriter(connection.getOutputStream(), EmailOTPAuthenticatorConstants.CHARSET);
                 if (StringUtils.isNotEmpty(payload)) {
                     writer.write(payload);
                 } else if (StringUtils.isNotEmpty(formParameters)) {
                     writer.write(formParameters);
                 }
-                writer.close();
             }
             if (connection.getResponseCode() == 200) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 while ((line = br.readLine()) != null) {
                     responseString.append(line);
                 }
-                br.close();
             } else {
                 return EmailOTPAuthenticatorConstants.FAILED + EmailOTPAuthenticatorConstants.REQUEST_FAILED;
             }
@@ -329,6 +326,11 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
             return EmailOTPAuthenticatorConstants.FAILED + e.getMessage();
         } finally {
             connection.disconnect();
+            try {
+                writer.close();
+                br.close();
+            } catch (IOException e) {
+            }
         }
         return responseString.toString();
     }
@@ -510,7 +512,8 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
         String tokenEndpoint = null;
         String api = getAPI(authenticatorProperties);
         if (emailOTPProperties.containsKey(api + EmailOTPAuthenticatorConstants.EMAILOTP_TOKEN_ENDPOINT)) {
-            tokenEndpoint = emailOTPProperties.get(api + EmailOTPAuthenticatorConstants.EMAILOTP_TOKEN_ENDPOINT).toString();
+            tokenEndpoint = emailOTPProperties.get(api
+                    + EmailOTPAuthenticatorConstants.EMAILOTP_TOKEN_ENDPOINT).toString();
         }
         return StringUtils.isNotEmpty(tokenEndpoint) ? tokenEndpoint : null;
     }
@@ -518,8 +521,10 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
     private void sendOTP(String username, String otp, String email) throws AuthenticationFailedException {
         System.setProperty(EmailOTPAuthenticatorConstants.AXIS2, EmailOTPAuthenticatorConstants.AXIS2_FILE);
         try {
-            ConfigurationContext configurationContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem((String) null, (String) null);
-            if (configurationContext.getAxisConfiguration().getTransportsOut().containsKey(EmailOTPAuthenticatorConstants.TRANSPORT_MAILTO)) {
+            ConfigurationContext configurationContext =
+                    ConfigurationContextFactory.createConfigurationContextFromFileSystem((String) null, (String) null);
+            if (configurationContext.getAxisConfiguration().getTransportsOut()
+                    .containsKey(EmailOTPAuthenticatorConstants.TRANSPORT_MAILTO)) {
                 NotificationSender notificationSender = new NotificationSender();
                 NotificationDataDTO notificationData = new NotificationDataDTO();
                 Notification emailNotification = null;
@@ -529,13 +534,6 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                 int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
                 String emailTemplate;
                 Config config;
-                if (MessageContext.getCurrentMessageContext() != null &&
-                        MessageContext.getCurrentMessageContext().getProperty(
-                                MessageContext.TRANSPORT_HEADERS) != null) {
-                    notificationData.setTransportHeaders(new HashMap(
-                            (Map) MessageContext.getCurrentMessageContext().getProperty(
-                                    MessageContext.TRANSPORT_HEADERS)));
-                }
                 try {
                     config = configBuilder.loadConfiguration(ConfigType.EMAIL, StorageType.REGISTRY, tenantId);
                 } catch (IdentityMgtConfigException e) {
@@ -548,7 +546,8 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                 if (config.getProperties().containsKey(EmailOTPAuthenticatorConstants.AUTHENTICATOR_NAME)) {
                     emailTemplate = config.getProperty(EmailOTPAuthenticatorConstants.AUTHENTICATOR_NAME);
                     try {
-                        emailNotification = NotificationBuilder.createNotification("EMAIL", emailTemplate, emailNotificationData);
+                        emailNotification = NotificationBuilder.createNotification("EMAIL", emailTemplate,
+                                emailNotificationData);
                     } catch (IdentityMgtServiceException e) {
                         log.error("Error occurred while creating notification from email template : " + emailTemplate, e);
                         throw new AuthenticationFailedException("Error occurred while creating notification from email template : "
@@ -556,15 +555,10 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
                     }
                     notificationData.setNotificationAddress(email);
                     NotificationSendingModule module = new DefaultEmailSendingModule();
-                    if (IdentityMgtConfig.getInstance().isNotificationInternallyManaged()) {
-                        module.setNotificationData(notificationData);
-                        module.setNotification(emailNotification);
-                        notificationSender.sendNotification(module);
-                        notificationData.setNotificationSent(true);
-                    } else {
-                        notificationData.setNotificationSent(false);
-                        notificationData.setNotificationCode(otp);
-                    }
+                    module.setNotificationData(notificationData);
+                    module.setNotification(emailNotification);
+                    notificationSender.sendNotification(module);
+                    notificationData.setNotificationSent(true);
                 } else {
                     throw new AuthenticationFailedException("Unable find the email template");
                 }
@@ -648,7 +642,7 @@ public class EmailOTPAuthenticator extends OpenIDConnectAuthenticator implements
         Property emailAPI = new Property();
         emailAPI.setName(EmailOTPAuthenticatorConstants.EMAIL_API);
         emailAPI.setDisplayName("Email API");
-        emailAPI.setDescription("Enter API to send OTP (E.g: Gmail, Sendgrid, Mandrill etc)");
+        emailAPI.setDescription("Enter API to send OTP (E.g: Gmail, Sendgrid etc)");
         emailAPI.setDisplayOrder(0);
         configProperties.add(emailAPI);
 

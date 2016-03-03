@@ -36,7 +36,6 @@ public class EmailOTPAuthenticatorConstants {
     public static final String API_KEY_HEADER_REQUIRED_APIS = "apiKeyHeaderRequiredAPIs";
 
     public static final String API_GMAIL = "Gmail";
-    public static final String API_MANDRILL = "Mandrill";
     public static final String API_SENDGRID = "Sendgrid";
 
     public static final String CODE = "OTPCode";
