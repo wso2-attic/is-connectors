@@ -100,7 +100,6 @@ public class InweboProvisioningConnector extends AbstractOutboundProvisioningCon
                 String mail = StringUtils.isNotEmpty(emailClaim) ? emailClaim : "";
                 String phone = StringUtils.isNotEmpty(phoneClaim) ? phoneClaim : "";
 
-
                 if (provisioningEntity.isJitProvisioning() && !isJitProvisioningEnabled()) {
                     if (log.isDebugEnabled()) {
                         log.debug("JIT provisioning disabled for inwebo connector");
@@ -172,7 +171,6 @@ public class InweboProvisioningConnector extends AbstractOutboundProvisioningCon
             Util.setHttpsClientCert(p12file, p12password);
         } catch (Exception e) {
             throw new IdentityProvisioningException("Error while adding certificate", e);
-
         }
         try {
             UserCreation userCreation = new UserCreation();
@@ -193,7 +191,6 @@ public class InweboProvisioningConnector extends AbstractOutboundProvisioningCon
             Util.setHttpsClientCert(p12file, p12password);
         } catch (Exception e) {
             throw new IdentityProvisioningException("Error while adding certificate", e);
-
         }
         try {
             String loginId = provisioningEntity.getIdentifier().getIdentifier();
@@ -209,8 +206,8 @@ public class InweboProvisioningConnector extends AbstractOutboundProvisioningCon
      * @param provisioningEntity
      * @throws IdentityProvisioningException
      */
-    private void deleteUser(ProvisioningEntity provisioningEntity, String serviceId, String userId, String p12file, String p12password)
-            throws IdentityProvisioningException {
+    private void deleteUser(ProvisioningEntity provisioningEntity, String serviceId, String userId, String p12file,
+                            String p12password) throws IdentityProvisioningException {
         boolean deletionStatus = false;
         try {
             Util.setHttpsClientCert(p12file, p12password);

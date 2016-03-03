@@ -77,12 +77,16 @@ public class UserDeletion {
         String namespacePrefix = InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_NAMESPACE_PREFIX;
         envelope.addNamespaceDeclaration(namespacePrefix, serverURI);
         SOAPBody soapBody = envelope.getBody();
-        SOAPElement soapBodyElem = soapBody.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION_LOGIN_DELETE, namespacePrefix);
-        SOAPElement soapBodyElem1 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_USER_ID, namespacePrefix);
+        SOAPElement soapBodyElem =
+                soapBody.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION_LOGIN_DELETE, namespacePrefix);
+        SOAPElement soapBodyElem1 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_USER_ID, namespacePrefix);
         soapBodyElem1.addTextNode(userId);
-        SOAPElement soapBodyElem2 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_SERVICE_ID, namespacePrefix);
+        SOAPElement soapBodyElem2 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_SERVICE_ID, namespacePrefix);
         soapBodyElem2.addTextNode(serviceId);
-        SOAPElement soapBodyElem3 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_LOGIN_ID, namespacePrefix);
+        SOAPElement soapBodyElem3 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_LOGIN_ID, namespacePrefix);
         soapBodyElem3.addTextNode(loginId);
         MimeHeaders headers = soapMessage.getMimeHeaders();
         headers.addHeader(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION, serverURI

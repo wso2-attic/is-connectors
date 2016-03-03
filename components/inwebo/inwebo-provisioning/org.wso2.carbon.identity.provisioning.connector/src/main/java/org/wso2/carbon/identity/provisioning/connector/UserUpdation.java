@@ -41,8 +41,8 @@ public class UserUpdation {
      * Method for create SOAP connection
      */
     public static void invokeSOAP(String userId, String serviceId, String loginId, String login, String firstName,
-                                     String name, String mail, String phone, String status, String role,
-                                     String extraFields) throws IdentityProvisioningException {
+                                  String name, String mail, String phone, String status, String role,
+                                  String extraFields) throws IdentityProvisioningException {
         SOAPConnectionFactory soapConnectionFactory = null;
         SOAPConnection soapConnection = null;
         try {
@@ -53,7 +53,6 @@ public class UserUpdation {
                     phone, status, role, extraFields), url);
             String updationStatus = soapResponse.getSOAPBody().getElementsByTagName("loginUpdateReturn").item(0)
                     .getTextContent().toString();
-            soapConnection.close();
             boolean processStatus = StringUtils.equals("OK", updationStatus);
             if (!processStatus) {
                 String error = soapResponse.getSOAPBody().getElementsByTagName("loginUpdateReturn").item(0)
@@ -84,31 +83,44 @@ public class UserUpdation {
         String namespacePrefix = InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_NAMESPACE_PREFIX;
         envelope.addNamespaceDeclaration(namespacePrefix, serverURI);
         SOAPBody soapBody = envelope.getBody();
-        SOAPElement soapBodyElem = soapBody.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION_LOGIN_UPDATE, namespacePrefix);
-        SOAPElement soapBodyElem1 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_USER_ID, namespacePrefix);
+        SOAPElement soapBodyElem =
+                soapBody.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION_LOGIN_UPDATE, namespacePrefix);
+        SOAPElement soapBodyElem1 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_USER_ID, namespacePrefix);
         soapBodyElem1.addTextNode(userId);
-        SOAPElement soapBodyElem2 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_SERVICE_ID, namespacePrefix);
+        SOAPElement soapBodyElem2 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_SERVICE_ID, namespacePrefix);
         soapBodyElem2.addTextNode(serviceId);
-        SOAPElement soapBodyElem3 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_LOGIN_ID, namespacePrefix);
+        SOAPElement soapBodyElem3 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_LOGIN_ID, namespacePrefix);
         soapBodyElem3.addTextNode(loginId);
-        SOAPElement soapBodyElem4 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_LOGIN, namespacePrefix);
+        SOAPElement soapBodyElem4 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_LOGIN, namespacePrefix);
         soapBodyElem4.addTextNode(login);
-        SOAPElement soapBodyElem5 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_FIRST_NAME, namespacePrefix);
+        SOAPElement soapBodyElem5 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_FIRST_NAME, namespacePrefix);
         soapBodyElem5.addTextNode(firstName);
-        SOAPElement soapBodyElem6 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_NAME, namespacePrefix);
+        SOAPElement soapBodyElem6 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_NAME, namespacePrefix);
         soapBodyElem6.addTextNode(name);
-        SOAPElement soapBodyElem7 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_MAIL, namespacePrefix);
+        SOAPElement soapBodyElem7 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_MAIL, namespacePrefix);
         soapBodyElem7.addTextNode(mail);
-        SOAPElement soapBodyElem8 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_PHONE, namespacePrefix);
+        SOAPElement soapBodyElem8 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_PHONE, namespacePrefix);
         soapBodyElem8.addTextNode(phone);
-        SOAPElement soapBodyElem9 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_STATUS, namespacePrefix);
+        SOAPElement soapBodyElem9 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_STATUS, namespacePrefix);
         soapBodyElem9.addTextNode(status);
-        SOAPElement soapBodyElem10 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ROLE, namespacePrefix);
+        SOAPElement soapBodyElem10 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ROLE, namespacePrefix);
         soapBodyElem10.addTextNode(role);
-        SOAPElement soapBodyElem11 = soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_EXTRA_FIELDS, namespacePrefix);
+        SOAPElement soapBodyElem11 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_EXTRA_FIELDS, namespacePrefix);
         soapBodyElem11.addTextNode(extraFields);
         MimeHeaders headers = soapMessage.getMimeHeaders();
-        headers.addHeader(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION, serverURI + InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION_HEADER);
+        headers.addHeader(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION, serverURI
+                + InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION_HEADER);
         soapMessage.saveChanges();
         return soapMessage;
     }
