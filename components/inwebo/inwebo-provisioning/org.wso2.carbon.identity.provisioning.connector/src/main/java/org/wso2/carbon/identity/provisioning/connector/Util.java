@@ -29,8 +29,9 @@ import java.security.SecureRandom;
 public class Util {
     /**
      * Set the client certificate to Default SSL Context
-     * @param certificateFile		File containing certificate (PKCS12 format)
-     * @param certPassword			Password of certificate
+     *
+     * @param certificateFile File containing certificate (PKCS12 format)
+     * @param certPassword    Password of certificate
      * @throws Exception
      */
     public static void setHttpsClientCert(String certificateFile, String certPassword)

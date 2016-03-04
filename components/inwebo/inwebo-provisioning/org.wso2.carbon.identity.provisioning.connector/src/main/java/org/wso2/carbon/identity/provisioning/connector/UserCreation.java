@@ -19,9 +19,9 @@
 package org.wso2.carbon.identity.provisioning.connector;
 
 import org.apache.commons.lang.StringUtils;
+import org.wso2.carbon.identity.provisioning.IdentityProvisioningException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.provisioning.IdentityProvisioningException;
 
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPBody;
@@ -38,7 +38,7 @@ public class UserCreation {
     private static final Log log = LogFactory.getLog(UserCreation.class);
 
     /**
-     * Method for create SOAP connection
+     * Method to create SOAP connection
      */
     public static String invokeSOAP(String userId, String serviceId, String login, String firstName, String name,
                                     String mail, String phone, String status, String role, String access,
@@ -129,7 +129,6 @@ public class UserCreation {
         headers.addHeader(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION, serverURI
                 + InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION_HEADER);
         soapMessage.saveChanges();
-
         return soapMessage;
     }
 }

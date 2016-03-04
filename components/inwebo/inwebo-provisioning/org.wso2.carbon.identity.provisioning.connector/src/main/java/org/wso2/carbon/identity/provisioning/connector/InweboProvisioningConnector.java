@@ -186,7 +186,6 @@ public class InweboProvisioningConnector extends AbstractOutboundProvisioningCon
                             String login, String firstName, String name, String mail, String phone, String status,
                             String role, String extraFields, String p12file, String p12password)
             throws IdentityProvisioningException {
-        boolean updationStatus = false;
         try {
             Util.setHttpsClientCert(p12file, p12password);
         } catch (Exception e) {
@@ -202,13 +201,8 @@ public class InweboProvisioningConnector extends AbstractOutboundProvisioningCon
         }
     }
 
-    /**
-     * @param provisioningEntity
-     * @throws IdentityProvisioningException
-     */
     private void deleteUser(ProvisioningEntity provisioningEntity, String serviceId, String userId, String p12file,
                             String p12password) throws IdentityProvisioningException {
-        boolean deletionStatus = false;
         try {
             Util.setHttpsClientCert(p12file, p12password);
         } catch (Exception e) {
