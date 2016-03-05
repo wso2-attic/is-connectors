@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.provisioning.connector;
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.provisioning.IdentityProvisioningException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPBody;
@@ -33,77 +35,100 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPException;
 
 public class UserCreation {
+    private static final Log log = LogFactory.getLog(UserCreation.class);
 
     /**
-     * Method for create SOAP connection
+     * Method to create SOAP connection
      */
     public static String invokeSOAP(String userId, String serviceId, String login, String firstName, String name,
                                     String mail, String phone, String status, String role, String access,
                                     String codeType, String language, String extraFields)
             throws IdentityProvisioningException {
         String provisionedId = null;
+        SOAPConnectionFactory soapConnectionFactory = null;
+        SOAPConnection soapConnection = null;
         try {
-            SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
-            SOAPConnection soapConnection = soapConnectionFactory.createConnection();
+            soapConnectionFactory = SOAPConnectionFactory.newInstance();
+            soapConnection = soapConnectionFactory.createConnection();
             String url = InweboConnectorConstants.INWEBO_URL;
-            SOAPMessage soapResponse = soapConnection.call(createUser(userId, serviceId, login, firstName, name, mail, phone, status,
-                    role, access, codeType, language, extraFields), url);
+            SOAPMessage soapResponse = soapConnection.call(createUser(userId, serviceId, login, firstName, name, mail,
+                    phone, status, role, access, codeType, language, extraFields), url);
             provisionedId = soapResponse.getSOAPBody().getElementsByTagName("id").item(0).getTextContent().toString();
-            soapConnection.close();
-            if (StringUtils.isEmpty(provisionedId) || provisionedId.equals("0")) {
+            if (StringUtils.isEmpty(provisionedId) || "0".equals(provisionedId)) {
                 String error = soapResponse.getSOAPBody().getElementsByTagName("loginCreateReturn").item(0)
                         .getTextContent().toString();
                 throw new IdentityProvisioningException("Error occurred while creating the user in InWebo:" + error);
             }
         } catch (SOAPException e) {
             throw new IdentityProvisioningException("Error occurred while sending SOAP Request to Server", e);
-        } catch (IdentityProvisioningException e) {
-            throw new IdentityProvisioningException("Error occurred while sending SOAP Request to Server", e);
+        } finally {
+            try {
+                if (soapConnection != null) {
+                    soapConnection.close();
+                }
+            } catch (SOAPException e) {
+                log.error("Error while closing the SOAP connection", e);
+            }
         }
         return provisionedId;
     }
 
     private static SOAPMessage createUser(String userId, String serviceId, String login, String firstName, String name,
-                                          String mail, String phone, String status, String role, String access, String codetype,
-                                          String language, String extrafields) throws SOAPException, IdentityProvisioningException {
+                                          String mail, String phone, String status, String role, String access,
+                                          String codetype, String language, String extrafields) throws SOAPException {
         MessageFactory messageFactory = MessageFactory.newInstance();
         SOAPMessage soapMessage = messageFactory.createMessage();
         SOAPPart soapPart = soapMessage.getSOAPPart();
         String serverURI = InweboConnectorConstants.INWEBO_URI;
         SOAPEnvelope envelope = soapPart.getEnvelope();
-        envelope.addNamespaceDeclaration("con", serverURI);
+        String namespacePrefix = InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_NAMESPACE_PREFIX;
+        envelope.addNamespaceDeclaration(namespacePrefix, serverURI);
         SOAPBody soapBody = envelope.getBody();
-        SOAPElement soapBodyElem = soapBody.addChildElement("loginCreate", "con");
-        SOAPElement soapBodyElem1 = soapBodyElem.addChildElement("userid", "con");
+        SOAPElement soapBodyElem =
+                soapBody.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION_LOGIN_CREATE, namespacePrefix);
+        SOAPElement soapBodyElem1 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_USER_ID, namespacePrefix);
         soapBodyElem1.addTextNode(userId);
-        SOAPElement soapBodyElem2 = soapBodyElem.addChildElement("serviceid", "con");
+        SOAPElement soapBodyElem2 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_SERVICE_ID, namespacePrefix);
         soapBodyElem2.addTextNode(serviceId);
-        SOAPElement soapBodyElem3 = soapBodyElem.addChildElement("login", "con");
+        SOAPElement soapBodyElem3 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_LOGIN, namespacePrefix);
         soapBodyElem3.addTextNode(login);
-        SOAPElement soapBodyElem4 = soapBodyElem.addChildElement("firstname", "con");
+        SOAPElement soapBodyElem4 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_FIRST_NAME, namespacePrefix);
         soapBodyElem4.addTextNode(firstName);
-        SOAPElement soapBodyElem5 = soapBodyElem.addChildElement("name", "con");
+        SOAPElement soapBodyElem5 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_NAME, namespacePrefix);
         soapBodyElem5.addTextNode(name);
-        SOAPElement soapBodyElem6 = soapBodyElem.addChildElement("mail", "con");
+        SOAPElement soapBodyElem6 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_MAIL, namespacePrefix);
         soapBodyElem6.addTextNode(mail);
-        SOAPElement soapBodyElem7 = soapBodyElem.addChildElement("phone", "con");
+        SOAPElement soapBodyElem7 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_PHONE, namespacePrefix);
         soapBodyElem7.addTextNode(phone);
-        SOAPElement soapBodyElem8 = soapBodyElem.addChildElement("status", "con");
+        SOAPElement soapBodyElem8 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_STATUS, namespacePrefix);
         soapBodyElem8.addTextNode(status);
-        SOAPElement soapBodyElem9 = soapBodyElem.addChildElement("role", "con");
+        SOAPElement soapBodyElem9 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ROLE, namespacePrefix);
         soapBodyElem9.addTextNode(role);
-        SOAPElement soapBodyElem10 = soapBodyElem.addChildElement("access", "con");
+        SOAPElement soapBodyElem10 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACCESS, namespacePrefix);
         soapBodyElem10.addTextNode(access);
-        SOAPElement soapBodyElem11 = soapBodyElem.addChildElement("codetype", "con");
+        SOAPElement soapBodyElem11 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_CONTENT_TYPE, namespacePrefix);
         soapBodyElem11.addTextNode(codetype);
-        SOAPElement soapBodyElem12 = soapBodyElem.addChildElement("lang", "con");
+        SOAPElement soapBodyElem12 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_LANG, namespacePrefix);
         soapBodyElem12.addTextNode(language);
-        SOAPElement soapBodyElem13 = soapBodyElem.addChildElement("extrafields", "con");
+        SOAPElement soapBodyElem13 =
+                soapBodyElem.addChildElement(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_EXTRA_FIELDS, namespacePrefix);
         soapBodyElem13.addTextNode(extrafields);
         MimeHeaders headers = soapMessage.getMimeHeaders();
-        headers.addHeader("SOAPAction", serverURI + "/services/ConsoleAdmin");
+        headers.addHeader(InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION, serverURI
+                + InweboConnectorConstants.InweboConnectorSOAPMessageConstants.SOAP_ACTION_HEADER);
         soapMessage.saveChanges();
-
         return soapMessage;
     }
 }
