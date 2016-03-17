@@ -22,14 +22,9 @@ package org.wso2.carbon.identity.authenticator.amazon;
 public class AmazonAuthenticatorConstants {
     public static final String AUTHENTICATOR_NAME = "AmazonAuthenticator";
     public static final String AUTHENTICATOR_FRIENDLY_NAME = "Amazon";
-
-    //Amazon authorize endpoint URL
     public static final String AMAZON_OAUTH_ENDPOINT = "https://www.amazon.com/ap/oa";
-    //Amazon token  endpoint URL
     public static final String AMAZON_TOKEN_ENDPOINT = "https://api.amazon.com/auth/o2/token";
-    //Amazon user info endpoint URL
     public static final String AMAZON_USERINFO_ENDPOINT = "https://api.amazon.com/user/profile";
-
     public static final String CLIENT_ID="Client Id";
     public static final String CLIENT_SECRET="Client Secret";
     public static final String CALLBACK_URL="Callback URL";

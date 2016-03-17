@@ -19,7 +19,6 @@
 
 package org.wso2.carbon.identity.authenticator.amazon;
 
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,8 +109,8 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
      */
     @Override
     public List<Property> getConfigurationProperties() {
+        List<Property> configProperties = new ArrayList<>();
 
-        List<Property> configProperties = new ArrayList<Property>();
         Property clientId = new Property();
         clientId.setName(OIDCAuthenticatorConstants.CLIENT_ID);
         clientId.setDisplayName(AmazonAuthenticatorConstants.CLIENT_ID);
@@ -135,9 +134,9 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
         callbackUrl.setDescription("Enter the callback url");
         callbackUrl.setDisplayOrder(2);
         configProperties.add(callbackUrl);
+
         return configProperties;
     }
-
 
     /**
      * Get OAuth2 Scope
@@ -151,9 +150,18 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
         return AmazonAuthenticatorConstants.AMAZON_SCOPE_PROFILE;
     }
 
+    /**
+     * Process the authentication response
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @param context  the AuthenticationContext
+     * @throws AuthenticationFailedException
+     */
     @Override
     protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
-                                                 AuthenticationContext context) throws AuthenticationFailedException {
+                                                 AuthenticationContext context)
+            throws AuthenticationFailedException {
         try {
             Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
             String clientId = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_ID);
@@ -175,9 +183,12 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
             AuthenticatedUser authenticatedUserObj;
             String json = sendRequest(AmazonAuthenticatorConstants.AMAZON_USERINFO_ENDPOINT,
                     oAuthResponse.getParam(OIDCAuthenticatorConstants.ACCESS_TOKEN));
-            JSONObject obj = new JSONObject(json);
-            authenticatedUserObj = AuthenticatedUser.createFederateAuthenticatedUserFromSubjectIdentifier((String) obj.get(AmazonAuthenticatorConstants.USER_ID));
-            authenticatedUserObj.setAuthenticatedSubjectIdentifier((String) obj.get(AmazonAuthenticatorConstants.USER_ID));
+            JSONObject jsonObject = new JSONObject(json);
+            authenticatedUserObj = AuthenticatedUser
+                    .createFederateAuthenticatedUserFromSubjectIdentifier(
+                            (String) jsonObject.get(AmazonAuthenticatorConstants.USER_ID));
+            authenticatedUserObj
+                    .setAuthenticatedSubjectIdentifier((String) jsonObject.get(AmazonAuthenticatorConstants.USER_ID));
             claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
             authenticatedUserObj.setUserAttributes(claims);
             context.setSubject(authenticatedUserObj);
@@ -186,6 +197,14 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
         }
     }
 
+    /**
+     * Get the OAuth response for access token
+     *
+     * @param oAuthClient   the OAuthClient
+     * @param accessRequest the AccessRequest
+     * @return Response for access token from service provider
+     * @throws AuthenticationFailedException
+     */
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
             throws AuthenticationFailedException {
         OAuthClientResponse oAuthResponse = null;
@@ -193,17 +212,28 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
             oAuthResponse = oAuthClient.accessToken(accessRequest);
         } catch (OAuthSystemException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Exception while requesting access token", e);
+                log.debug("OAuthSystem Exception while requesting access token", e);
             }
             throw new AuthenticationFailedException(e.getMessage(), e);
         } catch (OAuthProblemException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Exception while requesting access token", e);
+                log.debug("OAuthProblem Exception while requesting access token", e);
             }
         }
         return oAuthResponse;
     }
 
+    /**
+     * Get the access token from endpoint from code
+     *
+     * @param tokenEndPoint the Access_token endpoint
+     * @param clientId      the Client ID
+     * @param code          the Code
+     * @param clientSecret  the Client Secret
+     * @param callbackurl   the CallBack URL
+     * @return access token
+     * @throws AuthenticationFailedException
+     */
     private OAuthClientRequest getAccessRequest(String tokenEndPoint, String clientId, String code, String clientSecret,
                                                 String callbackurl) throws AuthenticationFailedException {
         OAuthClientRequest accessRequest;

@@ -2,7 +2,7 @@ Product: WSO2 IS authenticator for Amazon
 Pre-requisites:
 
 - Maven 3.x
-- Java 1.6 or above
+- Java 1.7 or above
 
 Tested Platform: 
 

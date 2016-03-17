@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.identity.application.authentication.framework.ApplicationAuthenticator;
 import org.wso2.carbon.identity.authenticator.amazon.AmazonAuthenticator;
-
 import java.util.Hashtable;
 
 /**
@@ -34,11 +33,16 @@ public class AmazonAuthenticatorServiceComponent {
 
     private static Log log = LogFactory.getLog(AmazonAuthenticatorServiceComponent.class);
 
-    protected void activate(ComponentContext ctxt) {
+    /**
+     * activate the authenticator
+     *
+     * @param componentContext the ComponentContext
+     */
+    protected void activate(ComponentContext componentContext) {
         try {
             AmazonAuthenticator authenticator = new AmazonAuthenticator();
             Hashtable<String, String> props = new Hashtable<String, String>();
-            ctxt.getBundleContext().registerService(ApplicationAuthenticator.class.getName(),
+            componentContext.getBundleContext().registerService(ApplicationAuthenticator.class.getName(),
                     authenticator, props);
             if (log.isDebugEnabled()) {
                 log.debug("Amazon authenticator is activated");
@@ -48,7 +52,12 @@ public class AmazonAuthenticatorServiceComponent {
         }
     }
 
-    protected void deactivate(ComponentContext ctxt) {
+    /**
+     * deactivate the authenticator
+     *
+     * @param componentContext the ComponentContext
+     */
+    protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
             log.debug("Amazon authenticator is deactivated");
         }
