@@ -34,11 +34,16 @@ public class DropboxAuthenticatorServiceComponent {
 
     private static Log log = LogFactory.getLog(DropboxAuthenticatorServiceComponent.class);
 
-    protected void activate(ComponentContext ctxt) {
+    /**
+     * activate the authenticator
+     *
+     * @param componentContext the ComponentContext
+     */
+    protected void activate(ComponentContext componentContext) {
         try {
             DropboxAuthenticator authenticator = new DropboxAuthenticator();
             Hashtable<String, String> props = new Hashtable<String, String>();
-            ctxt.getBundleContext().registerService(ApplicationAuthenticator.class.getName(),
+            componentContext.getBundleContext().registerService(ApplicationAuthenticator.class.getName(),
                     authenticator, props);
             if (log.isDebugEnabled()) {
                 log.debug("Dropbox authenticator is activated");
@@ -48,7 +53,12 @@ public class DropboxAuthenticatorServiceComponent {
         }
     }
 
-    protected void deactivate(ComponentContext ctxt) {
+    /**
+     * deactivate the authenticator
+     *
+     * @param componentContext the ComponentContext
+     */
+    protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
             log.debug("Dropbox authenticator is deactivated");
         }

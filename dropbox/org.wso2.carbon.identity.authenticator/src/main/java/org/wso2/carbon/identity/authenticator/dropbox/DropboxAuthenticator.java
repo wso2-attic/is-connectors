@@ -107,6 +107,7 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
     @Override
     public List<Property> getConfigurationProperties() {
         List<Property> configProperties = new ArrayList<Property>();
+
         Property clientId = new Property();
         clientId.setName(OIDCAuthenticatorConstants.CLIENT_ID);
         clientId.setDisplayName(DropboxAuthenticatorConstants.CLIENT_ID);
@@ -133,9 +134,18 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
         return configProperties;
     }
 
+    /**
+     * Process the authentication response
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @param context  the AuthenticationContext
+     * @throws AuthenticationFailedException
+     */
     @Override
     protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
-                                                 AuthenticationContext context) throws AuthenticationFailedException {
+                                                 AuthenticationContext context)
+            throws AuthenticationFailedException {
         try {
             Map<String, String> authenticatorProperties = context.getAuthenticatorProperties();
             String clientId = authenticatorProperties.get(OIDCAuthenticatorConstants.CLIENT_ID);
@@ -155,8 +165,9 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
             context.setProperty(OIDCAuthenticatorConstants.ACCESS_TOKEN, accessToken);
             Map<ClaimMapping, String> claims;
             AuthenticatedUser authenticatedUserObj;
-            authenticatedUserObj = AuthenticatedUser.createFederateAuthenticatedUserFromSubjectIdentifier(oAuthResponse
-                    .getParam(DropboxAuthenticatorConstants.USER_ID));
+            authenticatedUserObj = AuthenticatedUser
+                    .createFederateAuthenticatedUserFromSubjectIdentifier(oAuthResponse
+                            .getParam(DropboxAuthenticatorConstants.USER_ID));
             authenticatedUserObj.setAuthenticatedSubjectIdentifier(oAuthResponse
                     .getParam(DropboxAuthenticatorConstants.USER_ID));
             claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
@@ -167,6 +178,14 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
         }
     }
 
+    /**
+     * Get the OAuth response for access token
+     *
+     * @param oAuthClient   the OAuthClient
+     * @param accessRequest the AccessRequest
+     * @return Response for access token from service provider
+     * @throws AuthenticationFailedException
+     */
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
             throws AuthenticationFailedException {
         OAuthClientResponse oAuthResponse = null;
@@ -185,6 +204,17 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
         return oAuthResponse;
     }
 
+    /**
+     * Get the access token from endpoint from code
+     *
+     * @param tokenEndPoint the Access_token endpoint
+     * @param clientId      the Client ID
+     * @param code          the Code
+     * @param clientSecret  the Client Secret
+     * @param callbackurl   the CallBack URL
+     * @return access token
+     * @throws AuthenticationFailedException
+     */
     private OAuthClientRequest getAccessRequest(String tokenEndPoint, String clientId, String code, String clientSecret,
                                                 String callbackurl) throws AuthenticationFailedException {
         OAuthClientRequest accessRequest;
