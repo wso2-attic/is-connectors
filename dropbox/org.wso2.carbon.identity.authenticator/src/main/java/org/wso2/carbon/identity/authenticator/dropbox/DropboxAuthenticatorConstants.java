@@ -20,7 +20,7 @@
 package org.wso2.carbon.identity.authenticator.dropbox;
 
 public class DropboxAuthenticatorConstants {
-    public static final String AUTHENTICATOR_NAME = "DropboxAuthenticator";
+    public static final String AUTHENTICATOR_NAME = "Dropbox Authenticator";
     public static final String AUTHENTICATOR_FRIENDLY_NAME = "Dropbox";
     public static final String DROPBOX_OAUTH_ENDPOINT = "https://www.dropbox.com/1/oauth2/authorize";
     public static final String DROPBOX_TOKEN_ENDPOINT = "https://api.dropbox.com/1/oauth2/token";
