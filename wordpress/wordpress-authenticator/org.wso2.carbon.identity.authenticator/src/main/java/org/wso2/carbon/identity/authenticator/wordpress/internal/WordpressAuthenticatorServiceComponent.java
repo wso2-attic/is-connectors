@@ -41,7 +41,7 @@ public class WordpressAuthenticatorServiceComponent {
     protected void activate(ComponentContext componentContext) {
         try {
             WordpressAuthenticator authenticator = new WordpressAuthenticator();
-            Hashtable<String, String> props = new Hashtable<String, String>();
+            Hashtable<String, String> props = new Hashtable<>();
             componentContext.getBundleContext().registerService(ApplicationAuthenticator.class.getName(),
                     authenticator, props);
             if (log.isDebugEnabled()) {

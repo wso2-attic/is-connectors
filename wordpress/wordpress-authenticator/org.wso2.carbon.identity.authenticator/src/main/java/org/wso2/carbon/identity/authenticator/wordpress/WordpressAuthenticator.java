@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Authenticator of Wordpress
+ * Authenticator of Wordpress.
  */
 public class WordpressAuthenticator extends OpenIDConnectAuthenticator implements FederatedApplicationAuthenticator {
 
@@ -94,7 +94,7 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
     }
 
     /**
-     * Get the name of the Authenticator
+     * Get the name of the Authenticator.
      */
     @Override
     public String getName() {
@@ -102,11 +102,11 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
     }
 
     /**
-     * Get Configuration Properties
+     * Get Configuration Properties.
      */
     @Override
     public List<Property> getConfigurationProperties() {
-        List<Property> configProperties = new ArrayList<Property>();
+        List<Property> configProperties = new ArrayList<>();
 
         Property clientId = new Property();
         clientId.setName(OIDCAuthenticatorConstants.CLIENT_ID);
@@ -135,7 +135,7 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
     }
 
     /**
-     * Process the authentication response
+     * Process the authentication response.
      *
      * @param request  the HttpServletRequest
      * @param response the HttpServletResponse
@@ -154,19 +154,17 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
             String callbackUrl = getCallbackUrl(authenticatorProperties);
             OAuthAuthzResponse authorizationResponse = OAuthAuthzResponse.oauthCodeAuthzResponse(request);
             String code = authorizationResponse.getCode();
-            OAuthClientRequest accessRequest =
-                    getAccessRequest(tokenEndPoint, clientId, code, clientSecret, callbackUrl);
+            OAuthClientRequest accessRequest = getAccessRequest(tokenEndPoint, clientId, code, clientSecret, callbackUrl);
             OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
             OAuthClientResponse oAuthResponse = getOauthResponse(oAuthClient, accessRequest);
             String accessToken = oAuthResponse.getParam(OIDCAuthenticatorConstants.ACCESS_TOKEN);
             if (StringUtils.isBlank(accessToken)) {
-                throw new AuthenticationFailedException("Access token is empty or null");
+                throw new AuthenticationFailedException("Access token is empty");
             }
             context.setProperty(OIDCAuthenticatorConstants.ACCESS_TOKEN, accessToken);
             Map<ClaimMapping, String> claims;
             AuthenticatedUser authenticatedUserObj;
-            authenticatedUserObj = AuthenticatedUser
-                    .createFederateAuthenticatedUserFromSubjectIdentifier(oAuthResponse
+            authenticatedUserObj = AuthenticatedUser.createFederateAuthenticatedUserFromSubjectIdentifier(oAuthResponse
                     .getParam(WordpressAuthenticatorConstants.USER_ID));
             authenticatedUserObj.setAuthenticatedSubjectIdentifier(oAuthResponse
                     .getParam(WordpressAuthenticatorConstants.USER_ID));
@@ -179,7 +177,7 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
     }
 
     /**
-     * Get the OAuth response for access token
+     * Get the OAuth response for access token.
      *
      * @param oAuthClient   the OAuthClient
      * @param accessRequest the AccessRequest
@@ -188,24 +186,20 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
      */
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
             throws AuthenticationFailedException {
-        OAuthClientResponse oAuthResponse = null;
+        OAuthClientResponse oAuthResponse;
         try {
             oAuthResponse = oAuthClient.accessToken(accessRequest);
-        } catch (OAuthSystemException e) {
+        } catch (OAuthSystemException | OAuthProblemException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Exception while requesting access token", e);
             }
             throw new AuthenticationFailedException(e.getMessage(), e);
-        } catch (OAuthProblemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Exception while requesting access token", e);
-            }
         }
         return oAuthResponse;
     }
 
     /**
-     * Get the access token from endpoint from code
+     * Get the access token from endpoint from code.
      *
      * @param tokenEndPoint the Access_token endpoint
      * @param clientId      the Client ID
@@ -234,6 +228,4 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
         }
         return accessRequest;
     }
-
 }
-
