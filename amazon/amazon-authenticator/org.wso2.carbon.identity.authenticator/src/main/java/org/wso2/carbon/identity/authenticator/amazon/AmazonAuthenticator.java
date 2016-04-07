@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Authenticator of Amazon
+ * Authenticator of Amazon.
  */
 public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements FederatedApplicationAuthenticator {
 
@@ -89,7 +89,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
     }
 
     /**
-     * Get the friendly name of the Authenticator
+     * Get the friendly name of the Authenticator.
      */
     @Override
     public String getFriendlyName() {
@@ -97,7 +97,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
     }
 
     /**
-     * Get the name of the Authenticator
+     * Get the name of the Authenticator.
      */
     @Override
     public String getName() {
@@ -105,7 +105,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
     }
 
     /**
-     * Get Configuration Properties
+     * Get Configuration Properties.
      */
     @Override
     public List<Property> getConfigurationProperties() {
@@ -139,7 +139,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
     }
 
     /**
-     * Get OAuth2 Scope
+     * Get OAuth2 Scope.
      *
      * @param scope                   Scope
      * @param authenticatorProperties Authentication properties.
@@ -151,7 +151,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
     }
 
     /**
-     * Process the authentication response
+     * Process the authentication response.
      *
      * @param request  the HttpServletRequest
      * @param response the HttpServletResponse
@@ -176,7 +176,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
             OAuthClientResponse oAuthResponse = getOauthResponse(oAuthClient, accessRequest);
             String accessToken = oAuthResponse.getParam(OIDCAuthenticatorConstants.ACCESS_TOKEN);
             if (StringUtils.isBlank(accessToken)) {
-                throw new AuthenticationFailedException("Access token is empty or null");
+                throw new AuthenticationFailedException("Access token is empty");
             }
             context.setProperty(OIDCAuthenticatorConstants.ACCESS_TOKEN, accessToken);
             Map<ClaimMapping, String> claims;
@@ -184,21 +184,20 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
             String json = sendRequest(AmazonAuthenticatorConstants.AMAZON_USERINFO_ENDPOINT,
                     oAuthResponse.getParam(OIDCAuthenticatorConstants.ACCESS_TOKEN));
             JSONObject jsonObject = new JSONObject(json);
-            authenticatedUserObj = AuthenticatedUser
-                    .createFederateAuthenticatedUserFromSubjectIdentifier(
-                            (String) jsonObject.get(AmazonAuthenticatorConstants.USER_ID));
+            authenticatedUserObj = AuthenticatedUser.createFederateAuthenticatedUserFromSubjectIdentifier(
+                    (String) jsonObject.get(AmazonAuthenticatorConstants.USER_ID));
             authenticatedUserObj
                     .setAuthenticatedSubjectIdentifier((String) jsonObject.get(AmazonAuthenticatorConstants.USER_ID));
             claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
             authenticatedUserObj.setUserAttributes(claims);
             context.setSubject(authenticatedUserObj);
         } catch (OAuthProblemException | IOException | JSONException e) {
-            throw new AuthenticationFailedException("Authentication process failed", e);
+            throw new AuthenticationFailedException("Authentication process failed " + e.getMessage(), e);
         }
     }
 
     /**
-     * Get the OAuth response for access token
+     * Get the OAuth response for access token.
      *
      * @param oAuthClient   the OAuthClient
      * @param accessRequest the AccessRequest
@@ -207,7 +206,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
      */
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
             throws AuthenticationFailedException {
-        OAuthClientResponse oAuthResponse = null;
+        OAuthClientResponse oAuthResponse;
         try {
             oAuthResponse = oAuthClient.accessToken(accessRequest);
         } catch (OAuthSystemException e) {
@@ -219,12 +218,13 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
             if (log.isDebugEnabled()) {
                 log.debug("OAuthProblem Exception while requesting access token", e);
             }
+            throw new AuthenticationFailedException(e.getMessage(), e);
         }
         return oAuthResponse;
     }
 
     /**
-     * Get the access token from endpoint from code
+     * Get the access token from endpoint from code.
      *
      * @param tokenEndPoint the Access_token endpoint
      * @param clientId      the Client ID

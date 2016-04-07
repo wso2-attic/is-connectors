@@ -25,9 +25,9 @@ public class AmazonAuthenticatorConstants {
     public static final String AMAZON_OAUTH_ENDPOINT = "https://www.amazon.com/ap/oa";
     public static final String AMAZON_TOKEN_ENDPOINT = "https://api.amazon.com/auth/o2/token";
     public static final String AMAZON_USERINFO_ENDPOINT = "https://api.amazon.com/user/profile";
-    public static final String CLIENT_ID="Client Id";
-    public static final String CLIENT_SECRET="Client Secret";
-    public static final String CALLBACK_URL="Callback URL";
-    public static final String USER_ID="user_id";
+    public static final String CLIENT_ID = "Client Id";
+    public static final String CLIENT_SECRET = "Client Secret";
+    public static final String CALLBACK_URL = "Callback URL";
+    public static final String USER_ID = "user_id";
     public static final String AMAZON_SCOPE_PROFILE = "profile";
 }
