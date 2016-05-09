@@ -189,15 +189,7 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
         OAuthClientResponse oAuthResponse;
         try {
             oAuthResponse = oAuthClient.accessToken(accessRequest);
-        } catch (OAuthSystemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("OAuthSystemException while requesting access token", e);
-            }
-            throw new AuthenticationFailedException(e.getMessage(), e);
-        } catch (OAuthProblemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("OAuthProblemException while requesting access token", e);
-            }
+        } catch (OAuthSystemException | OAuthProblemException e) {
             throw new AuthenticationFailedException(e.getMessage(), e);
         }
         return oAuthResponse;
@@ -226,9 +218,6 @@ public class DropboxAuthenticator extends OpenIDConnectAuthenticator implements 
                     .setCode(code)
                     .buildBodyMessage();
         } catch (OAuthSystemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Exception while building request for request access token", e);
-            }
             throw new AuthenticationFailedException(e.getMessage(), e);
         }
         return accessRequest;
