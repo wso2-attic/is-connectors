@@ -25,8 +25,8 @@ public class WordpressAuthenticatorConstants {
     public static final String WORDPRESS_OAUTH_ENDPOINT = "https://public-api.wordpress.com/oauth2/authorize";
     public static final String WORDPRESS_TOKEN_ENDPOINT = "https://public-api.wordpress.com/oauth2/token";
     public static final String WORDPRESS_USERINFO_ENDPOINT = "https://public-api.wordpress.com/rest/v1/me";
-    public static final String CLIENT_ID="Client Id";
-    public static final String CLIENT_SECRET="Client Secret";
-    public static final String CALLBACK_URL="Callback URL";
-    public static final String USER_ID="blog_id";
+    public static final String CLIENT_ID = "Client Id";
+    public static final String CLIENT_SECRET = "Client Secret";
+    public static final String CALLBACK_URL = "Callback URL";
+    public static final String USER_ID = "blog_id";
 }

@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.identity.application.authentication.framework.ApplicationAuthenticator;
 import org.wso2.carbon.identity.authenticator.wordpress.WordpressAuthenticator;
+
 import java.util.Hashtable;
 
 /**

@@ -190,10 +190,7 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
         try {
             oAuthResponse = oAuthClient.accessToken(accessRequest);
         } catch (OAuthSystemException | OAuthProblemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Exception while requesting access token", e);
-            }
-            throw new AuthenticationFailedException(e.getMessage(), e);
+            throw new AuthenticationFailedException("Exception while requesting access token", e);
         }
         return oAuthResponse;
     }
@@ -224,7 +221,8 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
             if (log.isDebugEnabled()) {
                 log.debug("Exception while building request for request access token", e);
             }
-            throw new AuthenticationFailedException(e.getMessage(), e);
+            throw new AuthenticationFailedException("Exception while building request for " +
+                    "request access token", e);
         }
         return accessRequest;
     }
