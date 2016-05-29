@@ -209,16 +209,9 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
         OAuthClientResponse oAuthResponse;
         try {
             oAuthResponse = oAuthClient.accessToken(accessRequest);
-        } catch (OAuthSystemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("OAuthSystem Exception while requesting access token", e);
-            }
-            throw new AuthenticationFailedException(e.getMessage(), e);
-        } catch (OAuthProblemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("OAuthProblem Exception while requesting access token", e);
-            }
-            throw new AuthenticationFailedException(e.getMessage(), e);
+        } catch (OAuthProblemException | OAuthSystemException e) {
+            throw new AuthenticationFailedException("OAuthProblem Exception while " +
+                    "requesting access token", e);
         }
         return oAuthResponse;
     }
@@ -234,8 +227,9 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
      * @return access token
      * @throws AuthenticationFailedException
      */
-    private OAuthClientRequest getAccessRequest(String tokenEndPoint, String clientId, String code, String clientSecret,
-                                                String callbackurl) throws AuthenticationFailedException {
+    private OAuthClientRequest getAccessRequest(String tokenEndPoint, String clientId, String code,
+                                                String clientSecret, String callbackurl)
+            throws AuthenticationFailedException {
         OAuthClientRequest accessRequest;
         try {
             accessRequest = OAuthClientRequest.tokenLocation(tokenEndPoint)
@@ -246,10 +240,8 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
                     .setClientSecret(clientSecret)
                     .buildBodyMessage();
         } catch (OAuthSystemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Exception while building request for request access token", e);
-            }
-            throw new AuthenticationFailedException(e.getMessage(), e);
+            throw new AuthenticationFailedException("Exception while building request " +
+                    "for request access token", e);
         }
         return accessRequest;
     }
