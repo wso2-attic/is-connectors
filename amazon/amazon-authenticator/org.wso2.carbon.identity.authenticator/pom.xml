@@ -15,11 +15,12 @@
  ~ limitations under the License.
 -->
 
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.identity.authenticator.amazon</groupId>
-    <artifactId>org.wso2.carbon.identity.authenticator.Amazon</artifactId>
+    <artifactId>org.wso2.carbon.identity.authenticator.amazon</artifactId>
     <version>1.0.0</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Authenticator Library For Amazon</name>
@@ -59,19 +60,22 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package>org.wso2.carbon.identity.authenticator.amazon.internal</Private-Package>
+                        <Private-Package>org.wso2.carbon.identity.authenticator.amazon.internal
+                        </Private-Package>
                         <Import-Package>
-                            org.apache.commons.logging.*; version="1.0.4",
-                            org.osgi.framework,
+                            org.apache.commons.logging.*;
+                            version="${commons-logging.osgi.version.range}",
+                            org.osgi.framework;version="${osgi.framework.imp.pkg.version.range}",
                             org.wso2.carbon.identity.application.authentication.framework.*,
-                            javax.servlet,
-                            javax.servlet.http,
-                            org.apache.oltu.oauth2.*; version="${oltu.package.import.version.range}",
+                            javax.servlet;version="${javax.servlet.version}",
+                            javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
+                            org.apache.oltu.oauth2.*;
+                            version="${oltu.package.import.version.range}",
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
                             !org.wso2.carbon.identity.authenticator.amazon.internal,
-                            org.wso2.carbon.identity.authenticator.*
+                            org.wso2.carbon.identity.authenticator.*;version="${version}"
                         </Export-Package>
                     </instructions>
                 </configuration>
@@ -91,4 +95,10 @@
             </plugin>
         </plugins>
     </build>
+    <properties>
+        <javax.servlet.version>2.4.0</javax.servlet.version>
+        <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
+        <commons-logging.osgi.version.range>[1.2,2.0)</commons-logging.osgi.version.range>
+        <osgi.framework.imp.pkg.version.range>[1.7.0, 2.0.0)</osgi.framework.imp.pkg.version.range>
+    </properties>
 </project>

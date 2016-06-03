@@ -51,6 +51,8 @@ import java.util.Map;
 
 /**
  * Authenticator of Amazon.
+ *
+ * @since 1.0.0
  */
 public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements FederatedApplicationAuthenticator {
 
@@ -141,7 +143,7 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
     /**
      * Get OAuth2 Scope.
      *
-     * @param scope                   Scope
+     * @param scope                   Scope.
      * @param authenticatorProperties Authentication properties.
      * @return OAuth2 Scope
      */
@@ -153,9 +155,9 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
     /**
      * Process the authentication response.
      *
-     * @param request  the HttpServletRequest
-     * @param response the HttpServletResponse
-     * @param context  the AuthenticationContext
+     * @param request  the HttpServletRequest.
+     * @param response the HttpServletResponse.
+     * @param context  the AuthenticationContext.
      * @throws AuthenticationFailedException
      */
     @Override
@@ -199,9 +201,9 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
     /**
      * Get the OAuth response for access token.
      *
-     * @param oAuthClient   the OAuthClient
-     * @param accessRequest the AccessRequest
-     * @return Response for access token from service provider
+     * @param oAuthClient   the OAuthClient.
+     * @param accessRequest the AccessRequest.
+     * @return Response for access token from service provider.
      * @throws AuthenticationFailedException
      */
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
@@ -219,11 +221,11 @@ public class AmazonAuthenticator extends OpenIDConnectAuthenticator implements F
     /**
      * Get the access token from endpoint from code.
      *
-     * @param tokenEndPoint the Access_token endpoint
-     * @param clientId      the Client ID
-     * @param code          the Code
-     * @param clientSecret  the Client Secret
-     * @param callbackurl   the CallBack URL
+     * @param tokenEndPoint the Access_token endpoint.
+     * @param clientId      the Client ID.
+     * @param code          the Code.
+     * @param clientSecret  the Client Secret.
+     * @param callbackurl   the CallBack URL.
      * @return access token
      * @throws AuthenticationFailedException
      */

@@ -35,9 +35,9 @@ public class AmazonAuthenticatorServiceComponent {
     private static Log log = LogFactory.getLog(AmazonAuthenticatorServiceComponent.class);
 
     /**
-     * activate the authenticator.
+     * Activate the authenticator.
      *
-     * @param componentContext the ComponentContext
+     * @param componentContext the ComponentContext.
      */
     protected void activate(ComponentContext componentContext) {
         try {
@@ -54,9 +54,9 @@ public class AmazonAuthenticatorServiceComponent {
     }
 
     /**
-     * deactivate the authenticator.
+     * Deactivate the authenticator.
      *
-     * @param componentContext the ComponentContext
+     * @param componentContext the ComponentContext.
      */
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
