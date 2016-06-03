@@ -48,6 +48,8 @@ import java.util.Map;
 
 /**
  * Authenticator of Wordpress.
+ *
+ * @since 1.0.0
  */
 public class WordpressAuthenticator extends OpenIDConnectAuthenticator implements FederatedApplicationAuthenticator {
 
@@ -137,9 +139,9 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
     /**
      * Process the authentication response.
      *
-     * @param request  the HttpServletRequest
-     * @param response the HttpServletResponse
-     * @param context  the AuthenticationContext
+     * @param request  the HttpServletRequest.
+     * @param response the HttpServletResponse.
+     * @param context  the AuthenticationContext.
      * @throws AuthenticationFailedException
      */
     @Override
@@ -179,9 +181,9 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
     /**
      * Get the OAuth response for access token.
      *
-     * @param oAuthClient   the OAuthClient
-     * @param accessRequest the AccessRequest
-     * @return Response for access token from service provider
+     * @param oAuthClient   the OAuthClient.
+     * @param accessRequest the AccessRequest.
+     * @return Response for access token from service provider.
      * @throws AuthenticationFailedException
      */
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
@@ -198,12 +200,12 @@ public class WordpressAuthenticator extends OpenIDConnectAuthenticator implement
     /**
      * Get the access token from endpoint from code.
      *
-     * @param tokenEndPoint the Access_token endpoint
-     * @param clientId      the Client ID
-     * @param code          the Code
-     * @param clientSecret  the Client Secret
-     * @param callbackurl   the CallBack URL
-     * @return access token
+     * @param tokenEndPoint the Access_token endpoint.
+     * @param clientId      the Client ID.
+     * @param code          the Code.
+     * @param clientSecret  the Client Secret.
+     * @param callbackurl   the CallBack URL.
+     * @return access token.
      * @throws AuthenticationFailedException
      */
     private OAuthClientRequest getAccessRequest(String tokenEndPoint, String clientId, String code, String clientSecret,

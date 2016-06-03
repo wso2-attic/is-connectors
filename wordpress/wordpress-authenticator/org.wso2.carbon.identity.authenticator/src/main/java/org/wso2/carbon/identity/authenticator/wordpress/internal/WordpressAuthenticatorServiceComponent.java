@@ -35,9 +35,9 @@ public class WordpressAuthenticatorServiceComponent {
     private static Log log = LogFactory.getLog(WordpressAuthenticatorServiceComponent.class);
 
     /**
-     * activate the authenticator
+     * activate the authenticator.
      *
-     * @param componentContext the ComponentContext
+     * @param componentContext the ComponentContext.
      */
     protected void activate(ComponentContext componentContext) {
         try {
@@ -54,9 +54,9 @@ public class WordpressAuthenticatorServiceComponent {
     }
 
     /**
-     * deactivate the authenticator
+     * deactivate the authenticator.
      *
-     * @param componentContext the ComponentContext
+     * @param componentContext the ComponentContext.
      */
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
