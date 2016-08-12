@@ -31,5 +31,7 @@ public class MailChimpAuthenticatorConstants {
     public static final String MailChimp_USERINFO_ENDPOINT = "https://us12.api.mailchimp.com/2.0/users/profile";
 
     public static final String MailChimp_EMAIL = "email";
-
+    public static final String CLIENT_ID = "Client Id";
+    public static final String CLIENT_SECRET = "Client Secret";
+    public static final String CALLBACK_URL = "Callback URL";
 }
