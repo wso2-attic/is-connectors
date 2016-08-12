@@ -36,7 +36,6 @@ import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.utils.JSONUtils;
-import org.json.JSONObject;
 import org.wso2.carbon.identity.application.authentication.framework.FederatedApplicationAuthenticator;
 import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
 import org.wso2.carbon.identity.application.authentication.framework.exception.AuthenticationFailedException;
@@ -63,6 +62,7 @@ import java.util.Map;
 
 /**
  * Authenticator of MailChimp
+ * @since 1.0.0
  */
 public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implements FederatedApplicationAuthenticator {
 
@@ -91,7 +91,6 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
     @Override
     protected String getUserInfoEndpoint(OAuthClientResponse token, Map<String, String> authenticatorProperties) {
         return MailChimpAuthenticatorConstants.MailChimp_USERINFO_ENDPOINT;
-
     }
 
     /**
@@ -119,7 +118,6 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
      */
     @Override
     protected String getScope(String scope, Map<String, String> authenticatorProperties) {
-
         return "";
     }
 
@@ -140,7 +138,7 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
 
         Property clientId = new Property();
         clientId.setName(OIDCAuthenticatorConstants.CLIENT_ID);
-        clientId.setDisplayName("Client Id");
+        clientId.setDisplayName(MailChimpAuthenticatorConstants.CLIENT_ID);
         clientId.setRequired(true);
         clientId.setDescription("Enter mailChimp client identifier value");
         clientId.setDisplayOrder(0);
@@ -148,7 +146,7 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
 
         Property clientSecret = new Property();
         clientSecret.setName(OIDCAuthenticatorConstants.CLIENT_SECRET);
-        clientSecret.setDisplayName("Client Secret");
+        clientSecret.setDisplayName(MailChimpAuthenticatorConstants.CLIENT_SECRET);
         clientSecret.setRequired(true);
         clientSecret.setConfidential(true);
         clientSecret.setDescription("Enter mailChimp client secret value");
@@ -156,7 +154,7 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
         configProperties.add(clientSecret);
 
         Property callbackUrl = new Property();
-        callbackUrl.setDisplayName("Callback URL");
+        callbackUrl.setDisplayName(MailChimpAuthenticatorConstants.CALLBACK_URL);
         callbackUrl.setName(IdentityApplicationConstants.OAuth2.CALLBACK_URL);
         callbackUrl.setDescription("Enter the callback url");
         callbackUrl.setDisplayOrder(2);
@@ -165,6 +163,14 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
         return configProperties;
     }
 
+    /**
+     * Process the authentication response.
+     *
+     * @param request  the HttpServletRequest.
+     * @param response the HttpServletResponse.
+     * @param context  the AuthenticationContext.
+     * @throws AuthenticationFailedException
+     */
     @Override
     protected void processAuthenticationResponse(HttpServletRequest request, HttpServletResponse response,
                                                  AuthenticationContext context) throws AuthenticationFailedException {
@@ -197,20 +203,24 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
         }
     }
 
+    /**
+     * Get subject attributes.
+     *
+     * @param authenticatorProperties Map<String, String>.
+     * @param token The token to request.
+     * @return attributes
+     */
     @Override
     protected Map<ClaimMapping, String> getSubjectAttributes(OAuthClientResponse token, Map<String, String> authenticatorProperties) {
         HashMap claims = new HashMap();
-
         try {
             String e = token.getParam("access_token");
             String url = this.getUserInfoEndpoint(token, authenticatorProperties);
             String json = sendRequest(url, e);
-            JSONObject obj = new JSONObject(json);
             if (StringUtils.isBlank(json)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Unable to fetch user claims. Proceeding without user claims");
                 }
-
                 return claims;
             }
 
@@ -228,10 +238,16 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
         } catch (Exception var11) {
             log.error("Error occurred while accessing user info endpoint", var11);
         }
-
         return claims;
     }
 
+    /**
+     * Process the UserClaim response.
+     *
+     * @param url  the url to send Request.
+     * @param accessToken the accessToken to request.
+     * @throws IOException
+     */
     protected String sendRequest(String url, String accessToken) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug("Claim URL: " + url);
@@ -264,6 +280,14 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
         }
     }
 
+    /**
+     * Get the OAuth response for access token.
+     *
+     * @param oAuthClient   the OAuthClient.
+     * @param accessRequest the AccessRequest.
+     * @return Response for access token from service provider.
+     * @throws AuthenticationFailedException
+     */
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
             throws AuthenticationFailedException {
         OAuthClientResponse oAuthResponse = null;
@@ -282,6 +306,17 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
         return oAuthResponse;
     }
 
+    /**
+     * Get the access token from endpoint from code.
+     *
+     * @param tokenEndPoint the Access_token endpoint.
+     * @param clientId      the Client ID.
+     * @param code          the Code.
+     * @param clientSecret  the Client Secret.
+     * @param callbackurl   the CallBack URL.
+     * @return access token
+     * @throws AuthenticationFailedException
+     */
     private OAuthClientRequest getAccessRequest(String tokenEndPoint, String clientId, String code, String clientSecret,
                                                 String callbackurl) throws AuthenticationFailedException {
         OAuthClientRequest accessRequest;
@@ -301,6 +336,4 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
         }
         return accessRequest;
     }
-
 }
-
