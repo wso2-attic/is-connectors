@@ -214,7 +214,7 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
     protected Map<ClaimMapping, String> getSubjectAttributes(OAuthClientResponse token, Map<String, String> authenticatorProperties) {
         HashMap claims = new HashMap();
         try {
-            String e = token.getParam("access_token");
+            String e = token.getParam(MailChimpAuthenticatorConstants.ACCESS_TOKEN);
             String url = this.getUserInfoEndpoint(token, authenticatorProperties);
             String json = sendRequest(url, e);
             if (StringUtils.isBlank(json)) {
@@ -230,8 +230,8 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
             while (i$.hasNext()) {
                 Map.Entry data = (Map.Entry) i$.next();
                 String key = (String) data.getKey();
-                claims.put(ClaimMapping.build(key, key, (String) null, false), jsonObject.get(key).toString());
-                if (log.isDebugEnabled() && IdentityUtil.isTokenLoggable("UserClaims")) {
+                claims.put(ClaimMapping.build(key, key, null, false), jsonObject.get(key).toString());
+                if (log.isDebugEnabled() && IdentityUtil.isTokenLoggable(MailChimpAuthenticatorConstants.USER_CLAIMS)) {
                     log.debug("Adding claims from end-point data mapping : " + key + " - " + jsonObject.get(key).toString());
                 }
             }
@@ -273,8 +273,8 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
             }
 
             reader.close();
-            if (log.isDebugEnabled() && IdentityUtil.isTokenLoggable("UserIdToken")) {
-                log.debug("response: " + builder.toString());
+            if (log.isDebugEnabled() && IdentityUtil.isTokenLoggable(MailChimpAuthenticatorConstants.USER_ID_TOKEN)) {
+                log.debug(MailChimpAuthenticatorConstants.RESPONSE + builder.toString());
             }
             return builder.toString();
         }

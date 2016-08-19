@@ -34,4 +34,8 @@ public class MailChimpAuthenticatorConstants {
     public static final String CLIENT_ID = "Client Id";
     public static final String CLIENT_SECRET = "Client Secret";
     public static final String CALLBACK_URL = "Callback URL";
+    public static final String ACCESS_TOKEN = "access_token";
+    public static final String USER_CLAIMS = "UserClaims";
+    public static final String USER_ID_TOKEN = "UserIdToken";
+    public static final String RESPONSE = "response: ";
 }
