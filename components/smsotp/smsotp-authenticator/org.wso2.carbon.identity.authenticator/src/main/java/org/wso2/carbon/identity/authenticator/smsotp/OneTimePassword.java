@@ -25,7 +25,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 public class OneTimePassword {
     private static Log log = LogFactory.getLog(SMSOTPAuthenticator.class);
@@ -33,6 +32,11 @@ public class OneTimePassword {
     // 0 1 2 3 4 5 6 7 8 9
     private static final int[] doubleDigits = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9};
 
+    /**
+     *
+     * @param size digit size of the number
+     * @return
+     */
     public static String getRandomNumber(int size) {
 
         StringBuilder generatedToken = new StringBuilder();
@@ -49,6 +53,11 @@ public class OneTimePassword {
         return generatedToken.toString();
     }
 
+    /**
+     * @param key ket to generate token
+     * @param base number base
+     * @param digits number of significant places in the number
+    **/
     public String generateToken(String key, String base, int digits) {
         boolean checksum = false;
         int truncOffset = 0;

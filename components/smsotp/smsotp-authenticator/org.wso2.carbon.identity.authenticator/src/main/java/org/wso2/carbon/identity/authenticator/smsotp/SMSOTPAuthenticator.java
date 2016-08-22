@@ -270,17 +270,17 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
             connection.disconnect();
         } catch (MalformedURLException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Invalid URL", e);
+                log.error("Invalid URL", e);
             }
             throw new MalformedURLException();
         } catch (ProtocolException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Error while setting the HTTP method", e);
+                log.error("Error while setting the HTTP method", e);
             }
             throw new ProtocolException();
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Error while getting the HTTP response", e);
+                log.error("Error while getting the HTTP response", e);
             }
             throw new IOException();
         } finally {

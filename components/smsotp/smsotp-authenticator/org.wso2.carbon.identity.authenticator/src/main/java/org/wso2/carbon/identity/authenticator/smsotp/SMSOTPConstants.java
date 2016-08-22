@@ -19,8 +19,6 @@
 
 package org.wso2.carbon.identity.authenticator.smsotp;
 
-import java.lang.String;
-
 public class SMSOTPConstants {
     public static final String AUTHENTICATOR_NAME = "SMSOTP";
     public static final String AUTHENTICATOR_FRIENDLY_NAME = "SMSOTP";
