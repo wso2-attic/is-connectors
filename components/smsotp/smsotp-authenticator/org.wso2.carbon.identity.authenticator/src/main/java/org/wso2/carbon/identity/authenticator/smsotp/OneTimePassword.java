@@ -25,6 +25,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 public class OneTimePassword {
     private static Log log = LogFactory.getLog(SMSOTPAuthenticator.class);
