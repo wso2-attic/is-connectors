@@ -262,8 +262,8 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpPost post = new HttpPost(url);
             post.setEntity(new StringEntity("{\"apikey\":\"" + accessToken + "\"" + "}"));
-            HttpResponse r = httpClient.execute(post);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(r.getEntity().getContent()));
+            HttpResponse response = httpClient.execute(post);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             StringBuilder builder = new StringBuilder();
 
             for (String inputLine = reader.readLine(); inputLine != null; inputLine = reader.readLine()) {
