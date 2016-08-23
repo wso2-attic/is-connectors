@@ -57,7 +57,6 @@ import java.util.Properties;
 public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implements FederatedApplicationAuthenticator {
 
     private static Log log = LogFactory.getLog(SMSOTPAuthenticator.class);
-    AuthenticationContext authContext = new AuthenticationContext();
     Map<String, String> newAuthenticatorProperties;
     private String otpToken;
     private String mobile;
