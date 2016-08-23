@@ -36,7 +36,7 @@ public class OneTimePassword {
     /**
      *
      * @param size digit size of the number
-     * @return
+     * @return token
      */
     public static String getRandomNumber(int size) {
 

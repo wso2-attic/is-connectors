@@ -107,10 +107,9 @@
                                         String loginFailed = request.getParameter("authFailure");
                                         if (loginFailed != null && "true".equals(loginFailed)) {
                                             String authFailureMsg = request.getParameter("authFailureMsg");
-                                            if (authFailureMsg != null && "login.fail.message".equals(authFailureMsg)) {
-                                    %>
-                                                <div class="alert alert-error">Authentication Failed! Please Retry</div>
-                                    <% } }  %>
+                                            if (authFailureMsg != null && "login.fail.message".equals(authFailureMsg)){
+                                    %>  <div class="alert alert-error">Authentication Failed! Please Retry</div>
+                                    <% } }%>
                                     <div class="row">
                                         <div class="span6">
                                              <!-- Token Pin -->
