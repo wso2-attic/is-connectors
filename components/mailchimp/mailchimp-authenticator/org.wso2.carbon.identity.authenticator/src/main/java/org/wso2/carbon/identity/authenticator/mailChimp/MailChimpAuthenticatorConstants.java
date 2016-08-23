@@ -20,8 +20,8 @@
 package org.wso2.carbon.identity.authenticator.mailChimp;
 
 public class MailChimpAuthenticatorConstants {
-    public static final String AUTHENTICATOR_NAME = "MailChimp";
-    public static final String AUTHENTICATOR_FRIENDLY_NAME = "MailChimpAuthenticator";
+    public static final String AUTHENTICATOR_NAME = "MailChimpAuthenticator";
+    public static final String AUTHENTICATOR_FRIENDLY_NAME = "MailChimp";
 
     //MailChimp authorize endpoint URL
     public static final String MailChimp_OAUTH_ENDPOINT = "https://login.mailchimp.com/oauth2/authorize";
