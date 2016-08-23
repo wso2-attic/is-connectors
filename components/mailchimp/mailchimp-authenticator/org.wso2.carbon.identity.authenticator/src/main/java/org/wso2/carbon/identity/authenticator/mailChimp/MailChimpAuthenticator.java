@@ -214,9 +214,9 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
     protected Map<ClaimMapping, String> getSubjectAttributes(OAuthClientResponse token, Map<String, String> authenticatorProperties) {
         HashMap claims = new HashMap();
         try {
-            String e = token.getParam(MailChimpAuthenticatorConstants.ACCESS_TOKEN);
+            String access_token = token.getParam(MailChimpAuthenticatorConstants.ACCESS_TOKEN);
             String url = this.getUserInfoEndpoint(token, authenticatorProperties);
-            String json = sendRequest(url, e);
+            String json = sendRequest(url, access_token);
             if (StringUtils.isBlank(json)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Unable to fetch user claims. Proceeding without user claims");
