@@ -27,6 +27,9 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+/**
+ * Token generator for SMSOTP
+ */
 public class OneTimePassword {
     private static Log log = LogFactory.getLog(SMSOTPAuthenticator.class);
     // These are used to calculate the check-sum digits.
