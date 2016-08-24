@@ -43,7 +43,7 @@ import org.wso2.carbon.identity.application.common.model.Property;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Map;
 
 /**
  * Authenticator for Yammer
