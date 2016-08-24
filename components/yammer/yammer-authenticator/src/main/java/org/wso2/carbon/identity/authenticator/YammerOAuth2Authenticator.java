@@ -142,13 +142,14 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
 
     /**
      * Builds request for access token
+     *
      * @param tokenEndPoint yammer assess token endpoint
      * @param clientId client id of app
      * @param code authorization code
      * @param clientSecret client secret of the app
      * @param callbackurl redirect url
      * @return
-     * @throws AuthenticationFailedException
+     * @throws AuthenticationFailedException.
      */
     private OAuthClientRequest getAccessRequest(String tokenEndPoint, String clientId, String code, String clientSecret,
                                                 String callbackurl)
@@ -167,10 +168,11 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
 
     /**
      * Get auth2 response
+     *
      * @param oAuthClient oauth client
      * @param accessRequest Built request for access token
      * @return
-     * @throws AuthenticationFailedException
+     * @throws AuthenticationFailedException.
      */
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
             throws AuthenticationFailedException {
