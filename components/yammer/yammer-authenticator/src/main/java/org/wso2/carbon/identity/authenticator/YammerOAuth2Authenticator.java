@@ -44,6 +44,9 @@ import org.wso2.carbon.identity.application.common.model.Property;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Authenticator for Yammer
@@ -137,8 +140,15 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
         }
     }
 
-    /*
-    returns auth request
+    /**
+     * Builds request for access token
+     * @param tokenEndPoint yammer assess token endpoint
+     * @param clientId client id of app
+     * @param code authorization code
+     * @param clientSecret client secret of the app
+     * @param callbackurl redirect url
+     * @return
+     * @throws AuthenticationFailedException
      */
     private OAuthClientRequest getAccessRequest(String tokenEndPoint, String clientId, String code, String clientSecret,
                                                 String callbackurl)
@@ -155,8 +165,12 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
         return accessRequest;
     }
 
-    /*
-    Get auth2 response
+    /**
+     * Get auth2 response
+     * @param oAuthClient oauth client
+     * @param accessRequest Built request for access token
+     * @return
+     * @throws AuthenticationFailedException
      */
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
             throws AuthenticationFailedException {

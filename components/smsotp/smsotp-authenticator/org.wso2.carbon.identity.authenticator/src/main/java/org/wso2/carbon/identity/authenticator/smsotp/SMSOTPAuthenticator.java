@@ -59,7 +59,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
     private static Log log = LogFactory.getLog(SMSOTPAuthenticator.class);
     Map<String, String> newAuthenticatorProperties;
     private String otpToken;
-    private String mobile;
+    private String mobile = "";
     private String smsUrl = "";
     private String clientId = "";
     private String clientSecret = "";
