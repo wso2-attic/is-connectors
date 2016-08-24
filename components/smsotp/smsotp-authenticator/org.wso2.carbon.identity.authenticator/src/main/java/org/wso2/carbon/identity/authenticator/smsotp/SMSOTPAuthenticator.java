@@ -105,8 +105,8 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         OneTimePassword token = new OneTimePassword();
         String secret = OneTimePassword.getRandomNumber(SMSOTPConstants.SECRET_KEY_LENGTH);
         otpToken = token.generateToken(secret, "" + SMSOTPConstants.NUMBER_BASE, SMSOTPConstants.NUMBER_DIGIT);
-        Object myToken = otpToken;
-        authContext.setProperty(otpToken, myToken);
+        Object myToken = SMSOTPConstants.OTP_TOKEN;
+        context.setProperty(SMSOTPConstants.OTP_TOKEN, myToken);
 
         Map<String, String> authenticatorProperties = context
                 .getAuthenticatorProperties();
@@ -189,7 +189,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
                                                  AuthenticationContext context) throws AuthenticationFailedException {
 
         String userToken = request.getParameter(SMSOTPConstants.CODE);
-        String contextToken = (String) authContext.getProperty(otpToken);
+        String contextToken = (String) context.getProperty(SMSOTPConstants.OTP_TOKEN);
         if (userToken.equals(contextToken)) {
             context.setSubject(AuthenticatedUser.createLocalAuthenticatedUserFromSubjectIdentifier("an authorised user"));
         } else {
