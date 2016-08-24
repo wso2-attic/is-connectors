@@ -252,6 +252,9 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         return configProperties;
     }
 
+    /**
+     * Send REST call
+     */
     public boolean sendRESTCall(String url, String urlParameters) throws IOException {
         HttpsURLConnection connection = null;
         try {
