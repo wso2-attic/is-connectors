@@ -62,6 +62,7 @@ import java.util.Map;
 
 /**
  * Authenticator of MailChimp
+ *
  * @since 1.0.0
  */
 public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implements FederatedApplicationAuthenticator {
@@ -207,7 +208,7 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
      * Get subject attributes.
      *
      * @param authenticatorProperties Map<String, String>.
-     * @param token The token to request.
+     * @param token                   The token to request.
      * @return attributes
      */
     @Override
@@ -244,7 +245,7 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
     /**
      * Process the UserClaim response.
      *
-     * @param url  the url to send Request.
+     * @param url         the url to send Request.
      * @param accessToken the accessToken to request.
      * @throws IOException
      */
