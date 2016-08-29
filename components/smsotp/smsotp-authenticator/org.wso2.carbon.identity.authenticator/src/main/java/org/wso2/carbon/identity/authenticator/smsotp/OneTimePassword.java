@@ -112,7 +112,6 @@ public class OneTimePassword {
      *                                  algorithms available.
      * @throws InvalidKeyException      The secret provided was not a valid HMAC-SHA-1 key.
      */
-
     public static byte[] hmacShaGenerate(byte[] keyBytes, byte[] text) throws NoSuchAlgorithmException, InvalidKeyException {
         Mac hmacSha;
         try {
