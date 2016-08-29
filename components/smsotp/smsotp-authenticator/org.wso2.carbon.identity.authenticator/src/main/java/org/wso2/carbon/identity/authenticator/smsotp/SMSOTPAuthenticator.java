@@ -144,7 +144,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
                 username = String.valueOf(context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser());
                 break;
             }
-        if (username != null) {
+        if (StringUtils.isNotEmpty(username)) {
             UserRealm userRealm = null;
             try {
                 String tenantDomain = MultitenantUtils.getTenantDomain(username);
@@ -166,7 +166,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
             }
         }
 
-        if (!StringUtils.isEmpty(clientId) && !StringUtils.isEmpty(clientSecret) && !StringUtils.isEmpty(mobile)) {
+        if (StringUtils.isNotEmpty(clientId) && StringUtils.isNotEmpty(clientSecret) && StringUtils.isNotEmpty(mobile)) {
             fullUrl = setUrl();
             try {
                 if (!sendRESTCall(smsUrl, fullUrl)) {
