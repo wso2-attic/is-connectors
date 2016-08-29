@@ -43,7 +43,10 @@ import org.wso2.carbon.identity.application.common.model.Property;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Authenticator for Yammer
@@ -118,7 +121,7 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
                     getAccessRequest(tokenEndPoint, clientId, code, clientSecret, callbackUrl);
             OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
             OAuthClientResponse oAuthResponse = getOauthResponse(oAuthClient, accessRequest);
-            String token = oAuthResponse.getParam("access_token");
+            String token = oAuthResponse.getParam(YammerOAuth2AuthenticatorConstants.TOKEN);
             String accessToken = JSONUtils.parseJSON(token).get(YammerOAuth2AuthenticatorConstants.ACCESS_TOKEN).toString();
             if (StringUtils.isBlank(accessToken)) {
                 throw new AuthenticationFailedException("Access token is empty or null");
@@ -127,8 +130,8 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
             AuthenticatedUser authenticatedUserObj;
             Map< ClaimMapping, String > claims;
             authenticatedUserObj = AuthenticatedUser
-                    .createFederateAuthenticatedUserFromSubjectIdentifier(JSONUtils.parseJSON(token).get("user_id").toString());
-            authenticatedUserObj.setAuthenticatedSubjectIdentifier(JSONUtils.parseJSON(token).get("user_id").toString());
+                    .createFederateAuthenticatedUserFromSubjectIdentifier(JSONUtils.parseJSON(token).get(YammerOAuth2AuthenticatorConstants.USER_ID).toString());
+            authenticatedUserObj.setAuthenticatedSubjectIdentifier(JSONUtils.parseJSON(token).get(YammerOAuth2AuthenticatorConstants.USER_ID).toString());
             claims = getSubjectAttributes(oAuthResponse, authenticatorProperties);
             authenticatedUserObj.setUserAttributes(claims);
             context.setSubject(authenticatedUserObj);
@@ -137,6 +140,17 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
         }
     }
 
+    /**
+     * Builds request for access token
+     *
+     * @param tokenEndPoint yammer assess token endpoint
+     * @param clientId client id of app
+     * @param code authorization code
+     * @param clientSecret client secret of the app
+     * @param callbackurl redirect url
+     * @return
+     * @throws AuthenticationFailedException.
+     */
     private OAuthClientRequest getAccessRequest(String tokenEndPoint, String clientId, String code, String clientSecret,
                                                 String callbackurl)
             throws AuthenticationFailedException {
@@ -152,6 +166,14 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
         return accessRequest;
     }
 
+    /**
+     * Get auth2 response
+     *
+     * @param oAuthClient oauth client
+     * @param accessRequest Built request for access token
+     * @return
+     * @throws AuthenticationFailedException.
+     */
     private OAuthClientResponse getOauthResponse(OAuthClient oAuthClient, OAuthClientRequest accessRequest)
             throws AuthenticationFailedException {
         OAuthClientResponse oAuthResponse = null;
@@ -177,7 +199,7 @@ public class YammerOAuth2Authenticator extends OpenIDConnectAuthenticator implem
                                                                Map< String, String > authenticatorProperties) {
         Map< ClaimMapping, String > claims = new HashMap<>();
         try {
-            String jsonString = token.getParam("access_token");
+            String jsonString = token.getParam(YammerOAuth2AuthenticatorConstants.TOKEN);
             String accessToken = JSONUtils.parseJSON(jsonString).get(YammerOAuth2AuthenticatorConstants.ACCESS_TOKEN).toString();
             String url = getUserInfoEndpoint(token, authenticatorProperties);
 

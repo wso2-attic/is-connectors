@@ -29,5 +29,7 @@ public class YammerOAuth2AuthenticatorConstants{
     public static final String YAMMER_CONNECTOR_NAME = "YammerOauth2Authenticator";
 
     public static final String ACCESS_TOKEN = "token";
+    public static final String TOKEN = "access_token";
+    public static final String USER_ID = "user_id";
 
 }

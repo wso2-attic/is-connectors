@@ -39,7 +39,6 @@
 
         if (Boolean.parseBoolean(request.getParameter(Constants.AUTH_FAILURE))) {
             authenticationFailed = "true";
-
             if (request.getParameter(Constants.AUTH_FAILURE_MSG) != null) {
                 errorMessage = request.getParameter(Constants.AUTH_FAILURE_MSG);
 
@@ -55,15 +54,13 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>WSO2 Identity Server</title>
-
         <link rel="icon" href="images/favicon.png" type="image/x-icon"/>
         <link href="libs/bootstrap_3.3.5/css/bootstrap.min.css" rel="stylesheet">
         <link href="css/Roboto.css" rel="stylesheet">
         <link href="css/custom-common.css" rel="stylesheet">
-
         <script src="js/scripts.js"></script>
         <script src="assets/js/jquery-1.7.1.min.js"></script>
-	<script src="https://mepin.com/javascripts/mepinlogin.js"></script>
+	    <script src="https://mepin.com/javascripts/mepinlogin.js"></script>
         <!--[if lt IE 9]>
         <script src="js/html5shiv.min.js"></script>
         <script src="js/respond.min.js"></script>
@@ -79,7 +76,6 @@
             <div class="pull-left brand float-remove-xs text-center-xs">
                 <a href="#">
                     <img src="images/logo-inverse.svg" alt="wso2" title="wso2" class="logo">
-
                     <h1><em>Identity Server</em></h1>
                 </a>
             </div>
@@ -88,16 +84,13 @@
 
     <!-- page content -->
     <div class="container-fluid body-wrapper">
-
         <div class="row">
             <div class="col-md-12">
-
                 <!-- content -->
                 <div class="container col-xs-10 col-sm-6 col-md-6 col-lg-4 col-centered wr-content wr-login col-centered">
                     <div>
                         <h2 class="wr-title blue-bg padding-double white boarder-bottom-blue margin-none">
                             Authenticating with SMSOTP &nbsp;&nbsp;</h2>
-
                     </div>
                     <div class="boarder-all ">
                         <div class="clearfix"></div>
@@ -114,10 +107,9 @@
                                         String loginFailed = request.getParameter("authFailure");
                                         if (loginFailed != null && "true".equals(loginFailed)) {
                                             String authFailureMsg = request.getParameter("authFailureMsg");
-                                            if (authFailureMsg != null && "login.fail.message".equals(authFailureMsg)) {
-                                    %>
-                                                <div class="alert alert-error">Authentication Failed! Please Retry</div>
-                                    <% } }  %>
+                                            if (authFailureMsg != null && "login.fail.message".equals(authFailureMsg)){
+                                    %>  <div class="alert alert-error">Authentication Failed! Please Retry</div>
+                                    <% } }%>
                                     <div class="row">
                                         <div class="span6">
                                              <!-- Token Pin -->
@@ -135,10 +127,8 @@
                            <div class="clearfix"></div>
                         </div>
                     </div>
-                    <!-- /content -->
                 </div>
             </div>
-            <!-- /content/body -->
         </div>
     </div>
 

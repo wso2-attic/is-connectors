@@ -27,12 +27,19 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+/**
+ * Token generator for SMSOTP
+ */
 public class OneTimePassword {
     private static Log log = LogFactory.getLog(SMSOTPAuthenticator.class);
-    // These are used to calculate the check-sum digits.
-    // 0 1 2 3 4 5 6 7 8 9
+
     private static final int[] doubleDigits = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9};
 
+    /**
+     *
+     * @param size digit size of the number
+     * @return token
+     */
     public static String getRandomNumber(int size) {
 
         StringBuilder generatedToken = new StringBuilder();
@@ -49,6 +56,11 @@ public class OneTimePassword {
         return generatedToken.toString();
     }
 
+    /**
+     * @param key ket to generate token
+     * @param base number base
+     * @param digits number of significant places in the number
+    **/
     public String generateToken(String key, String base, int digits) {
         boolean checksum = false;
         int truncOffset = 0;
@@ -100,7 +112,6 @@ public class OneTimePassword {
      *                                  algorithms available.
      * @throws InvalidKeyException      The secret provided was not a valid HMAC-SHA-1 key.
      */
-
     public static byte[] hmacShaGenerate(byte[] keyBytes, byte[] text) throws NoSuchAlgorithmException, InvalidKeyException {
         Mac hmacSha;
         try {

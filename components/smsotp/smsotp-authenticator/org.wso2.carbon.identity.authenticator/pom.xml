@@ -96,7 +96,8 @@
                         </Import-Package>
                         <Export-Package>
                             !org.wso2.carbon.identity.authenticator.internal,
-                            org.wso2.carbon.identity.authenticator.*
+                            org.wso2.carbon.identity.authenticator.*;
+                            version="${identity.application.smsotp.package.export.version}",
                         </Export-Package>
                     </instructions>
                 </configuration>

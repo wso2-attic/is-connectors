@@ -57,10 +57,9 @@ import java.util.Properties;
 public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implements FederatedApplicationAuthenticator {
 
     private static Log log = LogFactory.getLog(SMSOTPAuthenticator.class);
-    AuthenticationContext authContext = new AuthenticationContext();
     Map<String, String> newAuthenticatorProperties;
     private String otpToken;
-    private String mobile;
+    private String mobile = "";
     private String smsUrl = "";
     private String clientId = "";
     private String clientSecret = "";
@@ -106,8 +105,8 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         OneTimePassword token = new OneTimePassword();
         String secret = OneTimePassword.getRandomNumber(SMSOTPConstants.SECRET_KEY_LENGTH);
         otpToken = token.generateToken(secret, "" + SMSOTPConstants.NUMBER_BASE, SMSOTPConstants.NUMBER_DIGIT);
-        Object myToken = otpToken;
-        authContext.setProperty(otpToken, myToken);
+        Object myToken = SMSOTPConstants.OTP_TOKEN;
+        context.setProperty(SMSOTPConstants.OTP_TOKEN, myToken);
 
         Map<String, String> authenticatorProperties = context
                 .getAuthenticatorProperties();
@@ -145,7 +144,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
                 username = String.valueOf(context.getSequenceConfig().getStepMap().get(stepMap).getAuthenticatedUser());
                 break;
             }
-        if (username != null) {
+        if (StringUtils.isNotEmpty(username)) {
             UserRealm userRealm = null;
             try {
                 String tenantDomain = MultitenantUtils.getTenantDomain(username);
@@ -167,7 +166,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
             }
         }
 
-        if (!StringUtils.isEmpty(clientId) && !StringUtils.isEmpty(clientSecret) && !StringUtils.isEmpty(mobile)) {
+        if (StringUtils.isNotEmpty(clientId) && StringUtils.isNotEmpty(clientSecret) && StringUtils.isNotEmpty(mobile)) {
             fullUrl = setUrl();
             try {
                 if (!sendRESTCall(smsUrl, fullUrl)) {
@@ -190,7 +189,7 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
                                                  AuthenticationContext context) throws AuthenticationFailedException {
 
         String userToken = request.getParameter(SMSOTPConstants.CODE);
-        String contextToken = (String) authContext.getProperty(otpToken);
+        String contextToken = (String) context.getProperty(SMSOTPConstants.OTP_TOKEN);
         if (userToken.equals(contextToken)) {
             context.setSubject(AuthenticatedUser.createLocalAuthenticatedUserFromSubjectIdentifier("an authorised user"));
         } else {
@@ -253,6 +252,9 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
         return configProperties;
     }
 
+    /**
+     * Send REST call
+     */
     public boolean sendRESTCall(String url, String urlParameters) throws IOException {
         HttpsURLConnection connection = null;
         try {
@@ -270,17 +272,17 @@ public class SMSOTPAuthenticator extends AbstractApplicationAuthenticator implem
             connection.disconnect();
         } catch (MalformedURLException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Invalid URL", e);
+                log.error("Invalid URL", e);
             }
             throw new MalformedURLException();
         } catch (ProtocolException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Error while setting the HTTP method", e);
+                log.error("Error while setting the HTTP method", e);
             }
             throw new ProtocolException();
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Error while getting the HTTP response", e);
+                log.error("Error while getting the HTTP response", e);
             }
             throw new IOException();
         } finally {
