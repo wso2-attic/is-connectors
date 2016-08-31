@@ -293,14 +293,9 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
         try {
             oAuthResponse = oAuthClient.accessToken(accessRequest);
         } catch (OAuthSystemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Exception while requesting access token", e);
-            }
             throw new AuthenticationFailedException(e.getMessage(), e);
         } catch (OAuthProblemException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Exception while requesting access token", e);
-            }
+            throw new AuthenticationFailedException(e.getMessage(), e);
         }
         return oAuthResponse;
     }
