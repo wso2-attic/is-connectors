@@ -28,12 +28,19 @@ import org.wso2.carbon.identity.authenticator.mailChimp.MailChimpAuthenticator;
 import java.util.Hashtable;
 
 /**
+ * Activate this service in the OSGI bundle.
+ *
  * @scr.component name="identity.application.authenticator.MailChimp.component" immediate="true"
  */
 public class MailChimpAuthenticatorServiceComponent {
 
     private static Log log = LogFactory.getLog(MailChimpAuthenticatorServiceComponent.class);
 
+    /**
+     * Activate the service.
+     *
+     * @param ctxt Context.
+     */
     protected void activate(ComponentContext ctxt) {
         try {
             MailChimpAuthenticator authenticator = new MailChimpAuthenticator();
@@ -48,6 +55,11 @@ public class MailChimpAuthenticatorServiceComponent {
         }
     }
 
+    /**
+     * Deactivate the service.
+     *
+     * @param ctxt Context.
+     */
     protected void deactivate(ComponentContext ctxt) {
         if (log.isDebugEnabled()) {
             log.debug("MailChimp authenticator is deactivated");
