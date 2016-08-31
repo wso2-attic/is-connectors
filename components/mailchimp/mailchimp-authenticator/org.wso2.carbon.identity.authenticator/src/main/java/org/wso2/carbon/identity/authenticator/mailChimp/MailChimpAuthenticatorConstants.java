@@ -38,4 +38,5 @@ public class MailChimpAuthenticatorConstants {
     public static final String USER_CLAIMS = "UserClaims";
     public static final String USER_ID_TOKEN = "UserIdToken";
     public static final String RESPONSE = "response: ";
+    public static final String REQUEST_METHOD = "POST";
 }

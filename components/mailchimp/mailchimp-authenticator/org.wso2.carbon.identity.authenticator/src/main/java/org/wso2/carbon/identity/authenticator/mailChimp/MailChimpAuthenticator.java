@@ -259,7 +259,7 @@ public class MailChimpAuthenticator extends OpenIDConnectAuthenticator implement
         } else {
             URL obj = new URL(url);
             HttpURLConnection urlConnection = (HttpURLConnection) obj.openConnection();
-            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestMethod(MailChimpAuthenticatorConstants.REQUEST_METHOD);
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpPost post = new HttpPost(url);
             post.setEntity(new StringEntity("{\"apikey\":\"" + accessToken + "\"" + "}"));
