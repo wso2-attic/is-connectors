@@ -1,0 +1,30 @@
+Manifest-Version: 1.0
+Export-Package: org.wso2.carbon.identity.authenticator;uses:="org.apac
+ he.commons.logging,org.json.simple.parser,org.json.simple,javax.net.s
+ sl,org.wso2.carbon.identity.application.common.model,org.wso2.carbon.
+ identity.application.authentication.framework.context,org.wso2.carbon
+ .identity.application.authentication.framework,org.wso2.carbon.identi
+ ty.application.authentication.framework.exception,javax.servlet.http"
+ ;version="1.0.0"
+Service-Component: OSGI-INF/serviceComponents.xml
+Built-By: Sri
+Tool: Bnd-1.43.0
+Bundle-Name: org.wso2.carbon.identity.authenticator.Inwebo
+Created-By: Apache Maven Bundle Plugin
+Build-Jdk: 1.7.0_67
+Bundle-Version: 1.0.0
+Bnd-LastModified: 1444646373661
+Bundle-ManifestVersion: 2
+Import-Package: javax.net.ssl;resolution:=optional,javax.servlet;versi
+ on="[2.6,3)",javax.servlet.http;version="[2.6,3)",org.apache.commons.
+ logging;version="1.0.4",org.json.simple;resolution:=optional,org.json
+ .simple.parser;resolution:=optional,org.osgi.framework;version="[1.7,
+ 2)",org.osgi.service.component;resolution:=optional;version="[1.2,2)"
+ ,org.wso2.carbon.identity.application.authentication.framework;versio
+ n="[4.2,5)",org.wso2.carbon.identity.application.authentication.frame
+ work.context;version="[4.2,5)",org.wso2.carbon.identity.application.a
+ uthentication.framework.exception;version="[4.2,5)",org.wso2.carbon.i
+ dentity.application.common.model;resolution:=optional;version="[4.2,5
+ )",org.wso2.carbon.identity.authenticator;resolution:=optional
+Bundle-SymbolicName: org.wso2.carbon.identity.authenticator.Inwebo
+
